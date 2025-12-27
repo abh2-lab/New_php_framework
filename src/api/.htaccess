@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block direct access to any PHP files except index.php
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} !index\.php$
+    RewriteCond %{REQUEST_URI} \.php$
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # Route all API requests through index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Security: Deny direct access to folders
+<FilesMatch "^(routes\.php|systemRoutes\.php)$">
+    Require all denied
+</FilesMatch>
