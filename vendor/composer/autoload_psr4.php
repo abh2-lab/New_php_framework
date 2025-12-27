@@ -14,6 +14,7 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'App\\Services\\' => array($baseDir . '/api/services'),
+    'App\\Core\\Utilities\\' => array($baseDir . '/api/core/utilities'),
     'App\\Core\\Middleware\\' => array($baseDir . '/api/core/middleware'),
     'App\\Core\\Exceptions\\' => array($baseDir . '/api/core/exceptions'),
     'App\\Core\\' => array($baseDir . '/api/core'),

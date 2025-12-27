@@ -39,6 +39,7 @@ class ComposerStaticInitfc0e5443f712fbd36d154a74df4eb5d4
         'A' => 
         array (
             'App\\Services\\' => 13,
+            'App\\Core\\Utilities\\' => 19,
             'App\\Core\\Middleware\\' => 20,
             'App\\Core\\Exceptions\\' => 20,
             'App\\Core\\' => 9,
@@ -79,6 +80,10 @@ class ComposerStaticInitfc0e5443f712fbd36d154a74df4eb5d4
         'App\\Services\\' => 
         array (
             0 => __DIR__ . '/../..' . '/api/services',
+        ),
+        'App\\Core\\Utilities\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/api/core/utilities',
         ),
         'App\\Core\\Middleware\\' => 
         array (

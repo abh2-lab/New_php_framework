@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Security;
 use Dotenv\Dotenv;
-use App\Core\Middleware\ValidationMiddleware;
+use App\Core\Utilities\ValidationUtility;
 use App\Core\Exceptions\ValidationException;
 
 
@@ -34,7 +34,7 @@ abstract class BaseController
      */
     protected function validateRequest(array $rules): array
     {
-        return ValidationMiddleware::validate($rules);
+        return ValidationUtility::validate($rules);
     }
 
     /**

@@ -1,92 +1,91 @@
 <?php
-// START OUTPUT BUFFERING FIRST
-ob_start('ob_gzhandler');
+/**
+ * Application Entry Point
+ * Clean bootstrap with proper output buffering for middleware support
+ */
 
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// ============================================
+// 1. BOOTSTRAP
+// ============================================
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// Load autoloader first
-require_once __DIR__ .'/../vendor/autoload.php'; // ← Fixed: two levels up
-
-// Load environment variables from ROOT
 use Dotenv\Dotenv;
 use App\Core\Security;
-use App\Core\Middleware\SecurityMiddleware;
-use App\Core\ExceptionHandler;
+use App\Core\Utilities\SecurityUtility;
 use App\Core\Router;
+use App\Core\ExceptionHandler;
 
-// Load .env if file exists (works in both local and Coolify)
+// Load environment
 if (file_exists(__DIR__ . '/../../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
     $dotenv->safeLoad();
-    // $dotenv->load();
 }
 
-// Initialize security
+// Configure error reporting
+if (!empty($_ENV['SHOWERRORS']) && ($_ENV['SHOWERRORS'] === 'true' || $_ENV['SHOWERRORS'] === '1')) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    ini_set('log_errors', '1');
+    ini_set('error_log', __DIR__ . '/php-error.log');
+} else {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+    ini_set('display_startup_errors', '0');
+}
+
+// ============================================
+// 2. SECURITY (Global Utilities)
+// ============================================
 Security::initialize();
-
-// Apply security headers and CORS
-SecurityMiddleware::applySecurityHeaders();
-SecurityMiddleware::handleCORS();
-
-// Rate limiting
-SecurityMiddleware::rateLimiting(100, 3600);
+SecurityUtility::applySecurityHeaders();
+SecurityUtility::handleCORS();
+SecurityUtility::rateLimiting(100, 3600);
 
 // Register exception handler
 ExceptionHandler::register();
 
-// Configure error reporting based on environment
-if (!empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === true || $_ENV['SHOW_ERRORS'] === '1')) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_log', __DIR__ . '/php-error.log');
-} else {
-    error_reporting(0);
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-}
+// ============================================
+// 3. DETECT RESPONSE TYPE
+// ============================================
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$isHtmlRoute = (
+    strpos($requestUri, '/docs') !== false ||
+    strpos($requestUri, '/service-test') !== false
+);
 
 // ============================================
-// CREATE ROUTER
+// 4. START OUTPUT BUFFERING
 // ============================================
-// Get base path from .env, default to empty string if not set
+// Use basic buffering - let middleware and controllers control headers
+ob_start();
+
+// ============================================
+// 5. ROUTER SETUP
+// ============================================
 $basePath = $_ENV['API_BASE_PATH'] ?? '';
 $router = new Router($basePath);
 
-// ============================================
-// LOAD ROUTES
-// ============================================
-// Load system routes first
+// Load routes
 require_once __DIR__ . '/core/SystemRoutes.php';
-
-// Load user/application routes
 require_once __DIR__ . '/routes.php';
 
-
 // ============================================
-// DISPATCH
+// 6. SET CONTENT TYPE (before dispatch)
 // ============================================
-// Set JSON content type except for docs
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-$isDocsRoute = strpos($requestUri, 'docs') !== false;
-
-if (!$isDocsRoute) {
-    header('Content-Type: application/json');
+if (!$isHtmlRoute && !headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
 }
 
-
-
+// ============================================
+// 7. DISPATCH REQUEST (middleware executes here)
+// ============================================
 $router->dispatch();
 
-// Handle output buffering
-if ($isDocsRoute) {
+// ============================================
+// 8. FLUSH OUTPUT
+// ============================================
+// Always flush - never clean (middleware needs output preserved)
+if (ob_get_level() > 0) {
     ob_end_flush();
-} else {
-    if (!headers_sent()) {
-        ob_end_clean();
-    }
 }

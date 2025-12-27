@@ -6,6 +6,7 @@
         "psr-4": {
             "App\\Controllers\\": "api/controllers/",
             "App\\Core\\Exceptions\\": "api/core/exceptions/",
+            "App\\Core\\Utilities\\": "api/core/utilities",
             "App\\Core\\Middleware\\": "api/core/middleware/",
             "App\\Core\\": "api/core/",
             "App\\Services\\": "api/services/",

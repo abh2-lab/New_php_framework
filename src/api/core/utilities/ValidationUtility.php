@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Core\Middleware;
+namespace App\Core\Utilities;
 
 use App\Core\Exceptions\ValidationException;
 
-class ValidationMiddleware
+class ValidationUtility 
 {
     /**
      * Sanitize and validate request data

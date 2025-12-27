@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Core\Middleware;
+namespace App\Core\Utilities;
 
-class SecurityMiddleware
+class SecurityUtility 
 {
     /**
      * Apply security headers

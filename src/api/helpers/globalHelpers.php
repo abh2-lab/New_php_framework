@@ -73,5 +73,5 @@ function sendJsonResponse(
     // Set JSON content type BEFORE any debug output
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
-    exit;
+    // exit;
 }
