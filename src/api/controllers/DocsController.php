@@ -13,8 +13,9 @@ class DocsController extends BaseController
     {
         parent::__construct();
 
-        $this->dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
-        $this->dotenv->load();
+        $this->dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
+
+        $this->dotenv->safeLoad();
     }
 
     public function setRouter($router)
@@ -852,7 +853,9 @@ class DocsController extends BaseController
                     <div>
                         <h1><span>🚀</span> Enhanced API Documentation</h1>
                         <p>Total APIs: <strong><?= $totalRoutes ?></strong> | Groups:
-                            <strong><?= count($groupedRoutes) ?></strong> | <a target="_blank" href="<?= $_ENV['APP_URL'] ?>/api/service-test">Service Tester</a> | <a target="_blank" href="<?= $_ENV['APP_URL'] ?>/curl_runner2.html">Curl Runner</a>
+                            <strong><?= count($groupedRoutes) ?></strong> | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/api/service-test">Service Tester</a> | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/curl_runner2.html">Curl Runner</a>
                         </p>
                     </div>
                     <div class="header-controls">

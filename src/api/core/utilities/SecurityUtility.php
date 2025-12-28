@@ -2,7 +2,7 @@
 
 namespace App\Core\Utilities;
 
-class SecurityUtility 
+class SecurityUtility
 {
     /**
      * Apply security headers
@@ -30,11 +30,13 @@ class SecurityUtility
         }
 
         // Content Security Policy (basic)
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com");
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://cdn.jsdelivr.net");
+
 
         // Referrer Policy
         header('Referrer-Policy: strict-origin-when-cross-origin');
     }
+
 
 
 
@@ -65,15 +67,27 @@ class SecurityUtility
         }
     }
 
-
-
-
-
     /**
      * Rate limiting (basic implementation)
      */
     public static function rateLimiting(int $maxRequests = 100, int $timeWindow = 3600): void
     {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+
+        // Exclude system/monitoring routes from rate limiting
+        $excludedPaths = [
+            '/monitoring',
+            '/docs',
+            '/service-test',
+            '/env/'
+        ];
+
+        foreach ($excludedPaths as $path) {
+            if (strpos($requestUri, $path) !== false) {
+                return; // Skip rate limiting for these endpoints
+            }
+        }
+
         $clientIP = self::getClientIP();
         $cacheKey = "rate_limit_" . md5($clientIP);
         $cacheFile = sys_get_temp_dir() . '/' . $cacheKey;
@@ -107,6 +121,7 @@ class SecurityUtility
         $requests[] = $currentTime;
         file_put_contents($cacheFile, json_encode($requests));
     }
+
 
     /**
      * Get allowed origins from environment or default

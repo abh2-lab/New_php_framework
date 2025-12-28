@@ -14,6 +14,7 @@ use App\Core\Security;
 use App\Core\Utilities\SecurityUtility;
 use App\Core\Router;
 use App\Core\ExceptionHandler;
+use App\Core\Middlewares\MonitoringMiddleware;
 
 // Load environment
 if (file_exists(__DIR__ . '/../../.env')) {
@@ -42,6 +43,9 @@ SecurityUtility::applySecurityHeaders();
 SecurityUtility::handleCORS();
 SecurityUtility::rateLimiting(100, 3600);
 
+// Initialize monitoring (if enabled)
+MonitoringMiddleware::start();
+
 // Register exception handler
 ExceptionHandler::register();
 
@@ -51,7 +55,8 @@ ExceptionHandler::register();
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $isHtmlRoute = (
     strpos($requestUri, '/docs') !== false ||
-    strpos($requestUri, '/service-test') !== false
+    strpos($requestUri, '/service-test') !== false ||
+    strpos($requestUri, '/monitoring') !== false
 );
 
 // ============================================
@@ -67,8 +72,15 @@ $basePath = $_ENV['API_BASE_PATH'] ?? '';
 $router = new Router($basePath);
 
 // Load routes
+// require_once __DIR__ . '/core/SystemRoutes.php';
+// require_once __DIR__ . '/routes.php';
+
+$router->setRouteType('system');
 require_once __DIR__ . '/core/SystemRoutes.php';
+
+$router->setRouteType('app');
 require_once __DIR__ . '/routes.php';
+
 
 // ============================================
 // 6. SET CONTENT TYPE (before dispatch)
@@ -76,6 +88,13 @@ require_once __DIR__ . '/routes.php';
 if (!$isHtmlRoute && !headers_sent()) {
     header('Content-Type: application/json; charset=utf-8');
 }
+
+
+
+// print_r($_ENV);
+// print_r( __DIR__. 'core/Config/connection.php');
+
+
 
 // ============================================
 // 7. DISPATCH REQUEST (middleware executes here)
