@@ -9573,3 +9573,269 @@ Stack trace:
 #0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
 #1 {main}
 ---------------------------------------------------------------------------------------
+[2025-12-29 08:26:44] App\Core\Exceptions\NotFoundException: Route not found: GET /api/test/nested/inner/deep in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/test/nested/inner/deep
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 08:27:04] Error: Class "App\Core\Middleware\TestMiddleware" not found in /var/www/html/api/core/Router.php:261
+Request: GET /api/test/nested/inner/deep
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/core/Router.php(211): App\Core\Router->executeBeforeMiddleware(Array)
+#1 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#2 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 08:36:37] Error: Class "App\Core\Middleware\TestMiddleware" not found in /var/www/html/api/core/Router.php:261
+Request: GET /api/test/nested/inner/deep
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/core/Router.php(211): App\Core\Router->executeBeforeMiddleware(Array)
+#1 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#2 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:19] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:27] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:28] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:28] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:28] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:28] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:28] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:36:29] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:12] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:14] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:14] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:15] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:16] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:16] App\Core\Exceptions\NotFoundException: Route not found: GET /api/admin/listAdminUsers in /var/www/html/api/core/Router.php:244
+Request: GET /api/api/admin/listAdminUsers
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:39] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:39] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:39] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:39] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:39] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:40] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:40] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:40] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:40] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:40] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------
+[2025-12-29 10:46:41] App\Core\Exceptions\NotFoundException: Route not found: POST /api/admin/login in /var/www/html/api/core/Router.php:244
+Request: POST /api/api/admin/login
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+IP: 172.18.0.1
+Stack trace:
+#0 /var/www/html/api/index.php(102): App\Core\Router->dispatch()
+#1 {main}
+---------------------------------------------------------------------------------------

@@ -14,6 +14,9 @@ class MonitoringMiddleware
     private static ?MetricsLogger $logger = null;
     private static bool $enabled = false;
 
+    private static ?array $requestStartCpu = null;
+
+
     /**
      * Initialize monitoring for current request
      */
@@ -27,12 +30,21 @@ class MonitoringMiddleware
             return;
         }
 
-        $GLOBALS['current_route_is_system'] = false;
-
+        // Increment active requests counter
+        self::incActiveRequests();
 
         // Record start time and memory
         self::$requestStartTime = microtime(true);
         self::$requestStartMemory = memory_get_usage();
+
+        self::$requestStartTime = microtime(true);
+        self::$requestStartMemory = memory_get_usage();
+
+        // Capture CPU usage at start (if available)
+        if (function_exists('getrusage')) {
+            self::$requestStartCpu = getrusage();
+        }
+
 
         // Initialize logger
         if (self::$logger === null) {
@@ -46,7 +58,7 @@ class MonitoringMiddleware
     /**
      * Log metrics after response is sent (called via shutdown function)
      */
-    public static function logMetrics(): void
+    public static function logMetrics_Old(): void
     {
         if (!self::$enabled || self::$requestStartTime === null) {
             return;
@@ -69,8 +81,10 @@ class MonitoringMiddleware
                 $statusCode = 200; // Default if not set
             }
 
-            // Check if this is a system route
-            $isSystemRoute = self::isSystemRoute($endpoint);
+            // Determine if this is a system route using matched route tags
+            $route = $GLOBALS['__fw_matched_route'] ?? null;
+            $tags = is_array($route['tags'] ?? null) ? $route['tags'] : [];
+            $isSystemRoute = in_array('System', $tags, true) || in_array('Monitoring', $tags, true);
 
             // Build metric data
             $metricData = [
@@ -84,8 +98,7 @@ class MonitoringMiddleware
                 'status_code' => $statusCode,
                 'ip' => self::getClientIp(),
                 'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
-                'is_system_route' => (bool)($GLOBALS['current_route_is_system'] ?? false),
-
+                'is_system_route' => $isSystemRoute,
             ];
 
             // Add query parameters if present
@@ -106,24 +119,107 @@ class MonitoringMiddleware
         } catch (\Exception $e) {
             // Fail silently - don't break the application
             error_log("MonitoringMiddleware Error: " . $e->getMessage());
+        } finally {
+            // Always decrement active requests counter, even if logging failed
+            self::decActiveRequests();
         }
     }
 
+
+
     /**
-     * Check if endpoint is a system route
+     * Log metrics after response is sent (called via shutdown function)
      */
-    private static function isSystemRoute(string $endpoint): bool
+    public static function logMetrics(): void
     {
-        $systemPrefixes = ['/monitoring', '/docs', '/env', '/service-test', '/runmigration'];
-        
-        foreach ($systemPrefixes as $prefix) {
-            if (strpos($endpoint, $prefix) === 0) {
-                return true;
-            }
+        if (!self::$enabled || self::$requestStartTime === null) {
+            return;
         }
-        
-        return false;
+
+        try {
+            // Calculate metrics
+            $responseTime = round((microtime(true) - self::$requestStartTime) * 1000, 2); // milliseconds
+            $memoryUsed = round((memory_get_usage() - self::$requestStartMemory) / 1024 / 1024, 2); // MB
+            $peakMemory = round(memory_get_peak_usage() / 1024 / 1024, 2); // MB
+
+            // Calculate CPU time used (user + system) in milliseconds
+            $cpuTimeMs = 0;
+            if (self::$requestStartCpu !== null && function_exists('getrusage')) {
+                $endCpu = getrusage();
+
+                // User CPU time (microseconds)
+                $userCpuUs = ($endCpu['ru_utime.tv_sec'] * 1000000 + $endCpu['ru_utime.tv_usec'])
+                    - (self::$requestStartCpu['ru_utime.tv_sec'] * 1000000 + self::$requestStartCpu['ru_utime.tv_usec']);
+
+                // System CPU time (microseconds)
+                $sysCpuUs = ($endCpu['ru_stime.tv_sec'] * 1000000 + $endCpu['ru_stime.tv_usec'])
+                    - (self::$requestStartCpu['ru_stime.tv_sec'] * 1000000 + self::$requestStartCpu['ru_stime.tv_usec']);
+
+                // Convert to milliseconds and round
+                $cpuTimeMs = round(($userCpuUs + $sysCpuUs) / 1000, 2);
+            }
+
+            // Get request details
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
+            $uri = $_SERVER['REQUEST_URI'] ?? '/';
+            $endpoint = parse_url($uri, PHP_URL_PATH);
+
+            // Get response status code
+            $statusCode = http_response_code();
+            if ($statusCode === false) {
+                $statusCode = 200; // Default if not set
+            }
+
+            // Determine if this is a system route using matched route tags
+            $route = $GLOBALS['__fw_matched_route'] ?? null;
+            $tags = is_array($route['tags'] ?? null) ? $route['tags'] : [];
+            $isSystemRoute = in_array('System', $tags, true) || in_array('Monitoring', $tags, true);
+
+            // Build metric data
+            $metricData = [
+                'timestamp' => date('Y-m-d H:i:s'),
+                'method' => $method,
+                'endpoint' => $endpoint,
+                'full_uri' => $uri,
+                'response_time' => $responseTime, // ms
+                'cpu_time' => $cpuTimeMs, // ms (NEW)
+                'memory_used' => $memoryUsed, // MB
+                'peak_memory' => $peakMemory, // MB
+                'status_code' => $statusCode,
+                'ip' => self::getClientIp(),
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
+                'is_system_route' => $isSystemRoute,
+            ];
+
+            // Add query parameters if present
+            if (!empty($_SERVER['QUERY_STRING'])) {
+                $metricData['query_string'] = $_SERVER['QUERY_STRING'];
+            }
+
+            // Add database query count if available (from connection.php)
+            if (isset($GLOBALS['query_count'])) {
+                $metricData['db_queries'] = $GLOBALS['query_count'];
+            } else {
+                $metricData['db_queries'] = 0;
+            }
+
+            // Log the metric
+            self::$logger->log($metricData);
+
+        } catch (\Exception $e) {
+            // Fail silently - don't break the application
+            error_log("MonitoringMiddleware Error: " . $e->getMessage());
+        } finally {
+            // Always decrement active requests counter, even if logging failed
+            self::decActiveRequests();
+
+            // Reset CPU tracking for next request
+            self::$requestStartCpu = null;
+        }
     }
+
+
+
 
     /**
      * Get the real client IP address
@@ -177,6 +273,7 @@ class MonitoringMiddleware
             'server' => [
                 'uptime' => self::getServerUptime(),
                 'load_average' => self::getLoadAverage(),
+                'active_requests' => self::getActiveRequests(), // Step 5: expose active requests
             ],
             'php' => [
                 'version' => PHP_VERSION,
@@ -211,7 +308,7 @@ class MonitoringMiddleware
 
         $unit = strtoupper(substr($memory, -1));
         $value = (int) $memory;
-        
+
         switch ($unit) {
             case 'G':
                 return $value * 1024;
@@ -358,5 +455,120 @@ class MonitoringMiddleware
         ], $additionalData);
 
         self::$logger->log($markerData);
+    }
+
+    // ==================== Active Requests Tracking (Step 5) ====================
+
+    private static function activeRequestsKey(): string
+    {
+        return 'monitoring_active_requests';
+    }
+
+    private static function apcuAvailable(): bool
+    {
+        return function_exists('apcu_fetch')
+            && function_exists('apcu_store')
+            && function_exists('apcu_inc')
+            && function_exists('apcu_dec');
+    }
+
+    private static function getActiveRequests(): int
+    {
+        $key = self::activeRequestsKey();
+
+        if (self::apcuAvailable()) {
+            $ok = false;
+            $val = apcu_fetch($key, $ok);
+            return $ok ? (int) $val : 0;
+        }
+
+        // Fallback: file-based counter
+        $file = sys_get_temp_dir() . '/monitoring_active_requests.count';
+        if (!file_exists($file)) {
+            return 0;
+        }
+
+        $fp = @fopen($file, 'c+');
+        if (!$fp) {
+            return 0;
+        }
+
+        flock($fp, LOCK_SH);
+        $raw = stream_get_contents($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+
+        return (int) trim($raw ?: '0');
+    }
+
+    private static function incActiveRequests(): void
+    {
+        $key = self::activeRequestsKey();
+
+        if (self::apcuAvailable()) {
+            $success = false;
+            apcu_inc($key, 1, $success);
+            if (!$success) {
+                // Key doesn't exist, initialize it
+                apcu_store($key, 1);
+            }
+            return;
+        }
+
+        // Fallback: file-based counter
+        $file = sys_get_temp_dir() . '/monitoring_active_requests.count';
+        $fp = @fopen($file, 'c+');
+        if (!$fp) {
+            return;
+        }
+
+        flock($fp, LOCK_EX);
+        $raw = stream_get_contents($fp);
+        $val = (int) trim($raw ?: '0');
+        $val++;
+
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, (string) $val);
+
+        flock($fp, LOCK_UN);
+        fclose($fp);
+    }
+
+    private static function decActiveRequests(): void
+    {
+        $key = self::activeRequestsKey();
+
+        if (self::apcuAvailable()) {
+            $success = false;
+            $newVal = apcu_dec($key, 1, $success);
+            if (!$success) {
+                // Key doesn't exist, initialize to 0
+                apcu_store($key, 0);
+            } elseif ($newVal !== false && $newVal < 0) {
+                // Prevent negative values
+                apcu_store($key, 0);
+            }
+            return;
+        }
+
+        // Fallback: file-based counter
+        $file = sys_get_temp_dir() . '/monitoring_active_requests.count';
+        $fp = @fopen($file, 'c+');
+        if (!$fp) {
+            return;
+        }
+
+        flock($fp, LOCK_EX);
+        $raw = stream_get_contents($fp);
+        $val = (int) trim($raw ?: '0');
+        $val = max(0, $val - 1); // Prevent negative
+
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, (string) $val);
+
+        flock($fp, LOCK_UN);
+        fclose($fp);
     }
 }

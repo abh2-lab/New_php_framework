@@ -172,77 +172,6 @@ class Router
     /**
      * Dispatch with middleware execution
      */
-    public function dispatch_old(): void
-    {
-        try {
-            $method = $_SERVER['REQUEST_METHOD'];
-            $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-
-            // Remove base path properly
-            if (!empty($this->basePath)) {
-                $basePath = '/' . trim($this->basePath, '/');
-                if (strpos($uri, $basePath) === 0) {
-                    $uri = substr($uri, strlen($basePath));
-                }
-            }
-
-            // Ensure URI starts with /
-            $uri = '/' . trim($uri, '/');
-            if ($uri === '/')
-                $uri = '/';
-
-            foreach ($this->routes as $route) {
-                if ($method !== $route['method'])
-                    continue;
-
-                if (preg_match($route['regex'], $uri, $matches)) {
-                    array_shift($matches);
-
-                    // Execute BEFORE middleware/filters
-                    $beforeResult = $this->executeBeforeMiddleware($route);
-                    if ($beforeResult !== null) {
-                        return; // Middleware halted execution
-                    }
-
-                    // Execute controller
-                    [$controller, $action] = explode('@', $route['handler']);
-                    $controllerClass = "App\\Controllers\\{$controller}";
-
-                    if (!class_exists($controllerClass)) {
-                        throw new \Exception("Controller not found: {$controllerClass}");
-                    }
-
-                    $controllerInstance = new $controllerClass();
-
-                    // Set router for DocsController
-                    if ($controller === 'DocsController') {
-                        $controllerInstance->setRouter($this);
-                    }
-
-                    if (!method_exists($controllerInstance, $action)) {
-                        throw new \Exception("Method {$action} not found in controller {$controllerClass}");
-                    }
-
-                    $response = call_user_func_array([$controllerInstance, $action], $matches);
-
-                    // Execute AFTER middleware/filters
-                    $this->executeAfterMiddleware($route, $response);
-
-                    return;
-                }
-            }
-
-            throw new NotFoundException("Route not found: {$method} {$uri}");
-
-        } catch (\Exception $e) {
-            throw $e;
-        }
-    }
-
-
-    /**
-     * Dispatch with middleware execution
-     */
     public function dispatch(): void
     {
         // Always reset per-request flags (important for PHP-FPM workers)
@@ -274,6 +203,7 @@ class Router
                 if (preg_match($route['regex'], $uri, $matches)) {
                     array_shift($matches);
 
+                    $GLOBALS['__fw_matched_route'] = $route;
                     // ✅ Expose route type for MonitoringMiddleware shutdown logger
                     $GLOBALS['current_route_is_system'] = (bool) ($route['is_system_route'] ?? false);
 

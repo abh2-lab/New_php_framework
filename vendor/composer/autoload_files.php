@@ -9,5 +9,6 @@ return array(
     '320cde22f66dd4f5d3fd621d3e88b98f' => $vendorDir . '/symfony/polyfill-ctype/bootstrap.php',
     '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => $vendorDir . '/symfony/polyfill-mbstring/bootstrap.php',
     'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
+    'fe1d4898277c26748a003292f432cd3b' => $vendorDir . '/jetbrains/phpstorm-stubs/PhpStormStubsMap.php',
     'd61f2688f739dd11869eceb15e089c76' => $baseDir . '/api/helpers/_autoload_helpers.php',
 );

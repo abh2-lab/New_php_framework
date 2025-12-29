@@ -1,6 +1,7 @@
 <?php 
 
 echo "welcome home | PRAISE THE LORD <br>this is public_html for static files";
+phpinfo();
 // exit;
 // phpinfo();
 

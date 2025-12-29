@@ -125,3 +125,14 @@ $router->add([
     'visible' => true,
     'group' => 'Monitoring'
 ]);
+
+
+
+$router->add([
+    'method' => 'GET',
+    'url' => '/monitoring/stream',
+    'controller' => 'MonitoringController@stream',
+    'desc' => 'SSE stream for live metrics',
+    'visible' => false,
+    'group' => 'Monitoring'
+]);
