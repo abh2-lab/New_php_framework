@@ -4,24 +4,23 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "App\\Controllers\\": "api/controllers/",
-            "App\\Core\\Exceptions\\": "api/core/exceptions/",
-            "App\\Core\\Utilities\\": "api/core/utilities",
-            "App\\Core\\Middleware\\": "api/core/middleware/",
-            "App\\Core\\": "api/core/",
-            "App\\Services\\": "api/services/",
-            "App\\": "api/"
+            "App\\Controllers\\": "src/api/controllers/",
+            "App\\Core\\Exceptions\\": "src/api/core/exceptions/",
+            "App\\Core\\Utilities\\": "src/api/core/utilities/",
+            "App\\Core\\Middlewares\\": "src/api/core/middlewares/",
+            "App\\Core\\": "src/api/core/",
+            "App\\Services\\": "src/api/services/",
+            "App\\Repositories\\": "src/api/repositories/",
+            "App\\": "src/api/"
         },
         "files": [
-            "api/helpers/_autoload_helpers.php"
+            "src/api/helpers/_autoload_helpers.php"
         ]
     },
     "require": {
         "php": ">=8.0",
         "vlucas/phpdotenv": "^5.6",
-        "firebase/php-jwt": "^6.11"
-    },
-    "require-dev": {
+        "firebase/php-jwt": "^6.11",
         "jetbrains/phpstorm-stubs": "^2024.3"
     }
 }

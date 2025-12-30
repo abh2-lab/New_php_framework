@@ -10,5 +10,5 @@ return array(
     '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => $vendorDir . '/symfony/polyfill-mbstring/bootstrap.php',
     'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
     'fe1d4898277c26748a003292f432cd3b' => $vendorDir . '/jetbrains/phpstorm-stubs/PhpStormStubsMap.php',
-    'd61f2688f739dd11869eceb15e089c76' => $baseDir . '/api/helpers/_autoload_helpers.php',
+    '7330dfdcd0854d09360b8e5497f177c4' => $baseDir . '/src/api/helpers/_autoload_helpers.php',
 );

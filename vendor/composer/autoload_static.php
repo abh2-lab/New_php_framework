@@ -11,7 +11,7 @@ class ComposerStaticInitfc0e5443f712fbd36d154a74df4eb5d4
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         'fe1d4898277c26748a003292f432cd3b' => __DIR__ . '/..' . '/jetbrains/phpstorm-stubs/PhpStormStubsMap.php',
-        'd61f2688f739dd11869eceb15e089c76' => __DIR__ . '/../..' . '/api/helpers/_autoload_helpers.php',
+        '7330dfdcd0854d09360b8e5497f177c4' => __DIR__ . '/../..' . '/src/api/helpers/_autoload_helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -40,8 +40,9 @@ class ComposerStaticInitfc0e5443f712fbd36d154a74df4eb5d4
         'A' => 
         array (
             'App\\Services\\' => 13,
+            'App\\Repositories\\' => 17,
             'App\\Core\\Utilities\\' => 19,
-            'App\\Core\\Middleware\\' => 20,
+            'App\\Core\\Middlewares\\' => 21,
             'App\\Core\\Exceptions\\' => 20,
             'App\\Core\\' => 9,
             'App\\Controllers\\' => 16,
@@ -80,31 +81,35 @@ class ComposerStaticInitfc0e5443f712fbd36d154a74df4eb5d4
         ),
         'App\\Services\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/services',
+            0 => __DIR__ . '/../..' . '/src/api/services',
+        ),
+        'App\\Repositories\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/api/repositories',
         ),
         'App\\Core\\Utilities\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/core/utilities',
+            0 => __DIR__ . '/../..' . '/src/api/core/utilities',
         ),
-        'App\\Core\\Middleware\\' => 
+        'App\\Core\\Middlewares\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/core/middleware',
+            0 => __DIR__ . '/../..' . '/src/api/core/middlewares',
         ),
         'App\\Core\\Exceptions\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/core/exceptions',
+            0 => __DIR__ . '/../..' . '/src/api/core/exceptions',
         ),
         'App\\Core\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/core',
+            0 => __DIR__ . '/../..' . '/src/api/core',
         ),
         'App\\Controllers\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api/controllers',
+            0 => __DIR__ . '/../..' . '/src/api/controllers',
         ),
         'App\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/api',
+            0 => __DIR__ . '/../..' . '/src/api',
         ),
     );
 

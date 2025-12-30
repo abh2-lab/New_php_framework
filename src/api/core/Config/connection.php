@@ -1,43 +1,156 @@
 <?php
+// src/api/Core/Config/connection.php
 
 use App\Core\Security;
-// Security check using the new Security class
-Security::ensureSecure();
 
-// Your existing database connection code stays the same...
+// Skip security check for CLI scripts (testing, cron jobs, etc.)
+if (php_sapi_name() !== 'cli') {
+    Security::ensureSecure();
+}
+
+// ============================================================================
+// DATABASE CONNECTION CONFIGURATION (Environment-based)
+// ============================================================================
+
+// Detect environment
+$isCLI = (php_sapi_name() === 'cli');
 $currentHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 
-if (strpos($currentHost, 'localhost') !== false || strpos($currentHost, '127.0.0.1') !== false) {
-    $servername = "db";
-    $port = "3306";
-    $username = "root";
-    $password = "abcd";
-    $dbname = "connect_ping2";
+// Determine connection parameters based on environment
+if ($isCLI) {
+    // CLI Mode - Connect via localhost (requires exposed port in docker-compose)
+    $servername = $_ENV['DB_HOST_CLI'] ?? "127.0.0.1";
+    $port = $_ENV['DB_PORT_CLI'] ?? "3306";
+    $username = $_ENV['DB_USER'] ?? "root";
+    $password = $_ENV['DB_PASSWORD'] ?? "abcd";
+    $dbname = $_ENV['DB_NAME'] ?? "testdb";
+} elseif (strpos($currentHost, 'localhost') !== false || strpos($currentHost, '127.0.0.1') !== false) {
+    // Docker/Local Web Mode - Use Docker service name
+    $servername = $_ENV['DB_HOST'] ?? "db";
+    $port = $_ENV['DB_PORT'] ?? "3306";
+    $username = $_ENV['DB_USER'] ?? "root";
+    $password = $_ENV['DB_PASSWORD'] ?? "abcd";
+    $dbname = $_ENV['DB_NAME'] ?? "testdb";
 } else {
-    $servername = "phpmyadmin.coolify.vps.boomlive.in";
-    $port = "3303";
-    $username = "root";
-    $password = "abcd";
-    $dbname = "connect_ping2";
+    // Production Mode
+    $servername = $_ENV['DB_HOST'] ?? "phpmyadmin.coolify.vps.boomlive.in";
+    $port = $_ENV['DB_PORT'] ?? "3303";
+    $username = $_ENV['DB_USER'] ?? "root";
+    $password = $_ENV['DB_PASSWORD'] ?? "abcd";
+    $dbname = $_ENV['DB_NAME'] ?? "connect_ping2";
 }
 
 // PDO connection
 try {
-    $dsn = "mysql:host=$servername;port=$port;dbname=$dbname";
+    $dsn = "mysql:host=$servername;port=$port;dbname=$dbname;charset=utf8mb4";
     $connpdo = new PDO($dsn, $username, $password);
     $connpdo->exec("SET time_zone = 'Asia/Kolkata'");
     $connpdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $connpdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $connpdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 } catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
+    $env = $isCLI ? "CLI" : ($currentHost ?? "Docker");
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => 'Database connection failed',
+        'mode' => $env,
+        'host' => $servername,
+        'port' => $port,
+        'database' => $dbname,
+        'message' => $e->getMessage()
+    ]);
     die();
 }
 
+// ============================================================================
+// TRANSACTION HELPER FUNCTIONS (NEW - For Database Class)
+// ============================================================================
 
+/**
+ * Begin a database transaction
+ * 
+ * @param PDO $conn Database connection
+ * @return bool Success status
+ */
+function transBegin(PDO $conn): bool
+{
+    try {
+        if ($conn->inTransaction()) {
+            error_log("Warning: Transaction already in progress");
+            return false;
+        }
+        return $conn->beginTransaction();
+    } catch (PDOException $e) {
+        error_log("Transaction Begin Error: " . $e->getMessage());
+        return false;
+    }
+}
 
+/**
+ * Commit a database transaction
+ * 
+ * @param PDO $conn Database connection
+ * @return bool Success status
+ */
+function transCommit(PDO $conn): bool
+{
+    try {
+        if (!$conn->inTransaction()) {
+            error_log("Warning: No active transaction to commit");
+            return false;
+        }
+        return $conn->commit();
+    } catch (PDOException $e) {
+        error_log("Transaction Commit Error: " . $e->getMessage());
+        return false;
+    }
+}
 
+/**
+ * Rollback a database transaction
+ * 
+ * @param PDO $conn Database connection
+ * @return bool Success status
+ */
+function transRollback(PDO $conn): bool
+{
+    try {
+        if (!$conn->inTransaction()) {
+            error_log("Warning: No active transaction to rollback");
+            return false;
+        }
+        return $conn->rollBack();
+    } catch (PDOException $e) {
+        error_log("Transaction Rollback Error: " . $e->getMessage());
+        return false;
+    }
+}
 
+/**
+ * Check if currently in a transaction
+ * 
+ * @param PDO $conn Database connection
+ * @return bool Transaction status
+ */
+function transStatus(PDO $conn): bool
+{
+    return $conn->inTransaction();
+}
 
-// Enhanced interpolateQuery function
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Enhanced interpolateQuery function
+ * Interpolates query parameters for debugging
+ * 
+ * @param PDO $conn Database connection
+ * @param string $query SQL query with placeholders
+ * @param array $params Parameters array
+ * @return string Interpolated SQL query
+ */
 function interpolateQuery(PDO $conn, string $query, array $params = []): string
 {
     $keys = array_keys($params);
@@ -52,15 +165,25 @@ function interpolateQuery(PDO $conn, string $query, array $params = []): string
             $value = implode(',', array_map([$conn, 'quote'], $value));
         } elseif (is_null($value)) {
             $value = 'NULL';
+        } elseif (is_bool($value)) {
+            $value = $value ? '1' : '0';
         }
 
         return str_replace($key, $value, $interpolatedQuery);
     }, $query);
 }
 
+// ============================================================================
+// LEGACY RunQuery FUNCTION
+// @deprecated Will be removed in future versions. Use Database class instead.
+// Kept for backward compatibility with existing controllers.
+// ============================================================================
 
 /**
  * RunQuery function - Array-only parameter style (Standard)
+ * 
+ * @deprecated This function is deprecated and will be removed in future versions.
+ *             Use the new Database class instead: $this->db->query()
  * 
  * Usage Examples:
  * 
@@ -85,13 +208,6 @@ function interpolateQuery(PDO $conn, string $query, array $params = []): string
  *     'query' => 'SELECT * FROM users WHERE status = :status',
  *     'params' => [':status' => 'active'],
  *     'returnSql' => true
- * ]);
- * 
- * // Fetch numeric array instead of associative
- * RunQuery([
- *     'conn' => $conn,
- *     'query' => 'SELECT * FROM users',
- *     'fetchAssoc' => false
  * ]);
  * 
  * @param array $config Configuration array with following keys:
@@ -172,5 +288,20 @@ function RunQuery(array $config)
         }
         
         return ['error' => $e->getMessage()];
+    }
+}
+
+// ============================================================================
+// CONNECTION VALIDATION (Debug Mode Only)
+// ============================================================================
+
+if (!empty($_ENV['DEBUG_MODE']) && $_ENV['DEBUG_MODE'] === 'true' && $isCLI) {
+    try {
+        $connpdo->query('SELECT 1');
+        error_log("✓ Database connection successful (CLI mode)");
+        error_log("  Host: $servername:$port");
+        error_log("  Database: $dbname");
+    } catch (PDOException $e) {
+        error_log("✗ Database connection test failed: " . $e->getMessage());
     }
 }

@@ -18,18 +18,15 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # ----------------------------
-# PHP extensions: ALL IN ONE (APCu + GD + DB + ZIP)
-# Install build dependencies ONCE, install all extensions, then purge
+# PHP extensions
 # ----------------------------
 ENV APCU_VERSION=5.1.26
 
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends $PHPIZE_DEPS; \
-    # Install APCu from PECL
     pecl install apcu-${APCU_VERSION}; \
     docker-php-ext-enable apcu; \
-    # Configure and install GD + other extensions
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
     docker-php-ext-install -j"$(nproc)" \
         gd \
@@ -37,7 +34,6 @@ RUN set -eux; \
         pdo_mysql \
         mysqli \
         zip; \
-    # Clean up PECL temp files and build dependencies
     rm -rf /tmp/pear; \
     apt-get purge -y --auto-remove $PHPIZE_DEPS; \
     rm -rf /var/lib/apt/lists/*
@@ -48,6 +44,9 @@ RUN set -eux; \
 RUN set -eux; \
     a2enmod rewrite; \
     echo "ServerName localhost" >> /etc/apache2/apache2.conf; \
+    # Change DocumentRoot to point directly to api folder if that is your entry point
+    # or keep it at html if you access via localhost/api/
+    sed -ri -e 's!/var/www/html!/var/www/html!g' /etc/apache2/sites-available/*.conf; \
     { \
       echo "<Directory /var/www/html>"; \
       echo "    AllowOverride All"; \
@@ -55,14 +54,13 @@ RUN set -eux; \
     } >> /etc/apache2/apache2.conf
 
 # ----------------------------
-# Composer (from official composer image)
+# Composer
 # ----------------------------
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # ----------------------------
-# PHP runtime settings
+# PHP Runtime Settings
 # ----------------------------
 RUN set -eux; \
     { \
@@ -75,19 +73,29 @@ RUN set -eux; \
       echo "apc.enable_cli = 1"; \
     } > /usr/local/etc/php/conf.d/custom.ini
 
+
+    
 # ----------------------------
-# App code
+# App Code & Dependencies
 # ----------------------------
 WORKDIR /var/www/html
 
-COPY --chown=www-data:www-data src/ /var/www/html/
+COPY composer.json ./
 
-# Optional: install composer deps if composer.json exists
-RUN set -eux; \
-    if [ -f composer.json ]; then \
-        composer install --no-interaction --no-progress --prefer-dist; \
-    fi; \
-    chown -R www-data:www-data /var/www/html; \
-    chmod -R 755 /var/www/html
+# Install dependencies (Creates /var/www/html/vendor)
+RUN composer install --no-interaction --no-progress --prefer-dist
+
+# --- CHANGED: Copy to ./src/ instead of ./ ---
+COPY src/ ./src/
+
+COPY .env ./
+
+# --- ADDED: Update Apache DocumentRoot to point to src/api ---
+# This ensures http://localhost/ loads src/api/index.php
+RUN sed -ri -e 's!/var/www/html!/var/www/html/src/api!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!/var/www/html/src/api!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
 EXPOSE 80

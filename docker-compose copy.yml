@@ -1,0 +1,36 @@
+version: '3'
+services:
+  web:
+    build: .
+    volumes:
+      - ./src:/var/www/html/src
+      # - ./vendor:/var/www/html/vendor 
+    env_file:
+      - .env
+    ports:
+      - 80:80
+  
+  db:
+    image: mysql:lts
+    volumes:
+      - db:/var/lib/mysql/
+    environment:
+      - MYSQL_ROOT_PASSWORD=abcd
+      - MYSQL_DATABASE=testdb
+      - MYSQL_USER=abh
+      - MYSQL_PASSWORD=abcd
+    ports:
+      - "3306:3306"
+      
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  db:

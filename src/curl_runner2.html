@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cURL Command Runner - Multi Tab</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #cbd5e0;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: #edf2f7;
+            border-bottom: 2px solid #cbd5e0;
+            overflow-x: auto;
+            align-items: center;
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #e2e8f0;
+            border: none;
+            border-right: 1px solid #cbd5e0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #4a5568;
+            white-space: nowrap;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .tab-item:hover {
+            background: #cbd5e0;
+        }
+
+        .tab-item.active {
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-close {
+            margin-left: 10px;
+            background: transparent;
+            border: none;
+            color: #e53e3e;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 5px;
+            line-height: 1;
+        }
+
+        .tab-close:hover {
+            color: #c53030;
+        }
+
+        .add-tab-btn {
+            padding: 12px 20px;
+            background: #48bb78;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .add-tab-btn:hover {
+            background: #38a169;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+            background: #1a202c;
+            color: #00ff00;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .curl-input {
+            min-height: 150px;
+        }
+
+        button.execute-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+
+        button.execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button.execute-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-clear {
+            background: #e53e3e;
+        }
+
+        .response-box {
+            background: #1a202c;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #00ff00;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status-line {
+            color: #48bb78;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #f56565;
+        }
+
+        .headers {
+            color: #63b3ed;
+            margin-bottom: 10px;
+        }
+
+        .body {
+            color: #fbd38d;
+        }
+
+        .loading {
+            color: #ecc94b;
+        }
+
+        .examples {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .examples h3 {
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .examples code {
+            display: block;
+            background: #1a202c;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 cURL Command Runner - Multi Tab</h1>
+            <p>Create multiple tabs to test different API requests simultaneously</p>
+        </div>
+
+        <div class="tabs-header" id="tabsHeader">
+            <!-- Tabs will be dynamically added here -->
+        </div>
+
+        <div id="tabsContent">
+            <!-- Tab contents will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        let tabs = [];
+        let activeTabId = null;
+        let tabCounter = 1;
+
+        // Initialize with first tab
+        function init() {
+            addTab();
+        }
+
+        // Add a new tab
+        function addTab() {
+            const tabId = tabCounter++;
+            const tab = {
+                id: tabId,
+                name: `Request ${tabId}`,
+                curlCommand: '',
+                response: 'Waiting for request...'
+            };
+            tabs.push(tab);
+            renderTabs();
+            switchTab(tabId);
+        }
+
+        // Remove a tab
+        function removeTab(tabId, event) {
+            event.stopPropagation();
+            if (tabs.length === 1) {
+                alert('Cannot close the last tab');
+                return;
+            }
+            
+            const index = tabs.findIndex(t => t.id === tabId);
+            if (index !== -1) {
+                tabs.splice(index, 1);
+                
+                // If removing active tab, switch to another tab
+                if (activeTabId === tabId) {
+                    const newActiveTab = tabs[Math.max(0, index - 1)];
+                    switchTab(newActiveTab.id);
+                } else {
+                    renderTabs();
+                }
+            }
+        }
+
+        // Switch to a tab
+        function switchTab(tabId) {
+            // Save current tab data before switching
+            if (activeTabId !== null) {
+                const currentTab = tabs.find(t => t.id === activeTabId);
+                if (currentTab) {
+                    const inputElement = document.getElementById(`curlInput-${activeTabId}`);
+                    const outputElement = document.getElementById(`responseOutput-${activeTabId}`);
+                    if (inputElement) currentTab.curlCommand = inputElement.value;
+                    if (outputElement) currentTab.response = outputElement.innerHTML;
+                }
+            }
+
+            activeTabId = tabId;
+            renderTabs();
+        }
+
+        // Render all tabs
+        function renderTabs() {
+            // Render tab headers
+            const tabsHeader = document.getElementById('tabsHeader');
+            tabsHeader.innerHTML = tabs.map(tab => `
+                <div class="tab-item ${tab.id === activeTabId ? 'active' : ''}" onclick="switchTab(${tab.id})">
+                    ${tab.name}
+                    <button class="tab-close" onclick="removeTab(${tab.id}, event)">×</button>
+                </div>
+            `).join('') + '<button class="add-tab-btn" onclick="addTab()">+</button>';
+
+            // Render tab contents
+            const tabsContent = document.getElementById('tabsContent');
+            tabsContent.innerHTML = tabs.map(tab => `
+                <div class="tab-content ${tab.id === activeTabId ? 'active' : ''}" id="tab-${tab.id}">
+                    <div class="input-section">
+                        <label for="curlInput-${tab.id}">Enter cURL Command:</label>
+                        <textarea id="curlInput-${tab.id}" class="curl-input" placeholder="Paste your cURL command here...&#10;&#10;Example:&#10;curl -X GET https://jsonplaceholder.typicode.com/todos/1">${tab.curlCommand}</textarea>
+                        <div style="margin-top: 15px;">
+                            <button class="execute-btn" onclick="executeCurl(${tab.id})">▶️ Execute</button>
+                            <button class="execute-btn btn-clear" onclick="clearTab(${tab.id})">🗑️ Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="output-section">
+                        <label for="responseOutput-${tab.id}">Response:</label>
+                        <div id="responseOutput-${tab.id}" class="response-box">${tab.response}</div>
+                    </div>
+
+                    <div class="examples">
+                        <h3>📋 Example cURL Commands:</h3>
+                        <code>curl https://jsonplaceholder.typicode.com/todos/1</code>
+                        <code>curl -X POST https://jsonplaceholder.typicode.com/posts -H "Content-Type: application/json" -d '{"title":"foo","body":"bar","userId":1}'</code>
+                        <code>curl -X POST http://example.com/login -d "username=admin" -d "password=12345"</code>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add Ctrl+Enter listener to active textarea
+            const activeInput = document.getElementById(`curlInput-${activeTabId}`);
+            if (activeInput) {
+                activeInput.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        executeCurl(activeTabId);
+                    }
+                });
+            }
+        }
+
+        function parseCurl(curlCommand) {
+            const parsed = {
+                method: 'GET',
+                url: '',
+                headers: {},
+                body: null
+            };
+
+            let cmd = curlCommand.trim().replace(/^curl\s+/i, '');
+
+            // Extract method
+            const methodMatch = cmd.match(/-X\s+(\w+)|--request\s+(\w+)/i);
+            if (methodMatch) {
+                parsed.method = (methodMatch[1] || methodMatch[2]).toUpperCase();
+                cmd = cmd.replace(/-X\s+\w+|--request\s+\w+/i, '');
+            }
+
+            // Extract headers
+            const headerRegex = /-H\s+["']([^"']+)["']|--header\s+["']([^"']+)["']/gi;
+            let headerMatch;
+            while ((headerMatch = headerRegex.exec(cmd)) !== null) {
+                const headerValue = headerMatch[1] || headerMatch[2];
+                const [key, ...valueParts] = headerValue.split(':');
+                if (key && valueParts.length > 0) {
+                    parsed.headers[key.trim()] = valueParts.join(':').trim();
+                }
+            }
+            cmd = cmd.replace(headerRegex, '');
+
+            // Extract ALL data parameters
+            const dataParams = [];
+            const dataRegex = /(?:-d|--data|--data-raw|--data-binary)\s+["']([^"']+)["']|(?:-d|--data|--data-raw|--data-binary)\s+(\S+)/gi;
+            let dataMatch;
+            while ((dataMatch = dataRegex.exec(cmd)) !== null) {
+                dataParams.push(dataMatch[1] || dataMatch[2]);
+            }
+            
+            if (dataParams.length > 0) {
+                parsed.body = dataParams.join('&');
+            }
+            
+            cmd = cmd.replace(dataRegex, '');
+
+            // Extract URL
+            cmd = cmd.trim().replace(/\\/g, '');
+            const urlMatch = cmd.match(/["']([^"']+)["']|(\S+)/);
+            if (urlMatch) {
+                parsed.url = urlMatch[1] || urlMatch[2];
+            }
+
+            return parsed;
+        }
+
+        async function executeCurl(tabId) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (!tab) return;
+
+            const curlInput = document.getElementById(`curlInput-${tabId}`).value.trim();
+            const output = document.getElementById(`responseOutput-${tabId}`);
+
+            if (!curlInput) {
+                output.innerHTML = '<span class="error">❌ Error: Please enter a cURL command</span>';
+                return;
+            }
+
+            output.innerHTML = '<span class="loading">⏳ Executing request...</span>';
+
+            try {
+                const parsed = parseCurl(curlInput);
+
+                if (!parsed.url) {
+                    throw new Error('Could not parse URL from cURL command');
+                }
+
+                const fetchOptions = {
+                    method: parsed.method,
+                    headers: parsed.headers
+                };
+
+                if (parsed.body && parsed.method !== 'GET' && parsed.method !== 'HEAD') {
+                    fetchOptions.body = parsed.body;
+                }
+
+                const startTime = Date.now();
+                const response = await fetch(parsed.url, fetchOptions);
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                const contentType = response.headers.get('content-type') || '';
+                let responseBody;
+                
+                if (contentType.includes('application/json')) {
+                    responseBody = JSON.stringify(await response.json(), null, 2);
+                } else {
+                    responseBody = await response.text();
+                }
+
+                const responseHeaders = {};
+                response.headers.forEach((value, key) => {
+                    responseHeaders[key] = value;
+                });
+
+                let outputText = '';
+                outputText += `<span class="status-line">✅ Status: ${response.status} ${response.statusText} (${duration}ms)</span>\n\n`;
+                outputText += `<span class="headers">📋 Response Headers:\n${JSON.stringify(responseHeaders, null, 2)}</span>\n\n`;
+                outputText += `<span class="body">📦 Response Body:\n${responseBody}</span>`;
+
+                output.innerHTML = outputText;
+                tab.response = outputText;
+
+            } catch (error) {
+                const errorText = `<span class="error">❌ Error: ${error.message}\n\nNote: CORS restrictions may prevent requests to some URLs. Try URLs that allow CORS like:\n- https://jsonplaceholder.typicode.com\n- https://httpbin.org\n- APIs with CORS enabled</span>`;
+                output.innerHTML = errorText;
+                tab.response = errorText;
+            }
+        }
+
+        function clearTab(tabId) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (tab) {
+                tab.curlCommand = '';
+                tab.response = 'Waiting for request...';
+                document.getElementById(`curlInput-${tabId}`).value = '';
+                document.getElementById(`responseOutput-${tabId}`).innerHTML = 'Waiting for request...';
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

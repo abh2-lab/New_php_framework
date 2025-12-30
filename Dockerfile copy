@@ -1,73 +1,93 @@
-# Use the official PHP Apache image with latest version
+# Official PHP Apache image (PHP 8.4 + Apache)
 FROM php:8.4-apache
-# FROM mirror.gcr.io/library/php:8.4-apache
 
-# Install system dependencies (add libzip-dev for ext-zip)
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    wget \
- && rm -rf /var/lib/apt/lists/*
+# ----------------------------
+# System dependencies
+# ----------------------------
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
+        libzip-dev \
+        zip \
+        unzip \
+        wget \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
-# Install APCu
-RUN pecl install apcu \
- && docker-php-ext-enable apcu
+# ----------------------------
+# PHP extensions: ALL IN ONE (APCu + GD + DB + ZIP)
+# Install build dependencies ONCE, install all extensions, then purge
+# ----------------------------
+ENV APCU_VERSION=5.1.26
 
-# Install PHP extensions (include zip)
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli zip
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends $PHPIZE_DEPS; \
+    # Install APCu from PECL
+    pecl install apcu-${APCU_VERSION}; \
+    docker-php-ext-enable apcu; \
+    # Configure and install GD + other extensions
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" \
+        gd \
+        pdo \
+        pdo_mysql \
+        mysqli \
+        zip; \
+    # Clean up PECL temp files and build dependencies
+    rm -rf /tmp/pear; \
+    apt-get purge -y --auto-remove $PHPIZE_DEPS; \
+    rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# ----------------------------
+# Apache config
+# ----------------------------
+RUN set -eux; \
+    a2enmod rewrite; \
+    echo "ServerName localhost" >> /etc/apache2/apache2.conf; \
+    { \
+      echo "<Directory /var/www/html>"; \
+      echo "    AllowOverride All"; \
+      echo "</Directory>"; \
+    } >> /etc/apache2/apache2.conf
 
-##############################################
-# Install Composer from official image
-##############################################
+# ----------------------------
+# Composer (from official composer image)
+# ----------------------------
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-# COPY --from=mirror.gcr.io/library/composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# Set Composer to allow running as root
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-##############################################
-# Set ServerName and permissions
-##############################################
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# ----------------------------
+# PHP runtime settings
+# ----------------------------
+RUN set -eux; \
+    { \
+      echo "memory_limit = 512M"; \
+      echo "max_execution_time = 600"; \
+      echo "max_input_time = 600"; \
+      echo "post_max_size = 128M"; \
+      echo "upload_max_filesize = 128M"; \
+      echo "max_input_vars = 5000"; \
+      echo "apc.enable_cli = 1"; \
+    } > /usr/local/etc/php/conf.d/custom.ini
 
-# Ensure Apache allows .htaccess overrides for specific directories
-RUN echo '<Directory /var/www/html>' >> /etc/apache2/apache2.conf && \
-    echo '    AllowOverride All' >> /etc/apache2/apache2.conf && \
-    echo '</Directory>' >> /etc/apache2/apache2.conf
-
-# Extended PHP configuration limits
-RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/custom.ini && \
-    echo "max_execution_time = 600" >> /usr/local/etc/php/conf.d/custom.ini && \
-    echo "max_input_time = 600" >> /usr/local/etc/php/conf.d/custom.ini && \
-    echo "post_max_size = 128M" >> /usr/local/etc/php/conf.d/custom.ini && \
-    echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/custom.ini && \
-    echo "max_input_vars = 5000" >> /usr/local/etc/php/conf.d/custom.ini
-
-# Set correct permissions for the web server user (after copying files)
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
-
-##############################################
-# COPY PHP application files from php_server to container
-##############################################
-COPY src/ /var/www/html/
-
-##############################################
-# Install Composer dependencies
-##############################################
+# ----------------------------
+# App code
+# ----------------------------
 WORKDIR /var/www/html
 
-# Set correct permissions for the web server user (after copying files)
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+COPY --chown=www-data:www-data src/ /var/www/html/
 
-# Expose the container port
+# Optional: install composer deps if composer.json exists
+RUN set -eux; \
+    if [ -f composer.json ]; then \
+        composer install --no-interaction --no-progress --prefer-dist; \
+    fi; \
+    chown -R www-data:www-data /var/www/html; \
+    chmod -R 755 /var/www/html
+
 EXPOSE 80

@@ -3,12 +3,19 @@ services:
   web:
     build: .
     volumes:
-      - ./src:/var/www/html/
-      - ./vendor:/var/www/html/vendor 
+      # 1. Sync local source code to container root for live updates
+      - ./src:/var/www/html/src
+      
+      # 2. Persist the vendor directory generated during the build
+      # (Prevents the volume above from overwriting installed dependencies)
+      - /var/www/html/vendor
+      
     env_file:
       - .env
     ports:
-      - 80:80
+      - "80:80"
+    depends_on:
+      - db
   
   db:
     image: mysql:lts
@@ -19,12 +26,14 @@ services:
       - MYSQL_DATABASE=testdb
       - MYSQL_USER=abh
       - MYSQL_PASSWORD=abcd
+    ports:
+      - "3306:3306"
       
   phpmyadmin:
     image: phpmyadmin
     restart: always
     ports:
-      - 8080:80
+      - "8080:80"
     environment:
       - PMA_HOST=db
     depends_on:
