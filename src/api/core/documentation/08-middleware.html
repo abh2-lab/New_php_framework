@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Middleware System - Framework Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: #0d1117;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #58a6ff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #79c0ff;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            color: #a5d6ff;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        h4 {
+            color: #c9d1d9;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #c9d1d9;
+            line-height: 1.8;
+        }
+
+        .intro {
+            background: #1c2128;
+            padding: 20px;
+            border-left: 4px solid #58a6ff;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .important {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #f85149;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .important strong {
+            color: #f85149;
+        }
+
+        .tip {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #3fb950;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #3fb950;
+        }
+
+        .warning {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #d29922;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #d29922;
+        }
+
+        code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #ff7b72;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #c9d1d9;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+        .function { color: #d2a8ff; }
+        .variable { color: #ffa657; }
+        .class { color: #79c0ff; }
+        .number { color: #79c0ff; }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            color: #c9d1d9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0d1117;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #1c2128;
+            color: #58a6ff;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #30363d;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .label-before { background: #3fb950; color: white; }
+        .label-after { background: #8b5cf6; color: white; }
+        .label-interface { background: #1f6feb; color: white; }
+        .label-abstract { background: #d29922; color: white; }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            color: #58a6ff;
+        }
+
+        .flow-diagram {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #79c0ff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Home</a>
+
+        <h1>Middleware System</h1>
+
+        <div class="intro">
+            <p><strong>Middleware allows you to execute code before and after your controller logic.</strong></p>
+            <p>Think of middleware as "hooks" or "filters" that wrap around your controller execution, enabling cross-cutting concerns like authentication, logging, validation, and monitoring without cluttering controller code.</p>
+        </div>
+
+        <h2>What is Middleware?</h2>
+
+        <p>Middleware provides two execution hooks:</p>
+        <ul>
+            <li><strong>Before Middleware:</strong> Runs before the controller (can halt execution)</li>
+            <li><strong>After Middleware:</strong> Runs after the controller (can modify response)</li>
+        </ul>
+
+        <div class="flow-diagram">
+┌─────────────────────────────────────────┐
+│          REQUEST RECEIVED               │
+└────────────┬────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│    BEFORE MIDDLEWARE EXECUTES           │
+│    • Authentication                      │
+│    • Validation                          │
+│    • Rate Limiting                       │
+│    • Can halt with response              │
+└────────────┬────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│      CONTROLLER EXECUTES                │
+│      • Business logic                    │
+│      • Calls services/repositories       │
+│      • Returns response                  │
+└────────────┬────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│    AFTER MIDDLEWARE EXECUTES            │
+│    • Response transformation             │
+│    • Logging                             │
+│    • Add headers                         │
+│    • Performance tracking                │
+└────────────┬────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│         RESPONSE SENT                   │
+└─────────────────────────────────────────┘
+        </div>
+
+        <h2>MiddlewareInterface</h2>
+        <span class="label label-interface">INTERFACE</span>
+
+        <p>All middleware must implement the <code>MiddlewareInterface</code>:</p>
+
+        <pre><code><span class="comment">// File: src/api/core/middleware/MiddlewareInterface.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Core\Middleware</span>;
+
+<span class="keyword">interface</span> <span class="class">MiddlewareInterface</span> {
+    <span class="comment">/**
+     * Execute before controller
+     * @return mixed|null Return value halts execution and becomes response
+     */</span>
+    <span class="keyword">public function</span> <span class="function">before</span>();
+
+    <span class="comment">/**
+     * Execute after controller
+     * @param mixed $response Controller response
+     * @return void
+     */</span>
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>);
+}</code></pre>
+
+        <h2>BaseMiddleware Abstract Class</h2>
+        <span class="label label-abstract">ABSTRACT</span>
+
+        <p>The framework provides <code>BaseMiddleware</code> as a foundation for your middleware:</p>
+
+        <pre><code><span class="comment">// File: src/api/core/middleware/BaseMiddleware.php</span>
+
+<span class="keyword">abstract class</span> <span class="class">BaseMiddleware</span> <span class="keyword">implements</span> <span class="class">MiddlewareInterface</span> {
+    <span class="keyword">protected</span> <span class="keyword">array</span> <span class="variable">$request</span>;
+    <span class="keyword">protected</span> <span class="keyword">array</span> <span class="variable">$session</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>() {
+        <span class="comment">// Parse JSON input</span>
+        <span class="variable">$input</span> = <span class="function">file_get_contents</span>(<span class="string">'php://input'</span>);
+        <span class="variable">$data</span> = <span class="function">json_decode</span>(<span class="variable">$input</span>, <span class="keyword">true</span>);
+
+        <span class="variable">$this</span>-><span class="variable">request</span> = <span class="variable">$data</span> ?? <span class="variable">$_POST</span>;
+        <span class="variable">$this</span>-><span class="variable">session</span> = <span class="variable">$_SESSION</span> ?? [];
+    }
+
+    <span class="comment">/**
+     * Helper to halt execution and return JSON response
+     */</span>
+    <span class="keyword">protected function</span> <span class="function">haltWithJson</span>(<span class="keyword">int</span> <span class="variable">$statusCode</span>, <span class="keyword">string</span> <span class="variable">$status</span>, <span class="keyword">string</span> <span class="variable">$message</span>) {
+        <span class="function">http_response_code</span>(<span class="variable">$statusCode</span>);
+        <span class="function">header</span>(<span class="string">'Content-Type: application/json'</span>);
+        <span class="keyword">echo</span> <span class="function">json_encode</span>([
+            <span class="string">'status'</span> => <span class="variable">$status</span>,
+            <span class="string">'message'</span> => <span class="variable">$message</span>
+        ]);
+        <span class="keyword">exit</span>;
+    }
+
+    <span class="comment">// Must implement these in child classes</span>
+    <span class="keyword">abstract public function</span> <span class="function">before</span>();
+    <span class="keyword">abstract public function</span> <span class="function">after</span>(<span class="variable">$response</span>);
+}</code></pre>
+
+        <h3>What BaseMiddleware Provides</h3>
+        <ul>
+            <li><strong><code>$this->request</code>:</strong> Parsed JSON or POST data</li>
+            <li><strong><code>$this->session</code>:</strong> Session data array</li>
+            <li><strong><code>haltWithJson()</code>:</strong> Stop execution and send JSON response</li>
+        </ul>
+
+        <h2>Creating Custom Middleware</h2>
+
+        <h3>Step 1: Create Middleware File</h3>
+        <p>Create your middleware class in:</p>
+        <pre><code>src/api/middleware/{YourMiddleware}.php</code></pre>
+
+        <h3>Step 2: Extend BaseMiddleware</h3>
+        <pre><code><span class="comment">// File: src/api/middleware/AuthMiddleware.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Middleware</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\Middleware\BaseMiddleware</span>;
+
+<span class="keyword">class</span> <span class="class">AuthMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="comment">// Check for auth token</span>
+        <span class="variable">$token</span> = <span class="variable">$_SERVER</span>[<span class="string">'HTTP_AUTHORIZATION'</span>] ?? <span class="keyword">null</span>;
+
+        <span class="keyword">if</span> (!<span class="variable">$token</span>) {
+            <span class="comment">// Halt execution with 401 response</span>
+            <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">401</span>, <span class="string">'error'</span>, <span class="string">'Unauthorized: Missing token'</span>);
+        }
+
+        <span class="comment">// Validate token logic here...</span>
+        <span class="keyword">if</span> (!<span class="variable">$this</span>-><span class="function">isValidToken</span>(<span class="variable">$token</span>)) {
+            <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">403</span>, <span class="string">'error'</span>, <span class="string">'Forbidden: Invalid token'</span>);
+        }
+
+        <span class="comment">// Token is valid, continue to controller</span>
+        <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// null = continue execution</span>
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="comment">// Nothing to do after controller</span>
+    }
+
+    <span class="keyword">private function</span> <span class="function">isValidToken</span>(<span class="keyword">string</span> <span class="variable">$token</span>): <span class="keyword">bool</span> {
+        <span class="comment">// Your token validation logic</span>
+        <span class="keyword">return</span> <span class="keyword">true</span>;
+    }
+}</code></pre>
+
+        <h3>Step 3: Register Middleware</h3>
+        <p>In <code>src/api/routes.php</code>, register your middleware with a name:</p>
+
+        <pre><code><span class="comment">// Register middleware</span>
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'auth'</span>, <span class="class">\App\Middleware\AuthMiddleware</span>::<span class="keyword">class</span>);</code></pre>
+
+        <h3>Step 4: Attach to Routes</h3>
+        <pre><code><span class="comment">// Attach middleware to a single route</span>
+<span class="variable">$router</span>-><span class="function">add</span>([
+    <span class="string">'method'</span> => <span class="string">'GET'</span>,
+    <span class="string">'url'</span> => <span class="string">'/users/profile'</span>,
+    <span class="string">'controller'</span> => <span class="string">'UserController@profile'</span>,
+    <span class="string">'middleware'</span> => <span class="string">'auth'</span>, <span class="comment">// Single middleware</span>
+    <span class="string">'visible'</span> => <span class="keyword">true</span>
+]);</code></pre>
+
+        <h2>Before Middleware</h2>
+        <span class="label label-before">BEFORE</span>
+
+        <p>Before middleware executes <strong>before</strong> the controller and can halt execution.</p>
+
+        <h3>Use Cases</h3>
+        <ul>
+            <li>Authentication and authorization</li>
+            <li>Request validation</li>
+            <li>Rate limiting</li>
+            <li>Request logging</li>
+            <li>CORS preflight handling</li>
+        </ul>
+
+        <h3>Halting Execution</h3>
+        <p>If <code>before()</code> returns a non-null value, execution stops and that value becomes the response:</p>
+
+        <pre><code><span class="keyword">public function</span> <span class="function">before</span>() {
+    <span class="keyword">if</span> (!<span class="variable">$this</span>-><span class="function">isAuthenticated</span>()) {
+        <span class="comment">// Halt and send JSON response</span>
+        <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">401</span>, <span class="string">'error'</span>, <span class="string">'Not authenticated'</span>);
+        <span class="comment">// Code after this never runs</span>
+    }
+
+    <span class="comment">// Return null to continue to controller</span>
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+}</code></pre>
+
+        <h3>Real Example: BlockingMiddleware</h3>
+        <pre><code><span class="comment">// File: src/api/middleware/BlockingMiddleware.php</span>
+
+<span class="keyword">class</span> <span class="class">BlockingMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="function">error_log</span>(<span class="string">"BlockingMiddleware: Blocking request"</span>);
+
+        <span class="comment">// Always block with 403</span>
+        <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">403</span>, <span class="string">'error'</span>, <span class="string">'Access forbidden by middleware'</span>);
+
+        <span class="comment">// Controller never executes</span>
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="comment">// Never called because before() halts execution</span>
+    }
+}</code></pre>
+
+        <h2>After Middleware</h2>
+        <span class="label label-after">AFTER</span>
+
+        <p>After middleware executes <strong>after</strong> the controller completes.</p>
+
+        <h3>Use Cases</h3>
+        <ul>
+            <li>Response logging</li>
+            <li>Adding response headers</li>
+            <li>Response transformation</li>
+            <li>Performance tracking</li>
+            <li>Analytics</li>
+        </ul>
+
+        <div class="important">
+            <p><strong>Important:</strong> After middleware <strong>cannot halt execution</strong>. The response has already been generated by the controller.</p>
+        </div>
+
+        <h3>Real Example: LogMiddleware</h3>
+        <pre><code><span class="comment">// File: src/api/middleware/LogMiddleware.php</span>
+
+<span class="keyword">class</span> <span class="class">LogMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+    <span class="keyword">private</span> <span class="keyword">float</span> <span class="variable">$startTime</span>;
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="comment">// Record start time</span>
+        <span class="variable">$this</span>-><span class="variable">startTime</span> = <span class="function">microtime</span>(<span class="keyword">true</span>);
+
+        <span class="comment">// Log incoming request</span>
+        <span class="function">error_log</span>(<span class="function">sprintf</span>(
+            <span class="string">"Request: %s %s from %s"</span>,
+            <span class="variable">$_SERVER</span>[<span class="string">'REQUEST_METHOD'</span>],
+            <span class="variable">$_SERVER</span>[<span class="string">'REQUEST_URI'</span>],
+            <span class="variable">$_SERVER</span>[<span class="string">'REMOTE_ADDR'</span>]
+        ));
+
+        <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// Continue to controller</span>
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="comment">// Calculate request duration</span>
+        <span class="variable">$duration</span> = <span class="function">round</span>((<span class="function">microtime</span>(<span class="keyword">true</span>) - <span class="variable">$this</span>-><span class="variable">startTime</span>) * <span class="number">1000</span>, <span class="number">2</span>);
+
+        <span class="comment">// Log response</span>
+        <span class="function">error_log</span>(<span class="function">sprintf</span>(
+            <span class="string">"Response: %s ms"</span>,
+            <span class="variable">$duration</span>
+        ));
+    }
+}</code></pre>
+
+        <h2>Registering and Attaching Middleware</h2>
+
+        <h3>Registration in routes.php</h3>
+        <p>First, register middleware with a short name:</p>
+
+        <pre><code><span class="comment">// File: src/api/routes.php</span>
+
+<span class="comment">// Register middleware</span>
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'log'</span>, <span class="class">\App\Middleware\LogMiddleware</span>::<span class="keyword">class</span>);
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'auth'</span>, <span class="class">\App\Middleware\AuthMiddleware</span>::<span class="keyword">class</span>);
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'admin'</span>, <span class="class">\App\Middleware\AdminMiddleware</span>::<span class="keyword">class</span>);</code></pre>
+
+        <h3>Single Middleware on Route</h3>
+        <pre><code><span class="variable">$router</span>-><span class="function">add</span>([
+    <span class="string">'method'</span> => <span class="string">'GET'</span>,
+    <span class="string">'url'</span> => <span class="string">'/test/with-middleware'</span>,
+    <span class="string">'controller'</span> => <span class="string">'TestController@testRoute'</span>,
+    <span class="string">'middleware'</span> => <span class="string">'log'</span>, <span class="comment">// Single middleware</span>
+    <span class="string">'visible'</span> => <span class="keyword">true</span>
+]);</code></pre>
+
+        <h3>Multiple Middleware on Route</h3>
+        <pre><code><span class="variable">$router</span>-><span class="function">add</span>([
+    <span class="string">'method'</span> => <span class="string">'POST'</span>,
+    <span class="string">'url'</span> => <span class="string">'/admin/users'</span>,
+    <span class="string">'controller'</span> => <span class="string">'AdminController@users'</span>,
+    <span class="string">'middleware'</span> => [<span class="string">'log'</span>, <span class="string">'auth'</span>, <span class="string">'admin'</span>], <span class="comment">// Multiple middleware</span>
+    <span class="string">'visible'</span> => <span class="keyword">true</span>
+]);</code></pre>
+
+        <h3>Middleware Execution Order</h3>
+        <p>When multiple middleware are attached:</p>
+
+        <div class="flow-diagram">
+<span class="comment">// Middleware: ['log', 'auth', 'admin']</span>
+
+<span class="keyword">BEFORE</span> (in order):
+1. LogMiddleware->before()
+2. AuthMiddleware->before()
+3. AdminMiddleware->before()
+4. → Controller executes
+
+<span class="keyword">AFTER</span> (reverse order):
+5. AdminMiddleware->after()
+6. AuthMiddleware->after()
+7. LogMiddleware->after()
+        </div>
+
+        <div class="tip">
+            <p><strong>Why reverse order for after?</strong> This creates a proper "wrapping" effect, like Russian nesting dolls. The first middleware to execute before() is the last to execute after().</p>
+        </div>
+
+        <h3>Shared Middleware in Route Groups</h3>
+        <pre><code><span class="comment">// Apply middleware to all routes in group</span>
+<span class="variable">$router</span>-><span class="function">group</span>([
+    <span class="string">'prefix'</span> => <span class="string">'/admin'</span>,
+    <span class="string">'middleware'</span> => [<span class="string">'auth'</span>, <span class="string">'admin'</span>] <span class="comment">// Applies to all routes in group</span>
+], <span class="keyword">function</span>(<span class="variable">$router</span>) {
+
+    <span class="comment">// Route: /admin/dashboard (has auth + admin middleware)</span>
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'GET'</span>,
+        <span class="string">'url'</span> => <span class="string">'/dashboard'</span>,
+        <span class="string">'controller'</span> => <span class="string">'AdminController@dashboard'</span>
+    ]);
+
+    <span class="comment">// Route: /admin/users (has auth + admin + log middleware)</span>
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'GET'</span>,
+        <span class="string">'url'</span> => <span class="string">'/users'</span>,
+        <span class="string">'controller'</span> => <span class="string">'AdminController@users'</span>,
+        <span class="string">'middleware'</span> => <span class="string">'log'</span> <span class="comment">// Adds to group middleware</span>
+    ]);
+});</code></pre>
+
+        <h2>Real Framework Examples</h2>
+
+        <h3>Example 1: TestMiddleware</h3>
+        <p>Simple middleware demonstrating before/after hooks:</p>
+
+        <pre><code><span class="comment">// File: src/api/middleware/TestMiddleware.php</span>
+
+<span class="keyword">class</span> <span class="class">TestMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="function">error_log</span>(<span class="string">"TestMiddleware: BEFORE controller execution"</span>);
+
+        <span class="comment">// Continue to controller</span>
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="function">error_log</span>(<span class="string">"TestMiddleware: AFTER controller execution"</span>);
+
+        <span class="comment">// Add custom header to response</span>
+        <span class="function">header</span>(<span class="string">'X-Middleware-Test: Passed'</span>);
+    }
+}</code></pre>
+
+        <h3>Example 2: Rate Limiting Middleware</h3>
+        <pre><code><span class="keyword">class</span> <span class="class">RateLimitMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="variable">$ip</span> = <span class="variable">$_SERVER</span>[<span class="string">'REMOTE_ADDR'</span>];
+        <span class="variable">$key</span> = <span class="string">"rate_limit:{</span><span class="variable">$ip</span><span class="string">}"</span>;
+
+        <span class="comment">// Check request count (example using file cache)</span>
+        <span class="variable">$requests</span> = <span class="variable">$this</span>-><span class="function">getRequestCount</span>(<span class="variable">$key</span>);
+
+        <span class="keyword">if</span> (<span class="variable">$requests</span> > <span class="number">100</span>) {
+            <span class="comment">// Rate limit exceeded</span>
+            <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">429</span>, <span class="string">'error'</span>, <span class="string">'Rate limit exceeded'</span>);
+        }
+
+        <span class="comment">// Increment counter</span>
+        <span class="variable">$this</span>-><span class="function">incrementRequestCount</span>(<span class="variable">$key</span>);
+
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="comment">// Add rate limit headers</span>
+        <span class="function">header</span>(<span class="string">'X-RateLimit-Limit: 100'</span>);
+        <span class="function">header</span>(<span class="string">'X-RateLimit-Remaining: '</span> . (<span class="number">100</span> - <span class="variable">$this</span>-><span class="function">getRequestCount</span>()));
+    }
+}</code></pre>
+
+        <h3>Example 3: JSON Response Wrapper</h3>
+        <pre><code><span class="keyword">class</span> <span class="class">JsonWrapperMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="comment">// Nothing to do before</span>
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="comment">// Wrap all responses in a standard format</span>
+        <span class="keyword">if</span> (<span class="function">is_array</span>(<span class="variable">$response</span>)) {
+            <span class="function">header</span>(<span class="string">'Content-Type: application/json'</span>);
+            <span class="keyword">echo</span> <span class="function">json_encode</span>([
+                <span class="string">'timestamp'</span> => <span class="function">date</span>(<span class="string">'Y-m-d H:i:s'</span>),
+                <span class="string">'data'</span> => <span class="variable">$response</span>
+            ]);
+        }
+    }
+}</code></pre>
+
+        <h2>Accessing Request Data in Middleware</h2>
+
+        <h3>Via BaseMiddleware Properties</h3>
+        <pre><code><span class="keyword">public function</span> <span class="function">before</span>() {
+    <span class="comment">// Access parsed JSON/POST data</span>
+    <span class="variable">$userId</span> = <span class="variable">$this</span>-><span class="variable">request</span>[<span class="string">'user_id'</span>] ?? <span class="keyword">null</span>;
+
+    <span class="comment">// Access session data</span>
+    <span class="variable">$isLoggedIn</span> = <span class="variable">$this</span>-><span class="variable">session</span>[<span class="string">'logged_in'</span>] ?? <span class="keyword">false</span>;
+
+    <span class="comment">// Access global $_SERVER</span>
+    <span class="variable">$method</span> = <span class="variable">$_SERVER</span>[<span class="string">'REQUEST_METHOD'</span>];
+    <span class="variable">$ip</span> = <span class="variable">$_SERVER</span>[<span class="string">'REMOTE_ADDR'</span>];
+    <span class="variable">$token</span> = <span class="variable">$_SERVER</span>[<span class="string">'HTTP_AUTHORIZATION'</span>] ?? <span class="keyword">null</span>;
+}</code></pre>
+
+        <h3>Via Global $_GET, $_POST, $_REQUEST</h3>
+        <pre><code><span class="keyword">public function</span> <span class="function">before</span>() {
+    <span class="comment">// Query parameters</span>
+    <span class="variable">$page</span> = <span class="variable">$_GET</span>[<span class="string">'page'</span>] ?? <span class="number">1</span>;
+
+    <span class="comment">// Form data</span>
+    <span class="variable">$username</span> = <span class="variable">$_POST</span>[<span class="string">'username'</span>] ?? <span class="keyword">null</span>;
+
+    <span class="comment">// Cookies</span>
+    <span class="variable">$sessionId</span> = <span class="variable">$_COOKIE</span>[<span class="string">'session_id'</span>] ?? <span class="keyword">null</span>;
+}</code></pre>
+
+        <h2>Best Practices</h2>
+
+        <div class="tip">
+            <p><strong>✅ DO:</strong></p>
+            <ul>
+                <li>Use before middleware for authentication and validation</li>
+                <li>Use after middleware for logging and response transformation</li>
+                <li>Keep middleware focused on a single responsibility</li>
+                <li>Return <code>null</code> from before() to continue execution</li>
+                <li>Use <code>haltWithJson()</code> to stop execution cleanly</li>
+                <li>Register middleware with descriptive names</li>
+                <li>Use route groups for shared middleware</li>
+                <li>Log middleware execution for debugging</li>
+            </ul>
+        </div>
+
+        <div class="important">
+            <p><strong>❌ DON'T:</strong></p>
+            <ul>
+                <li>Don't put business logic in middleware (use services)</li>
+                <li>Don't try to halt execution in after() (won't work)</li>
+                <li>Don't perform heavy operations in middleware (impacts all requests)</li>
+                <li>Don't modify global state unless necessary</li>
+                <li>Don't forget to return null from before() when continuing</li>
+                <li>Don't use middleware for route-specific logic (put in controller)</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <p><strong>⚠️ Performance:</strong></p>
+            <ul>
+                <li>Middleware runs on <strong>every request</strong> it's attached to</li>
+                <li>Keep middleware execution fast (< 10ms recommended)</li>
+                <li>Avoid database queries in middleware when possible</li>
+                <li>Use caching for expensive operations (auth token validation, etc.)</li>
+            </ul>
+        </div>
+
+        <h2>When to Use Before vs After</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Use Case</th>
+                    <th>Before</th>
+                    <th>After</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Authentication</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td>Authorization</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td>Input validation</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td>Rate limiting</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td>Request logging</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Response logging</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Adding headers</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Response transformation</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td>Performance tracking</td>
+                    <td>✅ (start)</td>
+                    <td>✅ (end)</td>
+                </tr>
+                <tr>
+                    <td>Analytics</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Common Middleware Patterns</h2>
+
+        <h3>Pattern 1: Timing/Performance Tracking</h3>
+        <pre><code><span class="keyword">class</span> <span class="class">PerformanceMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+    <span class="keyword">private</span> <span class="keyword">float</span> <span class="variable">$startTime</span>;
+    <span class="keyword">private</span> <span class="keyword">int</span> <span class="variable">$startMemory</span>;
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="variable">$this</span>-><span class="variable">startTime</span> = <span class="function">microtime</span>(<span class="keyword">true</span>);
+        <span class="variable">$this</span>-><span class="variable">startMemory</span> = <span class="function">memory_get_usage</span>();
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="variable">$duration</span> = (<span class="function">microtime</span>(<span class="keyword">true</span>) - <span class="variable">$this</span>-><span class="variable">startTime</span>) * <span class="number">1000</span>;
+        <span class="variable">$memory</span> = <span class="function">memory_get_usage</span>() - <span class="variable">$this</span>-><span class="variable">startMemory</span>;
+
+        <span class="function">header</span>(<span class="string">"X-Response-Time: {</span><span class="variable">$duration</span><span class="string">}ms"</span>);
+        <span class="function">header</span>(<span class="string">"X-Memory-Used: {</span><span class="variable">$memory</span><span class="string">} bytes"</span>);
+    }
+}</code></pre>
+
+        <h3>Pattern 2: API Key Validation</h3>
+        <pre><code><span class="keyword">class</span> <span class="class">ApiKeyMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="variable">$apiKey</span> = <span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_API_KEY'</span>] ?? <span class="keyword">null</span>;
+
+        <span class="keyword">if</span> (!<span class="variable">$apiKey</span>) {
+            <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">401</span>, <span class="string">'error'</span>, <span class="string">'API key required'</span>);
+        }
+
+        <span class="keyword">if</span> (!<span class="variable">$this</span>-><span class="function">isValidApiKey</span>(<span class="variable">$apiKey</span>)) {
+            <span class="variable">$this</span>-><span class="function">haltWithJson</span>(<span class="number">403</span>, <span class="string">'error'</span>, <span class="string">'Invalid API key'</span>);
+        }
+
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {}
+}</code></pre>
+
+        <h3>Pattern 3: CORS Headers</h3>
+        <pre><code><span class="keyword">class</span> <span class="class">CorsMiddleware</span> <span class="keyword">extends</span> <span class="class">BaseMiddleware</span> {
+
+    <span class="keyword">public function</span> <span class="function">before</span>() {
+        <span class="comment">// Handle preflight requests</span>
+        <span class="keyword">if</span> (<span class="variable">$_SERVER</span>[<span class="string">'REQUEST_METHOD'</span>] === <span class="string">'OPTIONS'</span>) {
+            <span class="function">header</span>(<span class="string">'Access-Control-Allow-Origin: *'</span>);
+            <span class="function">header</span>(<span class="string">'Access-Control-Allow-Methods: GET, POST, PUT, DELETE'</span>);
+            <span class="function">header</span>(<span class="string">'Access-Control-Allow-Headers: Content-Type, Authorization'</span>);
+            <span class="function">http_response_code</span>(<span class="number">200</span>);
+            <span class="keyword">exit</span>; <span class="comment">// Stop here for OPTIONS</span>
+        }
+
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="keyword">public function</span> <span class="function">after</span>(<span class="variable">$response</span>) {
+        <span class="function">header</span>(<span class="string">'Access-Control-Allow-Origin: *'</span>);
+    }
+}</code></pre>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #30363d;">
+
+        <p><strong>Next:</strong> <a href="09-error-handling.html">Error Handling & API Responses</a></p>
+        <p><a href="index.html" class="back-link">← Back to Documentation Home</a></p>
+    </div>
+</body>
+</html>

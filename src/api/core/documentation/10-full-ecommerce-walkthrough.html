@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full E-Commerce Walkthrough - Framework Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: #0d1117;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #58a6ff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #79c0ff;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            color: #a5d6ff;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        h4 {
+            color: #c9d1d9;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #c9d1d9;
+            line-height: 1.8;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #1c2128 0%, #2d333b 100%);
+            padding: 25px;
+            border-left: 4px solid #58a6ff;
+            margin-bottom: 30px;
+            border-radius: 6px;
+        }
+
+        .intro h3 {
+            color: #58a6ff;
+            margin-top: 0;
+        }
+
+        .step-box {
+            background: #1c2128;
+            padding: 20px;
+            border-left: 4px solid #3fb950;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .step-box h3 {
+            color: #3fb950;
+            margin-top: 0;
+        }
+
+        .important {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #f85149;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .important strong {
+            color: #f85149;
+        }
+
+        .tip {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #3fb950;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #3fb950;
+        }
+
+        code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #ff7b72;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #c9d1d9;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+        .function { color: #d2a8ff; }
+        .variable { color: #ffa657; }
+        .class { color: #79c0ff; }
+        .number { color: #79c0ff; }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            color: #c9d1d9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0d1117;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #1c2128;
+            color: #58a6ff;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #30363d;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .label-migration { background: #1f6feb; color: white; }
+        .label-repository { background: #f97316; color: white; }
+        .label-service { background: #8b5cf6; color: white; }
+        .label-controller { background: #3fb950; color: white; }
+        .label-route { background: #d29922; color: white; }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            color: #58a6ff;
+        }
+
+        .flow-diagram {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #79c0ff;
+            margin: 20px 0;
+        }
+
+        .file-tree {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #79c0ff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Home</a>
+
+        <h1>Full E-Commerce Walkthrough</h1>
+
+        <div class="intro">
+            <h3>🎯 What You'll Build</h3>
+            <p>This comprehensive tutorial walks you through building a complete e-commerce API using this framework. You'll create a fully functional online store with:</p>
+            <ul>
+                <li><strong>Product Management:</strong> List, view, create, and update products</li>
+                <li><strong>Order Processing:</strong> Create orders with multiple items, calculate totals, manage inventory</li>
+                <li><strong>User System:</strong> Registration, authentication, and user profiles</li>
+                <li><strong>Admin Panel:</strong> Protected routes for product management</li>
+            </ul>
+            <p><strong>This tutorial combines all concepts from the previous documentation pages into one real-world application.</strong></p>
+        </div>
+
+        <h2>Application Features</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Endpoints</th>
+                    <th>Access</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Product Listing</td>
+                    <td>GET /products/list</td>
+                    <td>Public</td>
+                </tr>
+                <tr>
+                    <td>Product Details</td>
+                    <td>GET /products/details</td>
+                    <td>Public</td>
+                </tr>
+                <tr>
+                    <td>Create Product</td>
+                    <td>POST /products/create</td>
+                    <td>Admin only</td>
+                </tr>
+                <tr>
+                    <td>Update Product</td>
+                    <td>POST /products/update</td>
+                    <td>Admin only</td>
+                </tr>
+                <tr>
+                    <td>Create Order</td>
+                    <td>POST /orders/create</td>
+                    <td>Authenticated users</td>
+                </tr>
+                <tr>
+                    <td>Order Details</td>
+                    <td>GET /orders/details</td>
+                    <td>Authenticated users</td>
+                </tr>
+                <tr>
+                    <td>Cancel Order</td>
+                    <td>POST /orders/cancel</td>
+                    <td>Authenticated users</td>
+                </tr>
+                <tr>
+                    <td>User Registration</td>
+                    <td>POST /auth/register</td>
+                    <td>Public</td>
+                </tr>
+                <tr>
+                    <td>User Login</td>
+                    <td>POST /auth/login</td>
+                    <td>Public</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Step 1: Database Schema & Migrations</h2>
+        <span class="label label-migration">MIGRATION</span>
+
+        <div class="step-box">
+            <h3>Create Migration File</h3>
+            <p><strong>File:</strong> <code>src/api/databases/001_ecommerce_schema.sql</code></p>
+        </div>
+
+        <pre><code><span class="comment">-- ============================================</span>
+<span class="comment">-- E-Commerce Application Schema</span>
+<span class="comment">-- Complete database structure for online store</span>
+<span class="comment">-- ============================================</span>
+
+<span class="comment">-- USERS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> users (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    email <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">UNIQUE NOT NULL</span>,
+    password_hash <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    role <span class="keyword">ENUM</span>(<span class="string">'user'</span>, <span class="string">'admin'</span>) <span class="keyword">DEFAULT</span> <span class="string">'user'</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'active'</span>, <span class="string">'inactive'</span>) <span class="keyword">DEFAULT</span> <span class="string">'active'</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_email (email),
+    <span class="keyword">INDEX</span> idx_role (role)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- CATEGORIES TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> categories (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    slug <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">UNIQUE NOT NULL</span>,
+    description <span class="keyword">TEXT</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'active'</span>, <span class="string">'inactive'</span>) <span class="keyword">DEFAULT</span> <span class="string">'active'</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_slug (slug),
+    <span class="keyword">INDEX</span> idx_status (status)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- PRODUCTS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> products (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    category_id <span class="keyword">INT UNSIGNED</span>,
+    name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    sku <span class="keyword">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">UNIQUE NOT NULL</span>,
+    description <span class="keyword">TEXT</span>,
+    price <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    stock <span class="keyword">INT NOT NULL DEFAULT</span> <span class="number">0</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'active'</span>, <span class="string">'inactive'</span>, <span class="string">'out_of_stock'</span>) <span class="keyword">DEFAULT</span> <span class="string">'active'</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_sku (sku),
+    <span class="keyword">INDEX</span> idx_category (category_id),
+    <span class="keyword">INDEX</span> idx_status (status),
+    <span class="keyword">FOREIGN KEY</span> (category_id) <span class="keyword">REFERENCES</span> categories(id) <span class="keyword">ON DELETE SET NULL</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- ORDERS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> orders (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    user_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    total_amount <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    payment_method <span class="keyword">ENUM</span>(<span class="string">'card'</span>, <span class="string">'cash'</span>, <span class="string">'upi'</span>) <span class="keyword">NOT NULL</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'pending'</span>, <span class="string">'confirmed'</span>, <span class="string">'cancelled'</span>, <span class="string">'completed'</span>) <span class="keyword">DEFAULT</span> <span class="string">'pending'</span>,
+    notes <span class="keyword">TEXT</span>,
+    cancellation_reason <span class="keyword">TEXT</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    cancelled_at <span class="keyword">TIMESTAMP NULL</span>,
+    <span class="keyword">INDEX</span> idx_user_id (user_id),
+    <span class="keyword">INDEX</span> idx_status (status),
+    <span class="keyword">INDEX</span> idx_created_at (created_at),
+    <span class="keyword">FOREIGN KEY</span> (user_id) <span class="keyword">REFERENCES</span> users(id) <span class="keyword">ON DELETE RESTRICT</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- ORDER ITEMS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> order_items (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    order_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    product_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    product_name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    quantity <span class="keyword">INT NOT NULL</span>,
+    price <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    subtotal <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_order_id (order_id),
+    <span class="keyword">INDEX</span> idx_product_id (product_id),
+    <span class="keyword">FOREIGN KEY</span> (order_id) <span class="keyword">REFERENCES</span> orders(id) <span class="keyword">ON DELETE CASCADE</span>,
+    <span class="keyword">FOREIGN KEY</span> (product_id) <span class="keyword">REFERENCES</span> products(id) <span class="keyword">ON DELETE RESTRICT</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- SEED DATA</span>
+<span class="keyword">INSERT INTO</span> categories (name, slug, description, status)
+<span class="keyword">VALUES</span>
+    (<span class="string">'Electronics'</span>, <span class="string">'electronics'</span>, <span class="string">'Electronic devices and accessories'</span>, <span class="string">'active'</span>),
+    (<span class="string">'Clothing'</span>, <span class="string">'clothing'</span>, <span class="string">'Fashion and apparel'</span>, <span class="string">'active'</span>),
+    (<span class="string">'Books'</span>, <span class="string">'books'</span>, <span class="string">'Books and publications'</span>, <span class="string">'active'</span>)
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> updated_at = <span class="keyword">CURRENT_TIMESTAMP</span>;
+
+<span class="keyword">INSERT INTO</span> products (category_id, name, sku, description, price, stock, status)
+<span class="keyword">VALUES</span>
+    (<span class="number">1</span>, <span class="string">'Laptop Pro 15'</span>, <span class="string">'LAP-001'</span>, <span class="string">'High-performance laptop'</span>, <span class="number">999.99</span>, <span class="number">10</span>, <span class="string">'active'</span>),
+    (<span class="number">1</span>, <span class="string">'Wireless Mouse'</span>, <span class="string">'MOU-001'</span>, <span class="string">'Ergonomic wireless mouse'</span>, <span class="number">29.99</span>, <span class="number">50</span>, <span class="string">'active'</span>),
+    (<span class="number">2</span>, <span class="string">'Cotton T-Shirt'</span>, <span class="string">'TSH-001'</span>, <span class="string">'Comfortable cotton t-shirt'</span>, <span class="number">19.99</span>, <span class="number">100</span>, <span class="string">'active'</span>)
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> updated_at = <span class="keyword">CURRENT_TIMESTAMP</span>;
+
+<span class="keyword">INSERT INTO</span> users (email, password_hash, name, role, status)
+<span class="keyword">VALUES</span>
+    (<span class="string">'admin@store.com'</span>, <span class="string">'$2y$10$hashed_password_here'</span>, <span class="string">'Admin User'</span>, <span class="string">'admin'</span>, <span class="string">'active'</span>),
+    (<span class="string">'user@example.com'</span>, <span class="string">'$2y$10$hashed_password_here'</span>, <span class="string">'Regular User'</span>, <span class="string">'user'</span>, <span class="string">'active'</span>)
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> updated_at = <span class="keyword">CURRENT_TIMESTAMP</span>;</code></pre>
+
+        <div class="tip">
+            <p><strong>Run the migration:</strong></p>
+            <pre><code>POST http://localhost:8000/api/init/migrate</code></pre>
+        </div>
+
+        <h2>Step 2: Repository Layer</h2>
+        <span class="label label-repository">REPOSITORY</span>
+
+        <h3>ProductRepository</h3>
+        <div class="step-box">
+            <h3>Create Repository</h3>
+            <p><strong>File:</strong> <code>src/api/repositories/ProductRepository.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/repositories/ProductRepository.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Repositories</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\Database</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\NotFoundException</span>;
+
+<span class="keyword">class</span> <span class="class">ProductRepository</span> {
+    <span class="keyword">private</span> <span class="class">Database</span> <span class="variable">$db</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>(<span class="class">Database</span> <span class="variable">$db</span>) {
+        <span class="variable">$this</span>-><span class="variable">db</span> = <span class="variable">$db</span>;
+    }
+
+    <span class="comment">/**
+     * Get all active products with optional filters
+     */</span>
+    <span class="keyword">public function</span> <span class="function">findAll</span>(<span class="keyword">array</span> <span class="variable">$filters</span> = []): <span class="keyword">array</span> {
+        <span class="variable">$query</span> = <span class="string">"SELECT 
+                        p.id, p.name, p.sku, p.description, p.price, 
+                        p.stock, p.status, p.created_at,
+                        c.name as category_name, c.slug as category_slug
+                    FROM products p
+                    LEFT JOIN categories c ON p.category_id = c.id
+                    WHERE p.status = :status"</span>;
+
+        <span class="variable">$params</span> = [<span class="string">'status'</span> => <span class="string">'active'</span>];
+
+        <span class="keyword">if</span> (!<span class="function">empty</span>(<span class="variable">$filters</span>[<span class="string">'category'</span>])) {
+            <span class="variable">$query</span> .= <span class="string">" AND c.slug = :category"</span>;
+            <span class="variable">$params</span>[<span class="string">'category'</span>] = <span class="variable">$filters</span>[<span class="string">'category'</span>];
+        }
+
+        <span class="variable">$query</span> .= <span class="string">" ORDER BY p.created_at DESC LIMIT :limit"</span>;
+        <span class="variable">$params</span>[<span class="string">'limit'</span>] = <span class="variable">$filters</span>[<span class="string">'limit'</span>] ?? <span class="number">50</span>;
+
+        <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(<span class="variable">$query</span>, <span class="variable">$params</span>);
+    }
+
+    <span class="comment">/**
+     * Find product by ID
+     */</span>
+    <span class="keyword">public function</span> <span class="function">findById</span>(<span class="keyword">int</span> <span class="variable">$id</span>): ?<span class="keyword">array</span> {
+        <span class="variable">$query</span> = <span class="string">"SELECT 
+                        p.*, 
+                        c.name as category_name, c.slug as category_slug
+                    FROM products p
+                    LEFT JOIN categories c ON p.category_id = c.id
+                    WHERE p.id = :id"</span>;
+
+        <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">first</span>(<span class="variable">$query</span>, [<span class="string">'id'</span> => <span class="variable">$id</span>]);
+    }
+
+    <span class="comment">/**
+     * Create new product
+     */</span>
+    <span class="keyword">public function</span> <span class="function">create</span>(<span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">int</span> {
+        <span class="variable">$query</span> = <span class="string">"INSERT INTO products 
+                      (category_id, name, sku, description, price, stock, status)
+                   VALUES 
+                      (:category_id, :name, :sku, :description, :price, :stock, :status)"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(<span class="variable">$query</span>, [
+            <span class="string">'category_id'</span> => <span class="variable">$data</span>[<span class="string">'category_id'</span>] ?? <span class="keyword">null</span>,
+            <span class="string">'name'</span> => <span class="variable">$data</span>[<span class="string">'name'</span>],
+            <span class="string">'sku'</span> => <span class="variable">$data</span>[<span class="string">'sku'</span>],
+            <span class="string">'description'</span> => <span class="variable">$data</span>[<span class="string">'description'</span>] ?? <span class="keyword">null</span>,
+            <span class="string">'price'</span> => <span class="variable">$data</span>[<span class="string">'price'</span>],
+            <span class="string">'stock'</span> => <span class="variable">$data</span>[<span class="string">'stock'</span>] ?? <span class="number">0</span>,
+            <span class="string">'status'</span> => <span class="variable">$data</span>[<span class="string">'status'</span>] ?? <span class="string">'active'</span>
+        ]);
+
+        <span class="keyword">return</span> (<span class="keyword">int</span>) <span class="variable">$result</span>[<span class="string">'id'</span>];
+    }
+
+    <span class="comment">/**
+     * Update product
+     */</span>
+    <span class="keyword">public function</span> <span class="function">update</span>(<span class="keyword">int</span> <span class="variable">$id</span>, <span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">bool</span> {
+        <span class="variable">$setClauses</span> = [];
+        <span class="variable">$params</span> = [<span class="string">'id'</span> => <span class="variable">$id</span>];
+
+        <span class="keyword">foreach</span> (<span class="variable">$data</span> <span class="keyword">as</span> <span class="variable">$key</span> => <span class="variable">$value</span>) {
+            <span class="variable">$setClauses</span>[] = <span class="string">"{</span><span class="variable">$key</span><span class="string">} = :</span><span class="variable">$key</span><span class="string">"</span>;
+            <span class="variable">$params</span>[<span class="variable">$key</span>] = <span class="variable">$value</span>;
+        }
+
+        <span class="variable">$query</span> = <span class="string">"UPDATE products SET "</span> . <span class="function">implode</span>(<span class="string">', '</span>, <span class="variable">$setClauses</span>) . <span class="string">" WHERE id = :id"</span>;
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(<span class="variable">$query</span>, <span class="variable">$params</span>);
+
+        <span class="keyword">return</span> <span class="variable">$result</span>[<span class="string">'affectedRows'</span>] > <span class="number">0</span>;
+    }
+
+    <span class="comment">/**
+     * Reduce product stock (for orders)
+     */</span>
+    <span class="keyword">public function</span> <span class="function">reduceStock</span>(<span class="keyword">int</span> <span class="variable">$productId</span>, <span class="keyword">int</span> <span class="variable">$quantity</span>): <span class="keyword">bool</span> {
+        <span class="variable">$query</span> = <span class="string">"UPDATE products 
+                      SET stock = stock - :quantity 
+                      WHERE id = :id AND stock >= :quantity"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(<span class="variable">$query</span>, [
+            <span class="string">'id'</span> => <span class="variable">$productId</span>,
+            <span class="string">'quantity'</span> => <span class="variable">$quantity</span>
+        ]);
+
+        <span class="keyword">return</span> <span class="variable">$result</span>[<span class="string">'affectedRows'</span>] > <span class="number">0</span>;
+    }
+
+    <span class="comment">/**
+     * Restore product stock (for cancelled orders)
+     */</span>
+    <span class="keyword">public function</span> <span class="function">restoreStock</span>(<span class="keyword">int</span> <span class="variable">$productId</span>, <span class="keyword">int</span> <span class="variable">$quantity</span>): <span class="keyword">bool</span> {
+        <span class="variable">$query</span> = <span class="string">"UPDATE products 
+                      SET stock = stock + :quantity 
+                      WHERE id = :id"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(<span class="variable">$query</span>, [
+            <span class="string">'id'</span> => <span class="variable">$productId</span>,
+            <span class="string">'quantity'</span> => <span class="variable">$quantity</span>
+        ]);
+
+        <span class="keyword">return</span> <span class="variable">$result</span>[<span class="string">'affectedRows'</span>] > <span class="number">0</span>;
+    }
+}</code></pre>
+
+        <h3>OrderRepository</h3>
+        <div class="step-box">
+            <h3>Create Repository</h3>
+            <p><strong>File:</strong> <code>src/api/repositories/OrderRepository.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/repositories/OrderRepository.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Repositories</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\Database</span>;
+
+<span class="keyword">class</span> <span class="class">OrderRepository</span> {
+    <span class="keyword">private</span> <span class="class">Database</span> <span class="variable">$db</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>(<span class="class">Database</span> <span class="variable">$db</span>) {
+        <span class="variable">$this</span>-><span class="variable">db</span> = <span class="variable">$db</span>;
+    }
+
+    <span class="comment">/**
+     * Create new order
+     */</span>
+    <span class="keyword">public function</span> <span class="function">create</span>(<span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">int</span> {
+        <span class="variable">$query</span> = <span class="string">"INSERT INTO orders 
+                      (user_id, total_amount, payment_method, status, notes)
+                   VALUES 
+                      (:user_id, :total_amount, :payment_method, :status, :notes)"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(<span class="variable">$query</span>, [
+            <span class="string">'user_id'</span> => <span class="variable">$data</span>[<span class="string">'user_id'</span>],
+            <span class="string">'total_amount'</span> => <span class="variable">$data</span>[<span class="string">'total_amount'</span>],
+            <span class="string">'payment_method'</span> => <span class="variable">$data</span>[<span class="string">'payment_method'</span>],
+            <span class="string">'status'</span> => <span class="variable">$data</span>[<span class="string">'status'</span>] ?? <span class="string">'pending'</span>,
+            <span class="string">'notes'</span> => <span class="variable">$data</span>[<span class="string">'notes'</span>] ?? <span class="keyword">null</span>
+        ]);
+
+        <span class="keyword">return</span> (<span class="keyword">int</span>) <span class="variable">$result</span>[<span class="string">'id'</span>];
+    }
+
+    <span class="comment">/**
+     * Add order item
+     */</span>
+    <span class="keyword">public function</span> <span class="function">addItem</span>(<span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">int</span> {
+        <span class="variable">$query</span> = <span class="string">"INSERT INTO order_items 
+                      (order_id, product_id, product_name, quantity, price, subtotal)
+                   VALUES 
+                      (:order_id, :product_id, :product_name, :quantity, :price, :subtotal)"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(<span class="variable">$query</span>, <span class="variable">$data</span>);
+        <span class="keyword">return</span> (<span class="keyword">int</span>) <span class="variable">$result</span>[<span class="string">'id'</span>];
+    }
+
+    <span class="comment">/**
+     * Find order by ID with items
+     */</span>
+    <span class="keyword">public function</span> <span class="function">findById</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>): ?<span class="keyword">array</span> {
+        <span class="variable">$query</span> = <span class="string">"SELECT * FROM orders WHERE id = :id"</span>;
+        <span class="variable">$order</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">first</span>(<span class="variable">$query</span>, [<span class="string">'id'</span> => <span class="variable">$orderId</span>]);
+
+        <span class="keyword">if</span> (!<span class="variable">$order</span>) {
+            <span class="keyword">return</span> <span class="keyword">null</span>;
+        }
+
+        <span class="comment">// Get order items</span>
+        <span class="variable">$order</span>[<span class="string">'items'</span>] = <span class="variable">$this</span>-><span class="function">getOrderItems</span>(<span class="variable">$orderId</span>);
+
+        <span class="keyword">return</span> <span class="variable">$order</span>;
+    }
+
+    <span class="comment">/**
+     * Get order items
+     */</span>
+    <span class="keyword">public function</span> <span class="function">getOrderItems</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>): <span class="keyword">array</span> {
+        <span class="variable">$query</span> = <span class="string">"SELECT * FROM order_items WHERE order_id = :order_id"</span>;
+        <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(<span class="variable">$query</span>, [<span class="string">'order_id'</span> => <span class="variable">$orderId</span>]);
+    }
+
+    <span class="comment">/**
+     * Update order status
+     */</span>
+    <span class="keyword">public function</span> <span class="function">updateStatus</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>, <span class="keyword">string</span> <span class="variable">$status</span>, ?<span class="keyword">string</span> <span class="variable">$reason</span> = <span class="keyword">null</span>): <span class="keyword">bool</span> {
+        <span class="variable">$query</span> = <span class="string">"UPDATE orders 
+                      SET status = :status, 
+                          cancellation_reason = :reason,
+                          cancelled_at = "</span> . (<span class="variable">$status</span> === <span class="string">'cancelled'</span> ? <span class="string">'NOW()'</span> : <span class="string">'NULL'</span>) . <span class="string">"
+                      WHERE id = :id"</span>;
+
+        <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(<span class="variable">$query</span>, [
+            <span class="string">'id'</span> => <span class="variable">$orderId</span>,
+            <span class="string">'status'</span> => <span class="variable">$status</span>,
+            <span class="string">'reason'</span> => <span class="variable">$reason</span>
+        ]);
+
+        <span class="keyword">return</span> <span class="variable">$result</span>[<span class="string">'affectedRows'</span>] > <span class="number">0</span>;
+    }
+}</code></pre>
+
+        <h2>Step 3: Service Layer</h2>
+        <span class="label label-service">SERVICE</span>
+
+        <h3>OrderService</h3>
+        <div class="step-box">
+            <h3>Create Service</h3>
+            <p><strong>File:</strong> <code>src/api/services/OrderService.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/services/OrderService.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Services</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\Database</span>;
+<span class="keyword">use</span> <span class="class">App\Repositories\OrderRepository</span>;
+<span class="keyword">use</span> <span class="class">App\Repositories\ProductRepository</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\ValidationException</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\NotFoundException</span>;
+
+<span class="keyword">class</span> <span class="class">OrderService</span> {
+    <span class="keyword">private</span> <span class="class">Database</span> <span class="variable">$db</span>;
+    <span class="keyword">private</span> <span class="class">OrderRepository</span> <span class="variable">$orderRepo</span>;
+    <span class="keyword">private</span> <span class="class">ProductRepository</span> <span class="variable">$productRepo</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>(<span class="class">Database</span> <span class="variable">$db</span>) {
+        <span class="variable">$this</span>-><span class="variable">db</span> = <span class="variable">$db</span>;
+        <span class="variable">$this</span>-><span class="variable">orderRepo</span> = <span class="keyword">new</span> <span class="class">OrderRepository</span>(<span class="variable">$db</span>);
+        <span class="variable">$this</span>-><span class="variable">productRepo</span> = <span class="keyword">new</span> <span class="class">ProductRepository</span>(<span class="variable">$db</span>);
+    }
+
+    <span class="comment">/**
+     * Create order with items (uses transaction)
+     */</span>
+    <span class="keyword">public function</span> <span class="function">createOrder</span>(<span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">array</span> {
+        <span class="comment">// Validate items</span>
+        <span class="keyword">if</span> (<span class="function">empty</span>(<span class="variable">$data</span>[<span class="string">'items'</span>])) {
+            <span class="keyword">throw new</span> <span class="class">ValidationException</span>(<span class="string">'Order must have at least one item'</span>);
+        }
+
+        <span class="comment">// Use transaction for order creation</span>
+        <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">transaction</span>(<span class="keyword">function</span>() <span class="keyword">use</span> (<span class="variable">$data</span>) {
+            <span class="comment">// Calculate total and validate products</span>
+            <span class="variable">$totalAmount</span> = <span class="number">0</span>;
+            <span class="variable">$validatedItems</span> = [];
+
+            <span class="keyword">foreach</span> (<span class="variable">$data</span>[<span class="string">'items'</span>] <span class="keyword">as</span> <span class="variable">$item</span>) {
+                <span class="variable">$product</span> = <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">findById</span>(<span class="variable">$item</span>[<span class="string">'product_id'</span>]);
+
+                <span class="keyword">if</span> (!<span class="variable">$product</span>) {
+                    <span class="keyword">throw new</span> <span class="class">NotFoundException</span>(<span class="string">"Product {</span><span class="variable">$item</span>[<span class="string">'product_id'</span>]<span class="string">} not found"</span>);
+                }
+
+                <span class="keyword">if</span> (<span class="variable">$product</span>[<span class="string">'stock'</span>] < <span class="variable">$item</span>[<span class="string">'quantity'</span>]) {
+                    <span class="keyword">throw new</span> <span class="class">ValidationException</span>(<span class="string">"Insufficient stock for {</span><span class="variable">$product</span>[<span class="string">'name'</span>]<span class="string">}"</span>);
+                }
+
+                <span class="variable">$subtotal</span> = <span class="variable">$product</span>[<span class="string">'price'</span>] * <span class="variable">$item</span>[<span class="string">'quantity'</span>];
+                <span class="variable">$totalAmount</span> += <span class="variable">$subtotal</span>;
+
+                <span class="variable">$validatedItems</span>[] = [
+                    <span class="string">'product_id'</span> => <span class="variable">$product</span>[<span class="string">'id'</span>],
+                    <span class="string">'product_name'</span> => <span class="variable">$product</span>[<span class="string">'name'</span>],
+                    <span class="string">'quantity'</span> => <span class="variable">$item</span>[<span class="string">'quantity'</span>],
+                    <span class="string">'price'</span> => <span class="variable">$product</span>[<span class="string">'price'</span>],
+                    <span class="string">'subtotal'</span> => <span class="variable">$subtotal</span>
+                ];
+            }
+
+            <span class="comment">// Create order</span>
+            <span class="variable">$orderId</span> = <span class="variable">$this</span>-><span class="variable">orderRepo</span>-><span class="function">create</span>([
+                <span class="string">'user_id'</span> => <span class="variable">$data</span>[<span class="string">'user_id'</span>],
+                <span class="string">'total_amount'</span> => <span class="variable">$totalAmount</span>,
+                <span class="string">'payment_method'</span> => <span class="variable">$data</span>[<span class="string">'payment_method'</span>],
+                <span class="string">'status'</span> => <span class="string">'pending'</span>,
+                <span class="string">'notes'</span> => <span class="variable">$data</span>[<span class="string">'notes'</span>] ?? <span class="keyword">null</span>
+            ]);
+
+            <span class="comment">// Add items and reduce stock</span>
+            <span class="keyword">foreach</span> (<span class="variable">$validatedItems</span> <span class="keyword">as</span> <span class="variable">$item</span>) {
+                <span class="variable">$item</span>[<span class="string">'order_id'</span>] = <span class="variable">$orderId</span>;
+                <span class="variable">$this</span>-><span class="variable">orderRepo</span>-><span class="function">addItem</span>(<span class="variable">$item</span>);
+
+                <span class="comment">// Reduce product stock</span>
+                <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">reduceStock</span>(
+                    <span class="variable">$item</span>[<span class="string">'product_id'</span>], 
+                    <span class="variable">$item</span>[<span class="string">'quantity'</span>]
+                );
+            }
+
+            <span class="keyword">return</span> [
+                <span class="string">'order_id'</span> => <span class="variable">$orderId</span>,
+                <span class="string">'total_amount'</span> => <span class="variable">$totalAmount</span>,
+                <span class="string">'items_count'</span> => <span class="function">count</span>(<span class="variable">$validatedItems</span>)
+            ];
+        });
+    }
+
+    <span class="comment">/**
+     * Cancel order and restore stock
+     */</span>
+    <span class="keyword">public function</span> <span class="function">cancelOrder</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>, <span class="keyword">string</span> <span class="variable">$reason</span>): <span class="keyword">bool</span> {
+        <span class="variable">$order</span> = <span class="variable">$this</span>-><span class="variable">orderRepo</span>-><span class="function">findById</span>(<span class="variable">$orderId</span>);
+
+        <span class="keyword">if</span> (!<span class="variable">$order</span>) {
+            <span class="keyword">throw new</span> <span class="class">NotFoundException</span>(<span class="string">"Order {</span><span class="variable">$orderId</span><span class="string">} not found"</span>);
+        }
+
+        <span class="keyword">if</span> (<span class="variable">$order</span>[<span class="string">'status'</span>] === <span class="string">'cancelled'</span>) {
+            <span class="keyword">throw new</span> <span class="class">ValidationException</span>(<span class="string">'Order is already cancelled'</span>);
+        }
+
+        <span class="comment">// Use transaction</span>
+        <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">transaction</span>(<span class="keyword">function</span>() <span class="keyword">use</span> (<span class="variable">$orderId</span>, <span class="variable">$reason</span>, <span class="variable">$order</span>) {
+            <span class="comment">// Restore stock for each item</span>
+            <span class="keyword">foreach</span> (<span class="variable">$order</span>[<span class="string">'items'</span>] <span class="keyword">as</span> <span class="variable">$item</span>) {
+                <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">restoreStock</span>(
+                    <span class="variable">$item</span>[<span class="string">'product_id'</span>], 
+                    <span class="variable">$item</span>[<span class="string">'quantity'</span>]
+                );
+            }
+
+            <span class="comment">// Update order status</span>
+            <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">orderRepo</span>-><span class="function">updateStatus</span>(<span class="variable">$orderId</span>, <span class="string">'cancelled'</span>, <span class="variable">$reason</span>);
+        });
+    }
+
+    <span class="comment">/**
+     * Get order details
+     */</span>
+    <span class="keyword">public function</span> <span class="function">getOrderDetails</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>): <span class="keyword">array</span> {
+        <span class="variable">$order</span> = <span class="variable">$this</span>-><span class="variable">orderRepo</span>-><span class="function">findById</span>(<span class="variable">$orderId</span>);
+
+        <span class="keyword">if</span> (!<span class="variable">$order</span>) {
+            <span class="keyword">throw new</span> <span class="class">NotFoundException</span>(<span class="string">"Order {</span><span class="variable">$orderId</span><span class="string">} not found"</span>);
+        }
+
+        <span class="keyword">return</span> <span class="variable">$order</span>;
+    }
+}</code></pre>
+
+        <h2>Step 4: Controller Layer</h2>
+        <span class="label label-controller">CONTROLLER</span>
+
+        <h3>ProductController</h3>
+        <div class="step-box">
+            <h3>Create Controller</h3>
+            <p><strong>File:</strong> <code>src/api/controllers/ProductController.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/controllers/ProductController.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Controllers</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\BaseController</span>;
+<span class="keyword">use</span> <span class="class">App\Repositories\ProductRepository</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\NotFoundException</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\ValidationException</span>;
+
+<span class="keyword">class</span> <span class="class">ProductController</span> <span class="keyword">extends</span> <span class="class">BaseController</span> {
+    <span class="keyword">private</span> <span class="class">ProductRepository</span> <span class="variable">$productRepo</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>() {
+        <span class="keyword">parent</span>::<span class="function">__construct</span>();
+        <span class="variable">$this</span>-><span class="variable">productRepo</span> = <span class="keyword">new</span> <span class="class">ProductRepository</span>(<span class="variable">$this</span>-><span class="variable">db</span>);
+    }
+
+    <span class="comment">/**
+     * GET /products/list
+     * List all products with optional filtering
+     */</span>
+    <span class="keyword">public function</span> <span class="function">list</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$filters</span> = [
+                <span class="string">'category'</span> => <span class="variable">$_GET</span>[<span class="string">'category'</span>] ?? <span class="keyword">null</span>,
+                <span class="string">'limit'</span> => (<span class="keyword">int</span>) (<span class="variable">$_GET</span>[<span class="string">'limit'</span>] ?? <span class="number">50</span>)
+            ];
+
+            <span class="variable">$products</span> = <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">findAll</span>(<span class="variable">$filters</span>);
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Products retrieved'</span>, [
+                <span class="string">'products'</span> => <span class="variable">$products</span>,
+                <span class="string">'count'</span> => <span class="function">count</span>(<span class="variable">$products</span>)
+            ]);
+
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+
+    <span class="comment">/**
+     * GET /products/details?product_id=1
+     * Get product details
+     */</span>
+    <span class="keyword">public function</span> <span class="function">details</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$productId</span> = <span class="variable">$_GET</span>[<span class="string">'product_id'</span>] ?? <span class="keyword">null</span>;
+
+            <span class="keyword">if</span> (!<span class="variable">$productId</span>) {
+                <span class="variable">$this</span>-><span class="function">sendError</span>(<span class="string">'Product ID is required'</span>, <span class="number">400</span>);
+                <span class="keyword">return</span>;
+            }
+
+            <span class="variable">$product</span> = <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">findById</span>((<span class="keyword">int</span>) <span class="variable">$productId</span>);
+
+            <span class="keyword">if</span> (!<span class="variable">$product</span>) {
+                <span class="keyword">throw new</span> <span class="class">NotFoundException</span>(<span class="string">"Product {</span><span class="variable">$productId</span><span class="string">} not found"</span>);
+            }
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Product found'</span>, <span class="variable">$product</span>);
+
+        } <span class="keyword">catch</span> (<span class="class">NotFoundException</span> <span class="variable">$e</span>) {
+            <span class="keyword">throw</span> <span class="variable">$e</span>; <span class="comment">// Let ExceptionHandler format it</span>
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+
+    <span class="comment">/**
+     * POST /products/create
+     * Create new product (Admin only)
+     */</span>
+    <span class="keyword">public function</span> <span class="function">create</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$data</span> = <span class="variable">$this</span>-><span class="function">getRequestData</span>();
+
+            <span class="comment">// Validate</span>
+            <span class="variable">$errors</span> = <span class="variable">$this</span>-><span class="function">validateRequest</span>([
+                <span class="string">'name'</span> => <span class="string">'required'</span>,
+                <span class="string">'sku'</span> => <span class="string">'required'</span>,
+                <span class="string">'price'</span> => <span class="string">'required|numeric'</span>,
+                <span class="string">'stock'</span> => <span class="string">'required|integer'</span>
+            ]);
+
+            <span class="keyword">if</span> (!<span class="function">empty</span>(<span class="variable">$errors</span>)) {
+                <span class="keyword">throw new</span> <span class="class">ValidationException</span>(<span class="string">'Validation failed'</span>, <span class="variable">$errors</span>);
+            }
+
+            <span class="variable">$productId</span> = <span class="variable">$this</span>-><span class="variable">productRepo</span>-><span class="function">create</span>(<span class="variable">$data</span>);
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Product created'</span>, [
+                <span class="string">'product_id'</span> => <span class="variable">$productId</span>
+            ]);
+
+        } <span class="keyword">catch</span> (<span class="class">ValidationException</span> <span class="variable">$e</span>) {
+            <span class="keyword">throw</span> <span class="variable">$e</span>;
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+}</code></pre>
+
+        <h3>OrderController</h3>
+        <div class="step-box">
+            <h3>Create Controller</h3>
+            <p><strong>File:</strong> <code>src/api/controllers/OrderController.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/controllers/OrderController.php</span>
+
+<span class="keyword">namespace</span> <span class="class">App\Controllers</span>;
+
+<span class="keyword">use</span> <span class="class">App\Core\BaseController</span>;
+<span class="keyword">use</span> <span class="class">App\Services\OrderService</span>;
+<span class="keyword">use</span> <span class="class">App\Core\Exceptions\ValidationException</span>;
+
+<span class="keyword">class</span> <span class="class">OrderController</span> <span class="keyword">extends</span> <span class="class">BaseController</span> {
+    <span class="keyword">private</span> <span class="class">OrderService</span> <span class="variable">$orderService</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>() {
+        <span class="keyword">parent</span>::<span class="function">__construct</span>();
+        <span class="variable">$this</span>-><span class="variable">orderService</span> = <span class="keyword">new</span> <span class="class">OrderService</span>(<span class="variable">$this</span>-><span class="variable">db</span>);
+    }
+
+    <span class="comment">/**
+     * POST /orders/create
+     * Create new order
+     */</span>
+    <span class="keyword">public function</span> <span class="function">create</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$data</span> = <span class="variable">$this</span>-><span class="function">getRequestData</span>();
+
+            <span class="comment">// Validate</span>
+            <span class="variable">$errors</span> = <span class="variable">$this</span>-><span class="function">validateRequest</span>([
+                <span class="string">'user_id'</span> => <span class="string">'required|integer'</span>,
+                <span class="string">'payment_method'</span> => <span class="string">'required'</span>,
+                <span class="string">'items'</span> => <span class="string">'required|array'</span>
+            ]);
+
+            <span class="keyword">if</span> (!<span class="function">empty</span>(<span class="variable">$errors</span>)) {
+                <span class="keyword">throw new</span> <span class="class">ValidationException</span>(<span class="string">'Validation failed'</span>, <span class="variable">$errors</span>);
+            }
+
+            <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">orderService</span>-><span class="function">createOrder</span>(<span class="variable">$data</span>);
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Order created successfully'</span>, <span class="variable">$result</span>);
+
+        } <span class="keyword">catch</span> (<span class="class">ValidationException</span> <span class="variable">$e</span>) {
+            <span class="keyword">throw</span> <span class="variable">$e</span>;
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+
+    <span class="comment">/**
+     * GET /orders/details?order_id=1
+     * Get order details
+     */</span>
+    <span class="keyword">public function</span> <span class="function">details</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$orderId</span> = <span class="variable">$_GET</span>[<span class="string">'order_id'</span>] ?? <span class="keyword">null</span>;
+
+            <span class="keyword">if</span> (!<span class="variable">$orderId</span>) {
+                <span class="variable">$this</span>-><span class="function">sendError</span>(<span class="string">'Order ID is required'</span>, <span class="number">400</span>);
+                <span class="keyword">return</span>;
+            }
+
+            <span class="variable">$order</span> = <span class="variable">$this</span>-><span class="variable">orderService</span>-><span class="function">getOrderDetails</span>((<span class="keyword">int</span>) <span class="variable">$orderId</span>);
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Order found'</span>, <span class="variable">$order</span>);
+
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+
+    <span class="comment">/**
+     * POST /orders/cancel
+     * Cancel order
+     */</span>
+    <span class="keyword">public function</span> <span class="function">cancel</span>() {
+        <span class="keyword">try</span> {
+            <span class="variable">$data</span> = <span class="variable">$this</span>-><span class="function">getRequestData</span>();
+
+            <span class="variable">$orderId</span> = <span class="variable">$data</span>[<span class="string">'order_id'</span>] ?? <span class="keyword">null</span>;
+            <span class="variable">$reason</span> = <span class="variable">$data</span>[<span class="string">'reason'</span>] ?? <span class="string">'Customer request'</span>;
+
+            <span class="keyword">if</span> (!<span class="variable">$orderId</span>) {
+                <span class="variable">$this</span>-><span class="function">sendError</span>(<span class="string">'Order ID is required'</span>, <span class="number">400</span>);
+                <span class="keyword">return</span>;
+            }
+
+            <span class="variable">$this</span>-><span class="variable">orderService</span>-><span class="function">cancelOrder</span>((<span class="keyword">int</span>) <span class="variable">$orderId</span>, <span class="variable">$reason</span>);
+
+            <span class="variable">$this</span>-><span class="function">sendSuccess</span>(<span class="string">'Order cancelled successfully'</span>);
+
+        } <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+            <span class="variable">$this</span>-><span class="function">sendServerError</span>(<span class="variable">$e</span>-><span class="function">getMessage</span>());
+        }
+    }
+}</code></pre>
+
+        <h2>Step 5: Define Routes</h2>
+        <span class="label label-route">ROUTES</span>
+
+        <div class="step-box">
+            <h3>Define Routes</h3>
+            <p><strong>File:</strong> <code>src/api/routes.php</code></p>
+        </div>
+
+        <pre><code><span class="comment">// File: src/api/routes.php</span>
+
+<span class="comment">// Register middleware</span>
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'auth'</span>, <span class="class">\App\Middleware\AuthMiddleware</span>::<span class="keyword">class</span>);
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'admin'</span>, <span class="class">\App\Middleware\AdminMiddleware</span>::<span class="keyword">class</span>);
+<span class="variable">$router</span>-><span class="function">registerMiddleware</span>(<span class="string">'log'</span>, <span class="class">\App\Middleware\LogMiddleware</span>::<span class="keyword">class</span>);
+
+<span class="comment">// ==============================================</span>
+<span class="comment">// PUBLIC ROUTES (Products)</span>
+<span class="comment">// ==============================================</span>
+
+<span class="variable">$router</span>-><span class="function">add</span>([
+    <span class="string">'method'</span> => <span class="string">'GET'</span>,
+    <span class="string">'url'</span> => <span class="string">'/products/list'</span>,
+    <span class="string">'controller'</span> => <span class="string">'ProductController@list'</span>,
+    <span class="string">'desc'</span> => <span class="string">'Get list of products'</span>,
+    <span class="string">'visible'</span> => <span class="keyword">true</span>,
+    <span class="string">'group'</span> => <span class="string">'Products'</span>
+]);
+
+<span class="variable">$router</span>-><span class="function">add</span>([
+    <span class="string">'method'</span> => <span class="string">'GET'</span>,
+    <span class="string">'url'</span> => <span class="string">'/products/details'</span>,
+    <span class="string">'controller'</span> => <span class="string">'ProductController@details'</span>,
+    <span class="string">'desc'</span> => <span class="string">'Get product details by ID'</span>,
+    <span class="string">'visible'</span> => <span class="keyword">true</span>,
+    <span class="string">'group'</span> => <span class="string">'Products'</span>,
+    <span class="string">'params'</span> => [
+        <span class="string">'get'</span> => [
+            <span class="string">'product_id'</span> => <span class="string">'Product ID'</span>
+        ]
+    ]
+]);
+
+<span class="comment">// ==============================================</span>
+<span class="comment">// ADMIN ROUTES (Protected - Admin Only)</span>
+<span class="comment">// ==============================================</span>
+
+<span class="variable">$router</span>-><span class="function">group</span>([
+    <span class="string">'prefix'</span> => <span class="string">'/products'</span>,
+    <span class="string">'middleware'</span> => [<span class="string">'auth'</span>, <span class="string">'admin'</span>]
+], <span class="keyword">function</span>(<span class="variable">$router</span>) {
+
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'POST'</span>,
+        <span class="string">'url'</span> => <span class="string">'/create'</span>,
+        <span class="string">'controller'</span> => <span class="string">'ProductController@create'</span>,
+        <span class="string">'desc'</span> => <span class="string">'Create new product (Admin)'</span>,
+        <span class="string">'visible'</span> => <span class="keyword">true</span>,
+        <span class="string">'group'</span> => <span class="string">'Admin - Products'</span>
+    ]);
+
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'POST'</span>,
+        <span class="string">'url'</span> => <span class="string">'/update'</span>,
+        <span class="string">'controller'</span> => <span class="string">'ProductController@update'</span>,
+        <span class="string">'desc'</span> => <span class="string">'Update product (Admin)'</span>,
+        <span class="string">'visible'</span> => <span class="keyword">true</span>,
+        <span class="string">'group'</span> => <span class="string">'Admin - Products'</span>
+    ]);
+});
+
+<span class="comment">// ==============================================</span>
+<span class="comment">// AUTHENTICATED ROUTES (Orders)</span>
+<span class="comment">// ==============================================</span>
+
+<span class="variable">$router</span>-><span class="function">group</span>([
+    <span class="string">'prefix'</span> => <span class="string">'/orders'</span>,
+    <span class="string">'middleware'</span> => [<span class="string">'auth'</span>]
+], <span class="keyword">function</span>(<span class="variable">$router</span>) {
+
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'POST'</span>,
+        <span class="string">'url'</span> => <span class="string">'/create'</span>,
+        <span class="string">'controller'</span> => <span class="string">'OrderController@create'</span>,
+        <span class="string">'desc'</span> => <span class="string">'Create new order'</span>,
+        <span class="string">'visible'</span> => <span class="keyword">true</span>,
+        <span class="string">'group'</span> => <span class="string">'Orders'</span>
+    ]);
+
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'GET'</span>,
+        <span class="string">'url'</span> => <span class="string">'/details'</span>,
+        <span class="string">'controller'</span> => <span class="string">'OrderController@details'</span>,
+        <span class="string">'desc'</span> => <span class="string">'Get order details'</span>,
+        <span class="string">'visible'</span> => <span class="keyword">true</span>,
+        <span class="string">'group'</span> => <span class="string">'Orders'</span>
+    ]);
+
+    <span class="variable">$router</span>-><span class="function">add</span>([
+        <span class="string">'method'</span> => <span class="string">'POST'</span>,
+        <span class="string">'url'</span> => <span class="string">'/cancel'</span>,
+        <span class="string">'controller'</span> => <span class="string">'OrderController@cancel'</span>,
+        <span class="string">'desc'</span> => <span class="string">'Cancel order'</span>,
+        <span class="string">'visible'</span> => <span class="keyword">true</span>,
+        <span class="string">'group'</span> => <span class="string">'Orders'</span>
+    ]);
+});</code></pre>
+
+        <h2>Step 6: Complete Request Flow Example</h2>
+
+        <h3>Example 1: User Creates an Order</h3>
+
+        <div class="flow-diagram">
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ REQUEST: POST /api/orders/create                       │</span>
+<span class="comment">│ Body: {                                                │</span>
+<span class="comment">│   "user_id": 1,                                        │</span>
+<span class="comment">│   "payment_method": "card",                            │</span>
+<span class="comment">│   "items": [                                           │</span>
+<span class="comment">│     {"product_id": 1, "quantity": 2},                  │</span>
+<span class="comment">│     {"product_id": 2, "quantity": 1}                   │</span>
+<span class="comment">│   ]                                                    │</span>
+<span class="comment">│ }                                                      │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 1: MIDDLEWARE (AuthMiddleware)                    │</span>
+<span class="comment">│ • before() checks authentication                       │</span>
+<span class="comment">│ • Validates token/session                              │</span>
+<span class="comment">│ • Continues if authenticated                           │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 2: CONTROLLER (OrderController@create)            │</span>
+<span class="comment">│ • Receives request data                                │</span>
+<span class="comment">│ • Validates required fields                            │</span>
+<span class="comment">│ • Calls OrderService->createOrder()                    │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 3: SERVICE (OrderService->createOrder)            │</span>
+<span class="comment">│ • Starts Database Transaction                          │</span>
+<span class="comment">│ • Validates each product exists                        │</span>
+<span class="comment">│ • Checks stock availability                            │</span>
+<span class="comment">│ • Calculates totals                                    │</span>
+<span class="comment">│ • Calls repositories to save data                      │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 4: REPOSITORIES                                   │</span>
+<span class="comment">│                                                        │</span>
+<span class="comment">│ ProductRepository:                                     │</span>
+<span class="comment">│   • findById(1) → Gets product details                │</span>
+<span class="comment">│   • findById(2) → Gets product details                │</span>
+<span class="comment">│                                                        │</span>
+<span class="comment">│ OrderRepository:                                       │</span>
+<span class="comment">│   • create() → INSERT INTO orders                     │</span>
+<span class="comment">│   • addItem() → INSERT INTO order_items (x2)          │</span>
+<span class="comment">│                                                        │</span>
+<span class="comment">│ ProductRepository:                                     │</span>
+<span class="comment">│   • reduceStock(1, 2) → UPDATE products SET stock-2  │</span>
+<span class="comment">│   • reduceStock(2, 1) → UPDATE products SET stock-1  │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 5: DATABASE                                       │</span>
+<span class="comment">│ • Transaction committed successfully                   │</span>
+<span class="comment">│ • All queries executed                                 │</span>
+<span class="comment">│ • Data persisted                                       │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ STEP 6: CONTROLLER RESPONSE                            │</span>
+<span class="comment">│ • sendSuccess() called                                 │</span>
+<span class="comment">│ • HTTP 200 OK                                          │</span>
+<span class="comment">│ • JSON response formatted                              │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+                           │
+                           ▼
+<span class="comment">┌────────────────────────────────────────────────────────┐</span>
+<span class="comment">│ RESPONSE:                                              │</span>
+<span class="comment">│ {                                                      │</span>
+<span class="comment">│   "status": "success",                                 │</span>
+<span class="comment">│   "message": "Order created successfully",             │</span>
+<span class="comment">│   "data": {                                            │</span>
+<span class="comment">│     "order_id": 42,                                    │</span>
+<span class="comment">│     "total_amount": 2029.97,                           │</span>
+<span class="comment">│     "items_count": 2                                   │</span>
+<span class="comment">│   }                                                    │</span>
+<span class="comment">│ }                                                      │</span>
+<span class="comment">└────────────────────────────────────────────────────────┘</span>
+        </div>
+
+        <h2>Testing Your API</h2>
+
+        <h3>Using cURL</h3>
+
+        <h4>1. Get Product List</h4>
+        <pre><code>curl -X GET "http://localhost:8000/api/products/list"</code></pre>
+
+        <h4>2. Get Product Details</h4>
+        <pre><code>curl -X GET "http://localhost:8000/api/products/details?product_id=1"</code></pre>
+
+        <h4>3. Create Order</h4>
+        <pre><code>curl -X POST "http://localhost:8000/api/orders/create"   -H "Content-Type: application/json"   -H "Authorization: Bearer YOUR_TOKEN"   -d '{
+    "user_id": 1,
+    "payment_method": "card",
+    "items": [
+      {"product_id": 1, "quantity": 2},
+      {"product_id": 2, "quantity": 1}
+    ]
+  }'</code></pre>
+
+        <h4>4. Cancel Order</h4>
+        <pre><code>curl -X POST "http://localhost:8000/api/orders/cancel"   -H "Content-Type: application/json"   -H "Authorization: Bearer YOUR_TOKEN"   -d '{
+    "order_id": 42,
+    "reason": "Changed my mind"
+  }'</code></pre>
+
+        <h2>Complete Project Structure</h2>
+
+        <div class="file-tree">
+src/api/
+├── <span style="color:#58a6ff">controllers/</span>
+│   ├── ProductController.php
+│   ├── OrderController.php
+│   ├── AuthController.php
+│   └── TestController.php
+│
+├── <span style="color:#f97316">services/</span>
+│   ├── OrderService.php
+│   ├── ProductService.php
+│   └── AuthService.php
+│
+├── <span style="color:#d29922">repositories/</span>
+│   ├── ProductRepository.php
+│   ├── OrderRepository.php
+│   ├── UserRepository.php
+│   └── CategoryRepository.php
+│
+├── <span style="color:#8b5cf6">middleware/</span>
+│   ├── AuthMiddleware.php
+│   ├── AdminMiddleware.php
+│   └── LogMiddleware.php
+│
+├── <span style="color:#3fb950">databases/</span>
+│   └── 001_ecommerce_schema.sql
+│
+├── <span style="color:#79c0ff">core/</span>
+│   ├── BaseController.php
+│   ├── Database.php
+│   ├── Router.php
+│   ├── <span style="color:#a5d6ff">exceptions/</span>
+│   │   ├── BaseException.php
+│   │   ├── NotFoundException.php
+│   │   ├── ValidationException.php
+│   │   └── DatabaseException.php
+│   └── <span style="color:#a5d6ff">middleware/</span>
+│       ├── MiddlewareInterface.php
+│       └── BaseMiddleware.php
+│
+├── routes.php
+└── index.php
+        </div>
+
+        <h2>Summary</h2>
+
+        <p>You've now built a complete e-commerce API with:</p>
+
+        <ul>
+            <li>✅ <strong>Database Schema</strong> with proper relationships and indexes</li>
+            <li>✅ <strong>Repository Layer</strong> handling all database operations</li>
+            <li>✅ <strong>Service Layer</strong> with business logic and transactions</li>
+            <li>✅ <strong>Controller Layer</strong> managing HTTP requests/responses</li>
+            <li>✅ <strong>Routes</strong> with middleware protection</li>
+            <li>✅ <strong>Error Handling</strong> with custom exceptions</li>
+            <li>✅ <strong>Validation</strong> for all inputs</li>
+            <li>✅ <strong>Transactions</strong> for data consistency</li>
+            <li>✅ <strong>Stock Management</strong> with automatic updates</li>
+            <li>✅ <strong>Clean Architecture</strong> with proper separation of concerns</li>
+        </ul>
+
+        <div class="tip">
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+                <li>Add user authentication with JWT tokens</li>
+                <li>Implement pagination for product listing</li>
+                <li>Add search and filtering capabilities</li>
+                <li>Create an admin dashboard</li>
+                <li>Add email notifications for orders</li>
+                <li>Implement product reviews and ratings</li>
+                <li>Add payment gateway integration</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #30363d;">
+
+        <p style="text-align: center; font-size: 1.2em; color: #3fb950;"><strong>🎉 Congratulations! You've completed the full framework documentation series!</strong></p>
+
+        <p><a href="index.html" class="back-link">← Back to Documentation Home</a></p>
+    </div>
+</body>
+</html>

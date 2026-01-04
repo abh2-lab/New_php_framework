@@ -2,30 +2,34 @@
 // src/api/Core/Config/connection.php
 
 use App\Core\Security;
+use App\Core\Config\DatabaseConnection;
+use PDO;
+use PDOException;
+
 
 // Skip security check for CLI scripts (testing, cron jobs, etc.)
-if (php_sapi_name() !== 'cli') {
+$isCLI = (php_sapi_name() === 'cli');
+if (!$isCLI) {
     Security::ensureSecure();
 }
 
 // ============================================================================
 // DATABASE CONNECTION CONFIGURATION (Environment-based)
+// NOTE: Actual PDO creation is now handled by DatabaseConnection::pdo().
+// We still compute $servername/$port/$dbname for debug/error context.
 // ============================================================================
 
-// Detect environment
-$isCLI = (php_sapi_name() === 'cli');
-$currentHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+$appEnv = strtolower(trim($_ENV['APP_ENV'] ?? 'production'));
 
-// Determine connection parameters based on environment
+// Determine connection parameters for debug display / compatibility
 if ($isCLI) {
-    // CLI Mode - Connect via localhost (requires exposed port in docker-compose)
     $servername = $_ENV['DB_HOST_CLI'] ?? "127.0.0.1";
     $port = $_ENV['DB_PORT_CLI'] ?? "3306";
     $username = $_ENV['DB_USER'] ?? "root";
     $password = $_ENV['DB_PASSWORD'] ?? "abcd";
     $dbname = $_ENV['DB_NAME'] ?? "testdb";
-} elseif (strpos($currentHost, 'localhost') !== false || strpos($currentHost, '127.0.0.1') !== false) {
-    // Docker/Local Web Mode - Use Docker service name
+} elseif (in_array($appEnv, ['development', 'dev', 'local'], true)) {
+    // Development/Local/Docker Mode
     $servername = $_ENV['DB_HOST'] ?? "db";
     $port = $_ENV['DB_PORT'] ?? "3306";
     $username = $_ENV['DB_USER'] ?? "root";
@@ -40,26 +44,27 @@ if ($isCLI) {
     $dbname = $_ENV['DB_NAME'] ?? "connect_ping2";
 }
 
-// PDO connection
+// Create (cached) PDO connection using the new factory
 try {
-    $dsn = "mysql:host=$servername;port=$port;dbname=$dbname;charset=utf8mb4";
-    $connpdo = new PDO($dsn, $username, $password);
-    $connpdo->exec("SET time_zone = 'Asia/Kolkata'");
-    $connpdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $connpdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $connpdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-} catch (PDOException $e) {
-    $env = $isCLI ? "CLI" : ($currentHost ?? "Docker");
-    http_response_code(500);
-    header('Content-Type: application/json');
+    $connpdo = DatabaseConnection::pdo();
+} catch (\Throwable $e) {
+    // Keep old behavior: return JSON + die (so nothing breaks during migration)
+    $mode = $isCLI ? "CLI" : strtoupper($appEnv ?: 'production');
+
+    if (!$isCLI) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+    }
+
     echo json_encode([
         'error' => 'Database connection failed',
-        'mode' => $env,
+        'mode' => $mode,
         'host' => $servername,
         'port' => $port,
         'database' => $dbname,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ]);
+
     die();
 }
 
@@ -69,7 +74,7 @@ try {
 
 /**
  * Begin a database transaction
- * 
+ *
  * @param PDO $conn Database connection
  * @return bool Success status
  */
@@ -89,7 +94,7 @@ function transBegin(PDO $conn): bool
 
 /**
  * Commit a database transaction
- * 
+ *
  * @param PDO $conn Database connection
  * @return bool Success status
  */
@@ -109,7 +114,7 @@ function transCommit(PDO $conn): bool
 
 /**
  * Rollback a database transaction
- * 
+ *
  * @param PDO $conn Database connection
  * @return bool Success status
  */
@@ -129,7 +134,7 @@ function transRollback(PDO $conn): bool
 
 /**
  * Check if currently in a transaction
- * 
+ *
  * @param PDO $conn Database connection
  * @return bool Transaction status
  */
@@ -145,7 +150,7 @@ function transStatus(PDO $conn): bool
 /**
  * Enhanced interpolateQuery function
  * Interpolates query parameters for debugging
- * 
+ *
  * @param PDO $conn Database connection
  * @param string $query SQL query with placeholders
  * @param array $params Parameters array
@@ -181,48 +186,14 @@ function interpolateQuery(PDO $conn, string $query, array $params = []): string
 
 /**
  * RunQuery function - Array-only parameter style (Standard)
- * 
- * @deprecated This function is deprecated and will be removed in future versions.
- *             Use the new Database class instead: $this->db->query()
- * 
- * Usage Examples:
- * 
- * // Basic SELECT
- * RunQuery([
- *     'conn' => $conn,
- *     'query' => 'SELECT * FROM users WHERE id = :id',
- *     'params' => [':id' => 1]
- * ]);
- * 
- * // INSERT with success info
- * RunQuery([
- *     'conn' => $conn,
- *     'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
- *     'params' => [':name' => 'John', ':email' => 'john@example.com'],
- *     'withSuccess' => true
- * ]);
- * 
- * // Return SQL string for debugging
- * RunQuery([
- *     'conn' => $conn,
- *     'query' => 'SELECT * FROM users WHERE status = :status',
- *     'params' => [':status' => 'active'],
- *     'returnSql' => true
- * ]);
- * 
- * @param array $config Configuration array with following keys:
- *   - 'conn' (required): PDO database connection
- *   - 'query' (required): SQL query string
- *   - 'params' (optional): Array of parameters for prepared statement (default: [])
- *   - 'fetchAssoc' (optional): Return associative array (default: true)
- *   - 'withSuccess' (optional): Return success info with affected rows and ID (default: false)
- *   - 'returnSql' (optional): Return interpolated SQL string for debugging (default: false)
- * 
+ *
+ * @deprecated Use the new Database class instead: $this->db->query()
+ *
+ * @param array $config Configuration array
  * @return mixed Query results, success array, SQL string, or error array
  */
 function RunQuery(array $config)
 {
-    // Extract parameters with defaults
     $conn = $config['conn'] ?? null;
     $query = $config['query'] ?? null;
     $parameterArray = $config['params'] ?? [];
@@ -230,7 +201,6 @@ function RunQuery(array $config)
     $withSUCCESS = $config['withSuccess'] ?? false;
     $returnSql = $config['returnSql'] ?? false;
 
-    // Validate required parameters
     if (!$conn) {
         return ['error' => 'Database connection (conn) is required'];
     }
@@ -240,12 +210,10 @@ function RunQuery(array $config)
     }
 
     try {
-        // Return interpolated SQL for debugging if requested
         if ($returnSql) {
             return interpolateQuery($conn, $query, $parameterArray);
         }
 
-        // Prepare and execute query
         $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt = $conn->prepare($query);
 
@@ -253,10 +221,8 @@ function RunQuery(array $config)
             return ['error' => implode(', ', $stmt->errorInfo())];
         }
 
-        // Fetch results
         $rows = $stmt->fetchAll($dataAsASSOC ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
 
-        // Return detailed success information if requested
         if ($withSUCCESS) {
             $result = [
                 'success' => true,
@@ -265,12 +231,10 @@ function RunQuery(array $config)
                 'data' => $rows
             ];
 
-            // Get last insert ID for INSERT queries
             if (stripos(trim($query), 'insert') === 0) {
                 $result['id'] = $conn->lastInsertId();
             }
 
-            // Get ID from params for UPDATE queries
             if (stripos(trim($query), 'update') === 0 && isset($parameterArray[':id'])) {
                 $result['id'] = $parameterArray[':id'];
             }
@@ -278,15 +242,13 @@ function RunQuery(array $config)
             return $result;
         }
 
-        // Return simple row data
         return $rows;
-        
+
     } catch (PDOException $e) {
-        // Log the error only if LOG_ERRORS is enabled
         if (!empty($_ENV['LOG_ERRORS']) && ($_ENV['LOG_ERRORS'] === 'true' || $_ENV['LOG_ERRORS'] === '1')) {
             error_log("RunQuery Error: " . $e->getMessage() . " | Query: " . $query);
         }
-        
+
         return ['error' => $e->getMessage()];
     }
 }

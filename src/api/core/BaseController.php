@@ -4,15 +4,14 @@
 namespace App\Core;
 
 use App\Core\Database;
+use App\Core\Config\DatabaseConnection;
 use App\Core\Utilities\ValidationUtility;
 use Dotenv\Dotenv;
 use App\Core\Security;
-use App\Core\Exceptions\DatabaseException;
 
 abstract class BaseController
 {
-    protected $conn; // Legacy PDO connection (backward compatibility)
-    protected Database $db; // New Database class instance
+    protected ?Database $db = null;     // Only keep this - remove $conn
     private static bool $envLoaded = false;
 
     public function __construct()
@@ -20,41 +19,26 @@ abstract class BaseController
         // Ensure environment variables are loaded first
         $this->ensureEnvironmentLoaded();
 
-        // Skip security check for CLI scripts (testing, cron jobs, etc.)
+        // Skip security check for CLI scripts
         if (php_sapi_name() !== 'cli') {
             Security::ensureSecure();
         }
 
-        // Initialize database connection
-        require_once __DIR__ . '/../Core/Config/connection.php';
-        
-        // Set legacy connection (backward compatibility)
-        $this->conn = $connpdo;
-        
-        // Initialize new Database class
+        // Initialize database using modern DatabaseConnection class
         try {
-            $this->db = new Database($connpdo);
-        } catch (DatabaseException $e) {
-            error_log("Failed to initialize Database class: " . $e->getMessage());
-            // Fall back to just using $this->conn if Database class fails
+            $pdo = DatabaseConnection::pdo();
+            $this->db = new Database($pdo);
+        } catch (\Exception $e) {
+            error_log('Database initialization failed: ' . $e->getMessage());
             $this->db = null;
         }
     }
 
-    /**
-     * Validate request with rules
-     * 
-     * @param array $rules Validation rules
-     * @return array Validation result
-     */
     protected function validateRequest(array $rules): array
     {
         return ValidationUtility::validate($rules);
     }
 
-    /**
-     * Ensure environment variables are loaded before anything else
-     */
     private function ensureEnvironmentLoaded(): void
     {
         if (!self::$envLoaded) {
@@ -64,59 +48,27 @@ abstract class BaseController
         }
     }
 
-    /**
-     * Send success response using your global sendJsonResponse function
-     * 
-     * @param string $message Success message
-     * @param mixed $data Response data
-     * @param array $extra Extra fields to include
-     */
     protected function sendSuccess(string $message, $data = null, array $extra = []): void
     {
         sendJsonResponse(200, 'success', $message, $data, $extra);
     }
 
-    /**
-     * Send error response using your global sendJsonResponse function
-     * 
-     * @param string $message Error message
-     * @param int $statusCode HTTP status code
-     * @param mixed $data Additional error data
-     */
     protected function sendError(string $message, int $statusCode = 400, $data = null): void
     {
         sendJsonResponse($statusCode, 'error', $message, $data);
     }
 
-    /**
-     * Send validation error response
-     * 
-     * @param string $message Error message
-     * @param array $errors Validation errors array
-     */
     protected function sendValidationError(string $message, array $errors): void
     {
         $data = !empty($errors) ? ['validation_errors' => $errors] : null;
         sendJsonResponse(422, 'error', $message, $data);
     }
 
-    /**
-     * Send server error response
-     * 
-     * @param string $message Error message (default: "Internal server error")
-     */
     protected function sendServerError(string $message = "Internal server error"): void
     {
         sendJsonResponse(500, 'error', $message);
     }
 
-    /**
-     * Validate required fields in request data
-     * 
-     * @param array $data Request data
-     * @param array $required Required field names
-     * @return array Missing field names
-     */
     protected function validateRequired(array $data, array $required): array
     {
         $missing = [];
@@ -128,12 +80,6 @@ abstract class BaseController
         return $missing;
     }
 
-    /**
-     * Sanitize input data
-     * 
-     * @param mixed $input Input to sanitize
-     * @return mixed Sanitized input
-     */
     protected function sanitizeInput($input)
     {
         if (is_string($input)) {
@@ -145,29 +91,18 @@ abstract class BaseController
         return $input;
     }
 
-    /**
-     * Get request data (POST/PUT/PATCH)
-     * 
-     * @return array Request data
-     */
     protected function getRequestData(): array
     {
         $input = file_get_contents('php://input');
         $data = json_decode($input, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            // If JSON decode fails, try to get from $_POST
             $data = $_POST;
         }
 
         return $this->sanitizeInput($data ?? []);
     }
 
-    /**
-     * Get query parameters (GET)
-     * 
-     * @return array Query parameters
-     */
     protected function getQueryParams(): array
     {
         return $this->sanitizeInput($_GET);

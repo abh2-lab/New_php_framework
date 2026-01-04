@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database & Query Handling - Framework Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: #0d1117;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #58a6ff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #79c0ff;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            color: #a5d6ff;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        h4 {
+            color: #c9d1d9;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #c9d1d9;
+            line-height: 1.8;
+        }
+
+        .intro {
+            background: #1c2128;
+            padding: 20px;
+            border-left: 4px solid #58a6ff;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .important {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #f97316;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .important strong {
+            color: #f97316;
+        }
+
+        .tip {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #3fb950;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #3fb950;
+        }
+
+        code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #ff7b72;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #c9d1d9;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+        .function { color: #d2a8ff; }
+        .variable { color: #ffa657; }
+        .class { color: #79c0ff; }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            color: #c9d1d9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0d1117;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #1c2128;
+            color: #58a6ff;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #30363d;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .label-query { background: #1f6feb; color: white; }
+        .label-security { background: #f85149; color: white; }
+        .label-performance { background: #3fb950; color: white; }
+        .label-transaction { background: #d29922; color: white; }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Home</a>
+
+        <h1>Database & Query Handling</h1>
+
+        <div class="intro">
+            <p><strong>This framework uses a modern PDO wrapper class called <code>Database</code> that provides a clean, chainable interface for all database operations.</strong></p>
+            <p>Instead of working with raw PDO, you'll use the <code>Database</code> class which offers security, performance tracking, transaction support, and a simpler API.</p>
+        </div>
+
+        <h2>Overview: The Database Class</h2>
+
+        <p>The <code>Database</code> class is located at:</p>
+        <pre><code><span class="comment">// File path</span>
+src/api/core/Database.php
+
+<span class="comment">// Namespace</span>
+<span class="keyword">namespace</span> <span class="class">App\Core</span>;
+
+<span class="keyword">class</span> <span class="class">Database</span> { ... }</code></pre>
+
+        <h3>Key Features</h3>
+        <ul>
+            <li><strong>PDO Wrapper:</strong> Modern interface over raw PDO</li>
+            <li><strong>Prepared Statements:</strong> All queries use prepared statements for security</li>
+            <li><strong>Transaction Support:</strong> Built-in begin/commit/rollback with automatic error handling</li>
+            <li><strong>Performance Tracking:</strong> Automatic query count, execution time, and data size metrics</li>
+            <li><strong>Helper Methods:</strong> Simplified <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code></li>
+            <li><strong>Debug Mode:</strong> Logs slow queries (>500ms) when debug is enabled</li>
+        </ul>
+
+        <h2>How Controllers and Repositories Get Database Access</h2>
+
+        <h3>In Controllers (via BaseController)</h3>
+        <p>All controllers extend <code>BaseController</code>, which automatically initializes the database:</p>
+
+        <pre><code><span class="comment">// Inside BaseController constructor</span>
+<span class="keyword">protected</span> ?<span class="class">Database</span> <span class="variable">$db</span> = <span class="keyword">null</span>;
+
+<span class="keyword">public function</span> <span class="function">__construct</span>() {
+    <span class="comment">// Get PDO connection</span>
+    <span class="variable">$pdo</span> = <span class="class">DatabaseConnection</span>::<span class="function">pdo</span>();
+
+    <span class="comment">// Create Database wrapper instance</span>
+    <span class="variable">$this</span>-><span class="variable">db</span> = <span class="keyword">new</span> <span class="class">Database</span>(<span class="variable">$pdo</span>);
+}</code></pre>
+
+        <p>Controllers then pass <code>$this->db</code> to repositories:</p>
+
+        <pre><code><span class="comment">// Example: ProductController</span>
+<span class="keyword">private</span> <span class="class">ProductRepository</span> <span class="variable">$productRepo</span>;
+
+<span class="keyword">public function</span> <span class="function">__construct</span>() {
+    <span class="keyword">parent</span>::<span class="function">__construct</span>();
+    <span class="variable">$this</span>-><span class="variable">productRepo</span> = <span class="keyword">new</span> <span class="class">ProductRepository</span>(<span class="variable">$this</span>-><span class="variable">db</span>);
+}</code></pre>
+
+        <h3>In Repositories</h3>
+        <p>Repositories receive the <code>Database</code> instance via constructor injection:</p>
+
+        <pre><code><span class="keyword">class</span> <span class="class">ProductRepository</span> {
+    <span class="keyword">private</span> <span class="class">Database</span> <span class="variable">$db</span>;
+
+    <span class="keyword">public function</span> <span class="function">__construct</span>(<span class="class">Database</span> <span class="variable">$db</span>) {
+        <span class="variable">$this</span>-><span class="variable">db</span> = <span class="variable">$db</span>;
+    }
+
+    <span class="comment">// Now use $this->db for all queries</span>
+}</code></pre>
+
+        <h2>Core Query Method: <code>query()</code></h2>
+
+        <p>The <code>query()</code> method is the foundation of all database operations. It accepts a configuration array:</p>
+
+        <h3>Method Signature</h3>
+        <pre><code><span class="keyword">public function</span> <span class="function">query</span>(<span class="keyword">array</span> <span class="variable">$config</span>): <span class="keyword">array</span></code></pre>
+
+        <h3>Configuration Array Options</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>query</code></td>
+                    <td>string</td>
+                    <td>✅ Yes</td>
+                    <td>SQL query string with named placeholders</td>
+                </tr>
+                <tr>
+                    <td><code>params</code></td>
+                    <td>array</td>
+                    <td>No</td>
+                    <td>Associative array of parameters (default: <code>[]</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>fetchAssoc</code></td>
+                    <td>bool</td>
+                    <td>No</td>
+                    <td>Return associative array (<code>true</code>) or numeric (<code>false</code>). Default: <code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>withSuccess</code></td>
+                    <td>bool</td>
+                    <td>No</td>
+                    <td>Return structured response with success/id/affectedRows. Default: <code>false</code></td>
+                </tr>
+                <tr>
+                    <td><code>returnSql</code></td>
+                    <td>bool</td>
+                    <td>No</td>
+                    <td>Return interpolated SQL string (for debugging). Default: <code>false</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Basic Query Example</h3>
+        <pre><code><span class="comment">// Simple SELECT query</span>
+<span class="variable">$products</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">query</span>([
+    <span class="string">'query'</span> => <span class="string">'SELECT * FROM products WHERE category = :category'</span>,
+    <span class="string">'params'</span> => [<span class="string">'category'</span> => <span class="string">'Electronics'</span>]
+]);
+
+<span class="comment">// Result: Array of product rows</span>
+<span class="comment">// [</span>
+<span class="comment">//   ['id' => 1, 'name' => 'Laptop', 'category' => 'Electronics'],</span>
+<span class="comment">//   ['id' => 2, 'name' => 'Mouse', 'category' => 'Electronics']</span>
+<span class="comment">// ]</span></code></pre>
+
+        <h3>Query with Structured Response</h3>
+        <pre><code><span class="comment">// INSERT with structured response</span>
+<span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">query</span>([
+    <span class="string">'query'</span> => <span class="string">'INSERT INTO products (name, sku, price) VALUES (:name, :sku, :price)'</span>,
+    <span class="string">'params'</span> => [
+        <span class="string">'name'</span> => <span class="string">'Wireless Mouse'</span>,
+        <span class="string">'sku'</span> => <span class="string">'MOU-002'</span>,
+        <span class="string">'price'</span> => <span class="number">29.99</span>
+    ],
+    <span class="string">'withSuccess'</span> => <span class="keyword">true</span>
+]);
+
+<span class="comment">// Result structure:</span>
+<span class="comment">// [</span>
+<span class="comment">//   'success' => true,</span>
+<span class="comment">//   'affectedRows' => 1,</span>
+<span class="comment">//   'id' => 5,           // Last insert ID</span>
+<span class="comment">//   'data' => []</span>
+<span class="comment">// ]</span></code></pre>
+
+        <h2>Helper Methods</h2>
+
+        <p>The <code>Database</code> class provides convenient helper methods that wrap <code>query()</code>:</p>
+
+        <h3><code>select()</code> - Fetch Data</h3>
+        <span class="label label-query">SELECT</span>
+        <pre><code><span class="keyword">public function</span> <span class="function">select</span>(<span class="keyword">string</span> <span class="variable">$query</span>, <span class="keyword">array</span> <span class="variable">$params</span> = []): <span class="keyword">array</span>
+
+<span class="comment">// Example usage</span>
+<span class="variable">$products</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(
+    <span class="string">'SELECT * FROM products WHERE price > :min_price ORDER BY price'</span>,
+    [<span class="string">'min_price'</span> => <span class="number">50</span>]
+);
+
+<span class="comment">// Returns array of rows</span></code></pre>
+
+        <h3><code>insert()</code> - Insert Records</h3>
+        <span class="label label-query">INSERT</span>
+        <pre><code><span class="keyword">public function</span> <span class="function">insert</span>(<span class="keyword">string</span> <span class="variable">$query</span>, <span class="keyword">array</span> <span class="variable">$params</span> = []): <span class="keyword">array</span>
+
+<span class="comment">// Example usage</span>
+<span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(
+    <span class="string">'INSERT INTO orders (user_id, total_amount, status) VALUES (:user_id, :total, :status)'</span>,
+    [
+        <span class="string">'user_id'</span> => <span class="number">42</span>,
+        <span class="string">'total'</span> => <span class="number">299.99</span>,
+        <span class="string">'status'</span> => <span class="string">'pending'</span>
+    ]
+);
+
+<span class="comment">// Returns: ['success' => true, 'affectedRows' => 1, 'id' => 123, 'data' => []]</span>
+<span class="variable">$orderId</span> = <span class="variable">$result</span>[<span class="string">'id'</span>];</code></pre>
+
+        <h3><code>update()</code> - Update Records</h3>
+        <span class="label label-query">UPDATE</span>
+        <pre><code><span class="keyword">public function</span> <span class="function">update</span>(<span class="keyword">string</span> <span class="variable">$query</span>, <span class="keyword">array</span> <span class="variable">$params</span> = []): <span class="keyword">array</span>
+
+<span class="comment">// Example usage</span>
+<span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(
+    <span class="string">'UPDATE products SET stock = stock - :qty WHERE id = :id'</span>,
+    [<span class="string">'qty'</span> => <span class="number">5</span>, <span class="string">'id'</span> => <span class="number">10</span>]
+);
+
+<span class="comment">// Returns: ['success' => true, 'affectedRows' => 1, 'id' => 10, 'data' => []]</span></code></pre>
+
+        <h3><code>delete()</code> - Delete Records</h3>
+        <span class="label label-query">DELETE</span>
+        <pre><code><span class="keyword">public function</span> <span class="function">delete</span>(<span class="keyword">string</span> <span class="variable">$query</span>, <span class="keyword">array</span> <span class="variable">$params</span> = []): <span class="keyword">array</span>
+
+<span class="comment">// Example usage</span>
+<span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">delete</span>(
+    <span class="string">'DELETE FROM order_items WHERE order_id = :order_id'</span>,
+    [<span class="string">'order_id'</span> => <span class="number">99</span>]
+);
+
+<span class="comment">// Returns: ['success' => true, 'affectedRows' => 3, 'id' => null, 'data' => []]</span></code></pre>
+
+        <h3><code>first()</code> - Get Single Record</h3>
+        <span class="label label-query">SELECT ONE</span>
+        <pre><code><span class="keyword">public function</span> <span class="function">first</span>(<span class="keyword">string</span> <span class="variable">$query</span>, <span class="keyword">array</span> <span class="variable">$params</span> = []): ?<span class="keyword">array</span>
+
+<span class="comment">// Example usage</span>
+<span class="variable">$product</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">first</span>(
+    <span class="string">'SELECT * FROM products WHERE id = :id'</span>,
+    [<span class="string">'id'</span> => <span class="number">5</span>]
+);
+
+<span class="comment">// Returns: Single row array or NULL if not found</span>
+<span class="keyword">if</span> (<span class="variable">$product</span>) {
+    <span class="keyword">echo</span> <span class="variable">$product</span>[<span class="string">'name'</span>];
+}</code></pre>
+
+        <h2>Security: Prepared Statements</h2>
+        <span class="label label-security">CRITICAL</span>
+
+        <div class="important">
+            <p><strong>NEVER concatenate user input directly into SQL queries!</strong></p>
+            <p>Always use named placeholders (<code>:param</code>) and parameter binding.</p>
+        </div>
+
+        <h3>✅ Correct (Secure)</h3>
+        <pre><code><span class="comment">// Using named placeholders</span>
+<span class="variable">$products</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(
+    <span class="string">'SELECT * FROM products WHERE category = :category AND price < :max_price'</span>,
+    [
+        <span class="string">'category'</span> => <span class="variable">$userInput</span>,
+        <span class="string">'max_price'</span> => <span class="variable">$maxPrice</span>
+    ]
+);</code></pre>
+
+        <h3>❌ Wrong (SQL Injection Risk)</h3>
+        <pre><code><span class="comment">// NEVER do this!</span>
+<span class="variable">$query</span> = <span class="string">"SELECT * FROM products WHERE category = '</span><span class="variable">$userInput</span><span class="string">'"</span>;
+<span class="variable">$products</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(<span class="variable">$query</span>);</code></pre>
+
+        <h3>How It Works</h3>
+        <p>Behind the scenes, the framework:</p>
+        <ol>
+            <li>Prepares the SQL statement with placeholders</li>
+            <li>Binds parameters safely using PDO's binding mechanism</li>
+            <li>Executes the prepared statement</li>
+            <li>Returns the results</li>
+        </ol>
+
+        <h2>Transaction Management</h2>
+        <span class="label label-transaction">TRANSACTIONS</span>
+
+        <p>Transactions ensure that multiple database operations either all succeed or all fail together, maintaining data consistency.</p>
+
+        <h3>Manual Transaction Control</h3>
+        <pre><code><span class="comment">// Start transaction</span>
+<span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">beginTransaction</span>();
+
+<span class="keyword">try</span> {
+    <span class="comment">// Multiple operations</span>
+    <span class="variable">$orderResult</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(
+        <span class="string">'INSERT INTO orders (user_id, total_amount) VALUES (:user_id, :total)'</span>,
+        [<span class="string">'user_id'</span> => <span class="number">10</span>, <span class="string">'total'</span> => <span class="number">150.00</span>]
+    );
+
+    <span class="variable">$orderId</span> = <span class="variable">$orderResult</span>[<span class="string">'id'</span>];
+
+    <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(
+        <span class="string">'INSERT INTO order_items (order_id, product_id, quantity) VALUES (:order_id, :product_id, :qty)'</span>,
+        [<span class="string">'order_id'</span> => <span class="variable">$orderId</span>, <span class="string">'product_id'</span> => <span class="number">5</span>, <span class="string">'qty'</span> => <span class="number">2</span>]
+    );
+
+    <span class="comment">// Commit if all succeeded</span>
+    <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">commit</span>();
+
+} <span class="keyword">catch</span> (<span class="class">\Exception</span> <span class="variable">$e</span>) {
+    <span class="comment">// Rollback on error</span>
+    <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">rollback</span>();
+    <span class="keyword">throw</span> <span class="variable">$e</span>;
+}</code></pre>
+
+        <h3>Automatic Transaction (Recommended)</h3>
+        <p>Use the <code>transaction()</code> method with a callback for automatic commit/rollback:</p>
+
+        <pre><code><span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">transaction</span>(<span class="keyword">function</span>(<span class="variable">$db</span>) {
+    <span class="comment">// All operations inside this callback are in a transaction</span>
+    <span class="variable">$orderResult</span> = <span class="variable">$db</span>-><span class="function">insert</span>(
+        <span class="string">'INSERT INTO orders (user_id, total_amount) VALUES (:user_id, :total)'</span>,
+        [<span class="string">'user_id'</span> => <span class="number">10</span>, <span class="string">'total'</span> => <span class="number">150.00</span>]
+    );
+
+    <span class="variable">$orderId</span> = <span class="variable">$orderResult</span>[<span class="string">'id'</span>];
+
+    <span class="variable">$db</span>-><span class="function">insert</span>(
+        <span class="string">'INSERT INTO order_items (order_id, product_id, quantity) VALUES (:order_id, :product_id, :qty)'</span>,
+        [<span class="string">'order_id'</span> => <span class="variable">$orderId</span>, <span class="string">'product_id'</span> => <span class="number">5</span>, <span class="string">'qty'</span> => <span class="number">2</span>]
+    );
+
+    <span class="keyword">return</span> <span class="variable">$orderId</span>; <span class="comment">// Return value from transaction</span>
+});
+
+<span class="comment">// Automatically commits on success</span>
+<span class="comment">// Automatically rolls back on exception</span></code></pre>
+
+        <h3>Transaction Helper Methods</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>beginTransaction()</code></td>
+                    <td>Start a new transaction</td>
+                </tr>
+                <tr>
+                    <td><code>commit()</code></td>
+                    <td>Commit the current transaction</td>
+                </tr>
+                <tr>
+                    <td><code>rollback()</code></td>
+                    <td>Rollback the current transaction</td>
+                </tr>
+                <tr>
+                    <td><code>inTransaction()</code></td>
+                    <td>Check if currently inside a transaction (returns <code>bool</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>getTransactionLog()</code></td>
+                    <td>Get array of queries executed in current transaction (debug mode)</td>
+                </tr>
+                <tr>
+                    <td><code>transaction(callable $callback)</code></td>
+                    <td>Execute callback with automatic commit/rollback</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Database Connection Management</h2>
+
+        <h3>DatabaseConnection Singleton</h3>
+        <p>The framework uses a singleton pattern for database connections via the <code>DatabaseConnection</code> class:</p>
+
+        <pre><code><span class="comment">// Located at: src/api/core/config/DatabaseConnection.php</span>
+
+<span class="keyword">use</span> <span class="class">App\Core\Config\DatabaseConnection</span>;
+
+<span class="comment">// Get PDO connection (singleton)</span>
+<span class="variable">$pdo</span> = <span class="class">DatabaseConnection</span>::<span class="function">pdo</span>();
+
+<span class="comment">// Wrap it with Database class</span>
+<span class="variable">$db</span> = <span class="keyword">new</span> <span class="class">Database</span>(<span class="variable">$pdo</span>);</code></pre>
+
+        <h3>Environment-Based Configuration</h3>
+        <p>The connection automatically adapts based on environment variables:</p>
+
+        <h4>1. CLI Mode (Command Line)</h4>
+        <pre><code><span class="comment">// Uses CLI-specific variables:</span>
+<span class="variable">DB_HOST_CLI</span> = <span class="string">127.0.0.1</span>
+<span class="variable">DB_PORT_CLI</span> = <span class="string">3306</span>
+<span class="variable">DB_USER</span> = <span class="string">root</span>
+<span class="variable">DB_PASSWORD</span> = <span class="string">abcd</span>
+<span class="variable">DB_NAME</span> = <span class="string">testdb</span></code></pre>
+
+        <h4>2. Development Mode</h4>
+        <pre><code><span class="comment">// When APP_ENV = development|dev|local:</span>
+<span class="variable">DB_HOST</span> = <span class="string">db</span>
+<span class="variable">DB_PORT</span> = <span class="string">3306</span>
+<span class="variable">DB_USER</span> = <span class="string">root</span>
+<span class="variable">DB_PASSWORD</span> = <span class="string">abcd</span>
+<span class="variable">DB_NAME</span> = <span class="string">testdb</span></code></pre>
+
+        <h4>3. Production Mode</h4>
+        <pre><code><span class="comment">// When APP_ENV = production:</span>
+<span class="variable">DB_HOST</span> = <span class="string">phpmyadmin.coolify.vps.boomlive.in</span>
+<span class="variable">DB_PORT</span> = <span class="string">3303</span>
+<span class="variable">DB_USER</span> = <span class="string">root</span>
+<span class="variable">DB_PASSWORD</span> = <span class="string">abcd</span>
+<span class="variable">DB_NAME</span> = <span class="string">connectping2</span></code></pre>
+
+        <h3>Automatic Timezone Setup</h3>
+        <p>The connection automatically sets the timezone:</p>
+        <pre><code><span class="variable">$pdo</span>-><span class="function">exec</span>(<span class="string">"SET time_zone = 'Asia/Kolkata'"</span>);</code></pre>
+
+        <h2>Performance Tracking</h2>
+        <span class="label label-performance">MONITORING</span>
+
+        <p>The <code>Database</code> class automatically tracks performance metrics for every query:</p>
+
+        <h3>Tracked Metrics</h3>
+        <ul>
+            <li><strong>Query Count:</strong> Total number of queries executed (<code>$GLOBALS['query_count']</code>)</li>
+            <li><strong>Query Time:</strong> Total execution time in milliseconds (<code>$GLOBALS['query_time']</code>)</li>
+            <li><strong>Max Query Time:</strong> Slowest query execution time (<code>$GLOBALS['max_query_time']</code>)</li>
+            <li><strong>Data Size:</strong> Total data returned in KB (<code>$GLOBALS['db_data_size']</code>)</li>
+            <li><strong>Max Data Size:</strong> Largest single query result (<code>$GLOBALS['max_db_data_size']</code>)</li>
+        </ul>
+
+        <h3>Slow Query Logging</h3>
+        <p>When debug mode is enabled, queries taking longer than 500ms are automatically logged:</p>
+
+        <pre><code><span class="comment">// Logged to error_log when query > 500ms</span>
+<span class="string">"SLOW QUERY (753.42ms): SELECT * FROM products JOIN categories..."</span></code></pre>
+
+        <h3>Integration with Monitoring</h3>
+        <p>The <code>MonitoringMiddleware</code> automatically captures these metrics and includes them in performance reports:</p>
+
+        <pre><code><span class="comment">// Monitoring response includes:</span>
+{
+    <span class="string">"db_queries"</span>: <span class="number">5</span>,
+    <span class="string">"db_time"</span>: <span class="number">42.35</span>,           <span class="comment">// ms</span>
+    <span class="string">"max_db_time"</span>: <span class="number">18.20</span>,       <span class="comment">// ms</span>
+    <span class="string">"avg_db_time"</span>: <span class="number">8.47</span>,        <span class="comment">// ms</span>
+    <span class="string">"db_percentage"</span>: <span class="number">21.5</span>,      <span class="comment">// % of total response time</span>
+    <span class="string">"db_data_size"</span>: <span class="number">124.5</span>,     <span class="comment">// KB</span>
+    <span class="string">"response_time"</span>: <span class="number">197.2</span>      <span class="comment">// ms</span>
+}</code></pre>
+
+        <h2>Real-World Examples from Framework</h2>
+
+        <h3>Example 1: ProductRepository - Get All Products</h3>
+        <pre><code><span class="comment">// File: src/api/repositories/ProductRepository.php</span>
+
+<span class="keyword">public function</span> <span class="function">findAll</span>(<span class="keyword">int</span> <span class="variable">$limit</span> = <span class="number">50</span>): <span class="keyword">array</span> {
+    <span class="variable">$query</span> = <span class="string">"SELECT 
+                   id, name, sku, price, stock, category, 
+                   status, created_at, updated_at 
+               FROM products 
+               WHERE status = :status 
+               ORDER BY created_at DESC 
+               LIMIT :limit"</span>;
+
+    <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(<span class="variable">$query</span>, [
+        <span class="string">'status'</span> => <span class="string">'active'</span>,
+        <span class="string">'limit'</span> => <span class="variable">$limit</span>
+    ]);
+}</code></pre>
+
+        <h3>Example 2: OrderRepository - Create Order with Transaction</h3>
+        <pre><code><span class="comment">// File: src/api/repositories/OrderRepository.php</span>
+
+<span class="keyword">public function</span> <span class="function">create</span>(<span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">int</span> {
+    <span class="variable">$query</span> = <span class="string">"INSERT INTO orders 
+                  (user_id, total_amount, payment_method, status, notes, created_at) 
+               VALUES 
+                  (:user_id, :total_amount, :payment_method, :status, :notes, NOW())"</span>;
+
+    <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">insert</span>(<span class="variable">$query</span>, [
+        <span class="string">'user_id'</span> => <span class="variable">$data</span>[<span class="string">'user_id'</span>],
+        <span class="string">'total_amount'</span> => <span class="variable">$data</span>[<span class="string">'total_amount'</span>],
+        <span class="string">'payment_method'</span> => <span class="variable">$data</span>[<span class="string">'payment_method'</span>],
+        <span class="string">'status'</span> => <span class="variable">$data</span>[<span class="string">'status'</span>],
+        <span class="string">'notes'</span> => <span class="variable">$data</span>[<span class="string">'notes'</span>] ?? <span class="keyword">null</span>
+    ]);
+
+    <span class="keyword">return</span> (<span class="keyword">int</span>) <span class="variable">$result</span>[<span class="string">'id'</span>];
+}</code></pre>
+
+        <h3>Example 3: OrderRepository - Find with JOIN</h3>
+        <pre><code><span class="keyword">public function</span> <span class="function">getOrderItems</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>): <span class="keyword">array</span> {
+    <span class="variable">$query</span> = <span class="string">"SELECT 
+                   oi.id,
+                   oi.product_id,
+                   p.name as product_name,
+                   p.sku,
+                   oi.quantity,
+                   oi.price,
+                   oi.subtotal
+               FROM order_items oi
+               INNER JOIN products p ON oi.product_id = p.id
+               WHERE oi.order_id = :order_id
+               ORDER BY oi.id"</span>;
+
+    <span class="keyword">return</span> <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">select</span>(<span class="variable">$query</span>, [
+        <span class="string">'order_id'</span> => <span class="variable">$orderId</span>
+    ]);
+}</code></pre>
+
+        <h3>Example 4: Dynamic UPDATE with Multiple Fields</h3>
+        <pre><code><span class="comment">// File: src/api/repositories/OrderRepository.php</span>
+
+<span class="keyword">public function</span> <span class="function">update</span>(<span class="keyword">int</span> <span class="variable">$orderId</span>, <span class="keyword">array</span> <span class="variable">$data</span>): <span class="keyword">bool</span> {
+    <span class="variable">$setClauses</span> = [];
+    <span class="variable">$params</span> = [<span class="string">'id'</span> => <span class="variable">$orderId</span>];
+
+    <span class="comment">// Build SET clauses dynamically</span>
+    <span class="keyword">foreach</span> (<span class="variable">$data</span> <span class="keyword">as</span> <span class="variable">$key</span> => <span class="variable">$value</span>) {
+        <span class="variable">$setClauses</span>[] = <span class="string">"{</span><span class="variable">$key</span><span class="string">} = :</span><span class="variable">$key</span><span class="string">"</span>;
+        <span class="variable">$params</span>[<span class="variable">$key</span>] = <span class="variable">$value</span>;
+    }
+
+    <span class="variable">$setClauses</span>[] = <span class="string">"updated_at = NOW()"</span>;
+
+    <span class="variable">$query</span> = <span class="string">"UPDATE orders SET "</span> . <span class="function">implode</span>(<span class="string">', '</span>, <span class="variable">$setClauses</span>) . <span class="string">" WHERE id = :id"</span>;
+
+    <span class="variable">$result</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">update</span>(<span class="variable">$query</span>, <span class="variable">$params</span>);
+
+    <span class="keyword">return</span> <span class="variable">$result</span>[<span class="string">'affectedRows'</span>] > <span class="number">0</span>;
+}</code></pre>
+
+        <h2>Error Handling</h2>
+
+        <div class="important">
+            <p><strong>Database errors are automatically wrapped in <code>DatabaseException</code></strong></p>
+        </div>
+
+        <h3>Catching Database Errors</h3>
+        <pre><code><span class="keyword">use</span> <span class="class">App\Core\Exceptions\DatabaseException</span>;
+
+<span class="keyword">try</span> {
+    <span class="variable">$product</span> = <span class="variable">$this</span>-><span class="variable">db</span>-><span class="function">first</span>(
+        <span class="string">'SELECT * FROM products WHERE id = :id'</span>,
+        [<span class="string">'id'</span> => <span class="variable">$productId</span>]
+    );
+} <span class="keyword">catch</span> (<span class="class">DatabaseException</span> <span class="variable">$e</span>) {
+    <span class="comment">// In production, detailed DB errors are hidden</span>
+    <span class="comment">// In debug mode, full error is shown</span>
+    <span class="function">error_log</span>(<span class="string">"Database error: "</span> . <span class="variable">$e</span>-><span class="function">getMessage</span>());
+    <span class="keyword">throw</span> <span class="variable">$e</span>;
+}</code></pre>
+
+        <h3>Production vs Debug Mode</h3>
+        <ul>
+            <li><strong>Debug Mode (DEBUG_MODE=true):</strong> Full error messages, query logging, slow query warnings</li>
+            <li><strong>Production Mode:</strong> Generic error messages, no query logging, errors are logged but not exposed</li>
+        </ul>
+
+        <h2>Best Practices Summary</h2>
+
+        <div class="tip">
+            <p><strong>✅ DO:</strong></p>
+            <ul>
+                <li>Always use named placeholders for parameters</li>
+                <li>Use <code>first()</code> when expecting a single result</li>
+                <li>Use transactions for multi-step operations</li>
+                <li>Prefer the <code>transaction()</code> callback for automatic handling</li>
+                <li>Use helper methods (<code>select</code>, <code>insert</code>, <code>update</code>, <code>delete</code>) for clarity</li>
+                <li>Handle <code>DatabaseException</code> in repositories or services</li>
+            </ul>
+        </div>
+
+        <div class="important">
+            <p><strong>❌ DON'T:</strong></p>
+            <ul>
+                <li>Never concatenate user input into SQL strings</li>
+                <li>Don't forget to commit or rollback transactions</li>
+                <li>Don't use <code>SELECT *</code> in production (specify columns)</li>
+                <li>Don't expose raw database errors to end users</li>
+                <li>Don't perform database queries in controllers (use repositories)</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #30363d;">
+
+        <p><strong>Next:</strong> <a href="07-writing-migrations.html">Writing Migration Files</a></p>
+        <p><a href="index.html" class="back-link">← Back to Documentation Home</a></p>
+    </div>
+</body>
+</html>

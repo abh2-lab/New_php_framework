@@ -1,7 +1,14 @@
 <?php
 namespace App\Controllers;
 
+use App\Core\BaseController;
+
 class TestController extends BaseController {
+
+
+    public function welcome() {
+        $this->sendSuccess('praise the LORD');
+    }
     
     public function testRoute() {
         error_log("🎯 TestController::testRoute() executed");

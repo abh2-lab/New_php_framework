@@ -1,9 +1,25 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Match common API patterns: api, api2, v1, v2, admin-api, mobile
-    RewriteCond %{REQUEST_URI} ^/(api[0-9]*|v[0-9]+|admin-api|mobile|backend)/
+    # Block .env files
+    <FilesMatch "^\.env">
+        Require all denied
+    </FilesMatch>
+    
+    # Serve root index.php directly
+    RewriteRule ^/?$ - [L]
+    RewriteRule ^index\.php$ - [L]
+    
+    # Route /api/* to api/index.php ONLY
+    RewriteCond %{REQUEST_URI} ^/api(/.*)?$
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^[^/]+/(.*)$ /api/index.php [QSA,L]
+    RewriteRule ^api(/(.*))?$ api/index.php [QSA,L]
+    
+    # Serve existing files
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+    
 </IfModule>
+
+Options -Indexes

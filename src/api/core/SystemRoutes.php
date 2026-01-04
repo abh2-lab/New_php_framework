@@ -25,6 +25,96 @@ $router->add([
     'group' => 'System'
 ]);
 
+$router->add([
+    'method' => 'GET',
+    'url' => '/service-test/services',
+    'controller' => 'ServiceTesterController@listServices',
+    'desc' => 'Get list of available services',
+    'visible' => false,
+    'group' => 'System'
+]);
+
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/service-test/call',
+    'controller' => 'ServiceTesterController@call',
+    'desc' => 'Invoke a service method',
+    'visible' => false,
+    'group' => 'Tools'
+]);
+
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/service-test/execute',
+    'controller' => 'ServiceTesterController@execute',
+    'desc' => 'Execute service test',
+    'visible' => false,
+    'group' => 'Testing'
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/service-test/toggle-debug',
+    'controller' => 'ServiceTesterController@toggleDebug',
+    'desc' => 'Toggle debug mode',
+    'visible' => false,
+    'group' => 'Testing'
+]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+// REPOSITORY TESTING
+$router->add([
+    'method' => 'GET',
+    'url' => 'repository-test',
+    'controller' => 'RepositoryTesterController@index',
+    'desc' => 'Repository tester UI',
+    'visible' => true,
+    'group' => 'System'
+]);
+
+$router->add([
+    'method' => 'GET',
+    'url' => 'repository-test/repositories',
+    'controller' => 'RepositoryTesterController@listRepositories',
+    'desc' => 'List all repositories',
+    'visible' => false,
+    'group' => 'System'
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => 'repository-test/call',
+    'controller' => 'RepositoryTesterController@call',
+    'desc' => 'Call repository method',
+    'visible' => false,
+    'group' => 'System'
+]);
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ============================================
 // DATABASE MIGRATION
 // ============================================

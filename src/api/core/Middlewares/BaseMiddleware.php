@@ -1,5 +1,5 @@
 <?php
-namespace App\Core\Middleware;
+namespace App\Core\Middlewares;
 
 abstract class BaseMiddleware implements MiddlewareInterface {
     protected $request;

@@ -91,7 +91,6 @@ class MetricsLogger
         return $allMetrics;
     }
 
-
     public function getAggregatedStats(array $metrics): array
     {
         if (empty($metrics)) {
@@ -105,12 +104,22 @@ class MetricsLogger
             'max_response_time' => 0,
             'min_response_time' => PHP_FLOAT_MAX,
 
-            // NEW
             'p50_response_time' => 0,
             'p95_response_time' => 0,
 
             'avg_memory_used' => 0,
             'max_memory_used' => 0,
+
+            // ========== NEW: Database metrics ==========
+            'total_db_queries' => 0,
+            'avg_db_time' => 0,
+            'max_db_time' => 0,
+            'total_db_time' => 0,
+            'avg_db_percentage' => 0,
+            'total_db_data_size' => 0,
+            'avg_db_data_size' => 0,
+            'max_db_data_size' => 0,
+            // ==========================================
 
             'endpoints' => [],
             'status_codes' => [],
@@ -122,6 +131,11 @@ class MetricsLogger
 
         $memoryValues = [];
         $totalMemory = 0.0;
+
+        // ========== NEW: DB metrics tracking ==========
+        $dbPercentages = [];
+        $totalDbPercentage = 0.0;
+        // ==============================================
 
         foreach ($metrics as $metric) {
 
@@ -161,6 +175,28 @@ class MetricsLogger
 
                 $stats['max_memory_used'] = max($stats['max_memory_used'], $memory);
             }
+
+            // ========== START: NEW - Database metrics aggregation ==========
+            if (isset($metric['db_queries'])) {
+                $stats['total_db_queries'] += (int) $metric['db_queries'];
+            }
+
+            if (isset($metric['db_time'])) {
+                $stats['total_db_time'] += (float) $metric['db_time'];
+                $stats['max_db_time'] = max($stats['max_db_time'], (float) $metric['db_time']);
+            }
+
+            if (isset($metric['db_percentage'])) {
+                $dbPercentage = (float) $metric['db_percentage'];
+                $dbPercentages[] = $dbPercentage;
+                $totalDbPercentage += $dbPercentage;
+            }
+
+            if (isset($metric['db_data_size'])) {
+                $stats['total_db_data_size'] += (float) $metric['db_data_size'];
+                $stats['max_db_data_size'] = max($stats['max_db_data_size'], (float) $metric['db_data_size']);
+            }
+            // ========== END: NEW - Database metrics aggregation ==========
 
             // -------- Endpoint tracking --------
             if (isset($metric['endpoint'])) {
@@ -210,6 +246,19 @@ class MetricsLogger
         $memCount = count($memoryValues);
         $stats['avg_memory_used'] = $memCount > 0 ? round($totalMemory / $memCount, 2) : 0;
 
+        // ========== START: NEW - Calculate DB averages ==========
+        $totalRequests = count($metrics);
+        if ($totalRequests > 0) {
+            $stats['avg_db_time'] = round($stats['total_db_time'] / $totalRequests, 2);
+            $stats['avg_db_data_size'] = round($stats['total_db_data_size'] / $totalRequests, 2);
+        }
+
+        $dbPctCount = count($dbPercentages);
+        if ($dbPctCount > 0) {
+            $stats['avg_db_percentage'] = round($totalDbPercentage / $dbPctCount, 2);
+        }
+        // ========== END: NEW - Calculate DB averages ==========
+
         // Percentiles (linear interpolation)
         $percentile = function (array $vals, float $p): float {
             $n = count($vals);
@@ -248,8 +297,6 @@ class MetricsLogger
 
         return $stats;
     }
-
-
 
     /**
      * Get current log filename based on today's date

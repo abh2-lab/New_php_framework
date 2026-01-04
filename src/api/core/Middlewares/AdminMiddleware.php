@@ -1,5 +1,5 @@
 <?php
-namespace App\Core\Middleware;
+namespace App\Core\Middlewares;
 
 class AdminMiddleware extends BaseMiddleware {
     

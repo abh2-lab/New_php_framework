@@ -3,6 +3,7 @@
 
 namespace App\Controllers;
 
+use App\Core\BaseController;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -36,6 +37,7 @@ class ServiceTesterController extends BaseController
         ?>
         <!DOCTYPE html>
         <html lang="en">
+
         <head>
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,83 +58,306 @@ class ServiceTesterController extends BaseController
                     --err-bg: rgba(248, 81, 73, .15);
                     --pill: #a78bfa;
                 }
-                * { box-sizing: border-box; }
-                html, body { height: 100%; }
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                html,
                 body {
-                    margin: 0; padding: 12px; background: var(--bg); color: var(--text);
+                    height: 100%;
+                }
+
+                body {
+                    margin: 0;
+                    padding: 12px;
+                    background: var(--bg);
+                    color: var(--text);
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    font-size: 16px; line-height: 1.6; overflow: hidden;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    overflow: hidden;
                 }
-                .container { max-width: 1680px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; min-height: 0; }
+
+                .container {
+                    max-width: 1680px;
+                    margin: 0 auto;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 0;
+                }
+
                 .header {
-                    display: flex; align-items: center; justify-content: space-between;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
                     background: linear-gradient(135deg, #3c286a 0%, #5f5972 100%);
-                    padding: 6px 12px; border-radius: 8px; margin-bottom: 10px;
-                    box-shadow: 0 4px 12px rgba(139, 92, 246, .15); flex: 0 0 auto;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    box-shadow: 0 4px 12px rgba(139, 92, 246, .15);
+                    flex: 0 0 auto;
                 }
-                .header h1 { margin: 0; font-size: 18px; color: #fff; }
-                .header .right { display: flex; align-items: center; gap: 8px; }
-                .header .small { font-size: 12px; color: #e9d5ff; opacity: .9; }
+
+                .header h1 {
+                    margin: 0;
+                    font-size: 18px;
+                    color: #fff;
+                }
+
+                .header .right {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .header .small {
+                    font-size: 12px;
+                    color: #e9d5ff;
+                    opacity: .9;
+                }
+
                 .header .copy-btn {
-                    background: #8b5cf6; border: 1px solid #8b5cf6; color: #fff;
-                    padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;
+                    background: #8b5cf6;
+                    border: 1px solid #8b5cf6;
+                    color: #fff;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    cursor: pointer;
                 }
-                .header .copy-btn:hover { background: #7c3aed; }
-                .main { display: grid; grid-template-columns: 35% 65%; gap: 12px; flex: 1 1 auto; min-height: 0; }
+
+                .header .copy-btn:hover {
+                    background: #7c3aed;
+                }
+
+                .main {
+                    display: grid;
+                    grid-template-columns: 35% 65%;
+                    gap: 12px;
+                    flex: 1 1 auto;
+                    min-height: 0;
+                }
+
                 .panel {
-                    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-                    display: flex; flex-direction: column; min-height: 0;
+                    background: var(--panel);
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 0;
                 }
+
                 .left .search {
-                    display: flex; align-items: center; gap: 8px; background: #0f141b; border-bottom: 1px solid var(--border);
-                    padding: 8px 10px; border-top-left-radius: 8px; border-top-right-radius: 8px; flex: 0 0 auto;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: #0f141b;
+                    border-bottom: 1px solid var(--border);
+                    padding: 8px 10px;
+                    border-top-left-radius: 8px;
+                    border-top-right-radius: 8px;
+                    flex: 0 0 auto;
                 }
-                .left .search input { flex: 1; border: none; outline: none; background: transparent; color: var(--text); font-size: 15px; }
-                .left .scroll { flex: 1 1 auto; overflow-y: auto; padding: 10px; }
-                .service-block { border-top: 1px solid var(--border); padding-top: 8px; }
-                .service-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 8px 6px; border-radius: 6px; }
-                .service-header:hover { background: #0f141b; }
-                .service-name { font-weight: 600; color: var(--pill); font-size: 15px; }
-                .service-fqcn { color: var(--muted); font-size: 12px; margin-left: 8px; }
-                .caret { color: var(--muted); transition: transform .2s ease; margin-left: 8px; }
-                .collapsed .caret { transform: rotate(-90deg); }
-                .methods { margin-top: 6px; }
+
+                .left .search input {
+                    flex: 1;
+                    border: none;
+                    outline: none;
+                    background: transparent;
+                    color: var(--text);
+                    font-size: 15px;
+                }
+
+                .left .scroll {
+                    flex: 1 1 auto;
+                    overflow-y: auto;
+                    padding: 10px;
+                }
+
+                .service-block {
+                    border-top: 1px solid var(--border);
+                    padding-top: 8px;
+                }
+
+                .service-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    cursor: pointer;
+                    padding: 8px 6px;
+                    border-radius: 6px;
+                }
+
+                .service-header:hover {
+                    background: #0f141b;
+                }
+
+                .service-name {
+                    font-weight: 600;
+                    color: var(--pill);
+                    font-size: 15px;
+                }
+
+                .service-fqcn {
+                    color: var(--muted);
+                    font-size: 12px;
+                    margin-left: 8px;
+                }
+
+                .caret {
+                    color: var(--muted);
+                    transition: transform .2s ease;
+                    margin-left: 8px;
+                }
+
+                .collapsed .caret {
+                    transform: rotate(-90deg);
+                }
+
+                .methods {
+                    margin-top: 6px;
+                }
+
                 .method {
-                    padding: 9px 10px; margin: 6px 0; border: 1px solid var(--border); border-radius: 6px;
-                    cursor: pointer; transition: border-color .15s ease; font-size: 15px; background: #0d1117;
+                    padding: 9px 10px;
+                    margin: 6px 0;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: border-color .15s ease;
+                    font-size: 15px;
+                    background: #0d1117;
                 }
-                .method:hover { border-color: var(--brand); }
+
+                .method:hover {
+                    border-color: var(--brand);
+                }
+
                 .right .head {
-                    padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center;
-                    justify-content: space-between; flex: 0 0 auto;
+                    padding: 12px;
+                    border-bottom: 1px solid var(--border);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    flex: 0 0 auto;
                 }
-                .right .scroll { flex: 1 1 auto; overflow-y: auto; padding: 12px; }
-                .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-                .label { display: block; font-size: 14px; color: #c9d1d9; margin-bottom: 6px; }
-                .input, .textarea {
-                    width: 100%; background: #0d1117; border: 1px solid var(--border); color: var(--text);
-                    border-radius: 6px; padding: 11px 12px; font-family: 'Monaco','Menlo',monospace; font-size: 14px;
+
+                .right .scroll {
+                    flex: 1 1 auto;
+                    overflow-y: auto;
+                    padding: 12px;
                 }
-                .textarea { min-height: 150px; resize: vertical; }
-                .actions { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-                .btn { padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-                .btn-primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-                .btn-primary:hover { background: var(--brand-dark); }
-                .btn-secondary { background: #21262d; color: #c9d1d9; }
-                .status { font-size: 13px; margin-left: auto; padding: 6px 10px; border-radius: 6px; display: none; }
-                .ok { background: var(--ok-bg); color: var(--ok); display: inline-block; }
-                .err { background: var(--err-bg); color: var(--err); display: inline-block; }
+
+                .row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+
+                .label {
+                    display: block;
+                    font-size: 14px;
+                    color: #c9d1d9;
+                    margin-bottom: 6px;
+                }
+
+                .input,
+                .textarea {
+                    width: 100%;
+                    background: #0d1117;
+                    border: 1px solid var(--border);
+                    color: var(--text);
+                    border-radius: 6px;
+                    padding: 11px 12px;
+                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-size: 14px;
+                }
+
+                .textarea {
+                    min-height: 150px;
+                    resize: vertical;
+                }
+
+                .actions {
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                    margin-top: 10px;
+                }
+
+                .btn {
+                    padding: 10px 14px;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+
+                .btn-primary {
+                    background: var(--brand);
+                    border-color: var(--brand);
+                    color: #fff;
+                }
+
+                .btn-primary:hover {
+                    background: var(--brand-dark);
+                }
+
+                .btn-secondary {
+                    background: #21262d;
+                    color: #c9d1d9;
+                }
+
+                .status {
+                    font-size: 13px;
+                    margin-left: auto;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    display: none;
+                }
+
+                .ok {
+                    background: var(--ok-bg);
+                    color: var(--ok);
+                    display: inline-block;
+                }
+
+                .err {
+                    background: var(--err-bg);
+                    color: var(--err);
+                    display: inline-block;
+                }
+
                 pre {
-                    background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 12px;
-                    white-space: pre-wrap; color: var(--text); font-size: 15px;
+                    background: #0d1117;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    padding: 12px;
+                    white-space: pre-wrap;
+                    color: var(--text);
+                    font-size: 15px;
                 }
+
                 @media (max-width:1100px) {
-                    .main { grid-template-columns: 1fr; }
-                    .header { flex-wrap: wrap; gap: 6px; }
-                    .header .right { flex-wrap: wrap; }
+                    .main {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .header {
+                        flex-wrap: wrap;
+                        gap: 6px;
+                    }
+
+                    .header .right {
+                        flex-wrap: wrap;
+                    }
                 }
             </style>
         </head>
+
         <body>
             <div class="container">
                 <div class="header">
@@ -173,7 +398,8 @@ class ServiceTesterController extends BaseController
                             </div>
 
                             <div style="margin-top:10px;">
-                                <label class="label">Args JSON <span id="argsHint" style="color:#8b949e; font-size:12px;"></span></label>
+                                <label class="label">Args JSON <span id="argsHint"
+                                        style="color:#8b949e; font-size:12px;"></span></label>
                                 <textarea class="textarea" id="args"></textarea>
                             </div>
 
@@ -312,7 +538,7 @@ class ServiceTesterController extends BaseController
                     catalog.forEach(svc => {
                         output += `${svc.short} (${svc.class}):\n`;
                         if (!svc.methods.length) {
-                            output += '  - No public methods\n';
+                            output += '  - No public methods\n';
                         } else {
                             svc.methods.forEach(m => {
                                 const params = (m.params || []).map(p => {
@@ -323,7 +549,7 @@ class ServiceTesterController extends BaseController
                                     return param;
                                 }).join(', ');
                                 const returnType = m.returnType ? ': ' + m.returnType : '';
-                                output += `  - ${m.name}(${params})${returnType}\n`;
+                                output += `  - ${m.name}(${params})${returnType}\n`;
                             });
                         }
                         output += '\n';
@@ -406,6 +632,7 @@ class ServiceTesterController extends BaseController
                 fetchCatalog();
             </script>
         </body>
+
         </html>
         <?php
     }
@@ -494,7 +721,7 @@ class ServiceTesterController extends BaseController
                 ], $debug);
             }
 
-            // Prepare instance (inject $this->conn where sensible)
+            // Prepare instance
             $instance = null;
             if (!$m->isStatic()) {
                 $instance = $this->newServiceInstance($ref);
@@ -517,7 +744,7 @@ class ServiceTesterController extends BaseController
                 ]
             ], $debug);
         } catch (\Throwable $e) {
-            pp($e);
+            // pp($e); // removed assuming pp is helper not always avail
             $debug = ob_get_clean();
             $this->respondWithDebugAndJson(500, [
                 'status' => 'error',
@@ -529,10 +756,12 @@ class ServiceTesterController extends BaseController
     // Return debug first, then JSON, with text/plain so the client reads raw and splits
     private function respondWithDebugAndJson(int $statusCode, array $payload, string $debug): void
     {
-        while (ob_get_level()) { ob_end_clean(); } // ensure clean output
+        while (ob_get_level()) {
+            ob_end_clean();
+        } // ensure clean output
         http_response_code($statusCode);
         header('Content-Type: text/plain; charset=UTF-8');
-        $debug = trim((string)$debug);
+        $debug = trim((string) $debug);
         $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         echo ($debug !== '' ? $debug . "\n\n" : '') . $json;
         exit;
@@ -561,22 +790,27 @@ class ServiceTesterController extends BaseController
 
         $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($servicesDir));
         foreach ($rii as $file) {
-            if ($file->isDir() || $file->getExtension() !== 'php') continue;
+            if ($file->isDir() || $file->getExtension() !== 'php')
+                continue;
 
             $relative = str_replace($servicesDir . DIRECTORY_SEPARATOR, '', $file->getPathname());
             $class = 'App\\Services\\' . str_replace(['/', '\\', '.php'], ['\\', '\\', ''], $relative);
 
-            if (!class_exists($class)) continue;
+            if (!class_exists($class))
+                continue;
 
             try {
                 $ref = new ReflectionClass($class);
-                if ($ref->isAbstract()) continue;
+                if ($ref->isAbstract())
+                    continue;
 
                 $methods = [];
                 foreach ($ref->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
-                    if ($m->isConstructor()) continue;
+                    if ($m->isConstructor())
+                        continue;
                     $name = $m->getName();
-                    if (str_starts_with($name, '__')) continue;
+                    if (str_starts_with($name, '__'))
+                        continue;
 
                     $params = [];
                     foreach ($m->getParameters() as $p) {
@@ -584,7 +818,7 @@ class ServiceTesterController extends BaseController
                             'name' => $p->getName(),
                             'hasDefault' => $p->isDefaultValueAvailable(),
                             'default' => $p->isDefaultValueAvailable() ? $this->safeDefault($p) : null,
-                            'type' => $p->hasType() ? (string)$p->getType() : null,
+                            'type' => $p->hasType() ? (string) $p->getType() : null,
                             'optional' => $p->isOptional(),
                             'variadic' => $p->isVariadic(),
                         ];
@@ -594,7 +828,7 @@ class ServiceTesterController extends BaseController
                         'name' => $name,
                         'static' => $m->isStatic(),
                         'params' => $params,
-                        'returnType' => $m->hasReturnType() ? (string)$m->getReturnType() : null,
+                        'returnType' => $m->hasReturnType() ? (string) $m->getReturnType() : null,
                     ];
                 }
 
@@ -618,25 +852,47 @@ class ServiceTesterController extends BaseController
 
     private function safeDefault(ReflectionParameter $p)
     {
-        try { return $p->getDefaultValue(); }
-        catch (\Throwable) { return null; }
+        try {
+            return $p->getDefaultValue();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function newServiceInstance(ReflectionClass $ref)
     {
         $ctor = $ref->getConstructor();
-        if (!$ctor) return $ref->newInstance();
+        if (!$ctor)
+            return $ref->newInstance();
 
         $params = $ctor->getParameters();
         $args = [];
 
         foreach ($params as $p) {
             $name = strtolower($p->getName());
-            $type = $p->hasType() ? ltrim((string)$p->getType(), '?\\') : null;
+            $type = $p->hasType() ? ltrim((string) $p->getType(), '?\\') : null;
 
-            // Auto-inject DB connection when obvious
-            if ($type === 'PDO' || in_array($name, ['conn', 'pdo', 'db', 'connection', 'dbconn'], true)) {
-                $args[] = $this->conn;
+            // FIX: Explicitly check for Database Wrapper class
+            if ($type === 'App\Core\Database' || $type === 'Database') {
+                $args[] = $this->db;
+                continue;
+            }
+
+            // FIX: Explicitly check for PDO
+            if ($type === 'PDO') {
+                $args[] = $this->db ? $this->db->getConnection() : null;
+                continue;
+            }
+
+            // Fallback: name matching for untyped or loose params
+            if (in_array($name, ['conn', 'pdo', 'db', 'connection', 'dbconn'], true)) {
+                if ($name === 'db') {
+                    // Assume 'db' means the wrapper in this new framework structure
+                    $args[] = $this->db;
+                } else {
+                    // Assume 'conn' or 'pdo' means the raw connection
+                    $args[] = $this->db ? $this->db->getConnection() : null;
+                }
                 continue;
             }
 
@@ -661,10 +917,12 @@ class ServiceTesterController extends BaseController
         $out = [];
 
         $assoc = [];
-        if (is_object($input)) $input = (array)$input;
+        if (is_object($input))
+            $input = (array) $input;
         if (is_array($input)) {
             $isAssoc = array_keys($input) !== range(0, count($input) - 1);
-            if ($isAssoc) $assoc = $input;
+            if ($isAssoc)
+                $assoc = $input;
         }
 
         foreach ($params as $idx => $p) {
@@ -678,15 +936,33 @@ class ServiceTesterController extends BaseController
                 $hasProvided = true;
             }
 
-            $t = $p->hasType() ? ltrim((string)$p->getType(), '?\\') : null;
+            $type = $p->hasType() ? ltrim((string) $p->getType(), '?\\') : null;
             $lname = strtolower($name);
-            if (!$hasProvided && ($t === 'PDO' || in_array($lname, ['conn', 'pdo', 'db', 'connection', 'dbconn'], true))) {
-                $out[] = $this->conn;
+
+            // FIX: Explicitly check for Database Wrapper class (injection)
+            if (!$hasProvided && ($type === 'App\Core\Database' || $type === 'Database')) {
+                $out[] = $this->db;
+                continue;
+            }
+
+            // FIX: Explicitly check for PDO (injection)
+            if (!$hasProvided && $type === 'PDO') {
+                $out[] = $this->db ? $this->db->getConnection() : null;
+                continue;
+            }
+
+            // Fallback injection by name
+            if (!$hasProvided && in_array($lname, ['conn', 'pdo', 'db', 'connection', 'dbconn'], true)) {
+                if ($lname === 'db') {
+                    $out[] = $this->db;
+                } else {
+                    $out[] = $this->db ? $this->db->getConnection() : null;
+                }
                 continue;
             }
 
             if ($hasProvided) {
-                $out[] = $this->coerceType($t, $val);
+                $out[] = $this->coerceType($type, $val);
                 continue;
             }
 
@@ -707,14 +983,15 @@ class ServiceTesterController extends BaseController
 
     private function coerceType(?string $type, $val)
     {
-        if ($type === null) return $val;
+        if ($type === null)
+            return $val;
         $base = strtolower(ltrim($type, '?\\'));
         try {
             return match ($base) {
-                'int', 'integer' => is_numeric($val) ? (int)$val : (int)($val ?? 0),
-                'float', 'double' => is_numeric($val) ? (float)$val : (float)($val ?? 0),
-                'bool', 'boolean' => is_bool($val) ? $val : in_array(strtolower((string)$val), ['1', 'true', 'yes', 'on'], true),
-                'array' => is_array($val) ? $val : (is_string($val) ? json_decode($val, true, 512, JSON_THROW_ON_ERROR) : (array)$val),
+                'int', 'integer' => is_numeric($val) ? (int) $val : (int) ($val ?? 0),
+                'float', 'double' => is_numeric($val) ? (float) $val : (float) ($val ?? 0),
+                'bool', 'boolean' => is_bool($val) ? $val : in_array(strtolower((string) $val), ['1', 'true', 'yes', 'on'], true),
+                'array' => is_array($val) ? $val : (is_string($val) ? json_decode($val, true, 512, JSON_THROW_ON_ERROR) : (array) $val),
                 'string' => is_string($val) ? $val : json_encode($val),
                 default => $val,
             };

@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Core\BaseController;
+
 use Dotenv\Dotenv;
 
 class DocsController extends BaseController
@@ -856,6 +858,9 @@ class DocsController extends BaseController
                             <strong><?= count($groupedRoutes) ?></strong> | <a target="_blank"
                                 href="<?= $_ENV['APP_URL'] ?>/api/service-test">Service Tester</a> | <a target="_blank"
                                 href="<?= $_ENV['APP_URL'] ?>/curl_runner2.html">Curl Runner</a>
+                                | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/api/repository-test">Repository Tester</a> | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/api/monitoring">Monitoring </a>
                         </p>
                     </div>
                     <div class="header-controls">

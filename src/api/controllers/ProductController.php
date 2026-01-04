@@ -19,32 +19,22 @@ class ProductController extends BaseController
         $this->productService = new ProductService($this->db);
     }
 
-    /**
-     * Get all products
-     * 
-     * GET /api/products/list?category=Electronics&limit=10
-     */
+
+
     public function list()
-    {
-        $params = $this->getQueryParams();
-
-        $filters = [
-            'category' => $params['category'] ?? null,
-            'limit' => isset($params['limit']) ? (int)$params['limit'] : 10
-        ];
-
-        try {
-            $products = $this->productService->getProducts($filters);
-            
-            return $this->sendSuccess('Products retrieved successfully', [
-                'products' => $products,
-                'count' => count($products)
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage(), 400);
-        }
+{
+    if (!$this->db) {
+        return $this->sendServerError("Database not initialized");
     }
+
+    $filters = $this->getQueryParams(); // category, limit
+    $service = new ProductService($this->db);
+    $products = $service->getProducts($filters);
+
+    return $this->sendSuccess("Products fetched", $products);
+}
+
+
 
     /**
      * Get product details

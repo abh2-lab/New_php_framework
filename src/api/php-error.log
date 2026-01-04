@@ -1,0 +1,32 @@
+[02-Jan-2026 21:27:46 UTC] ✅ TestMiddleware::before() executed
+[02-Jan-2026 21:27:46 UTC] 🔥 Inner group before() executed
+[02-Jan-2026 21:27:46 UTC] 🎯 TestController::nestedRoute() executed
+[02-Jan-2026 21:27:46 UTC] ✅ TestMiddleware::after() executed
+[02-Jan-2026 21:36:26 UTC] ✅ TestMiddleware::before() executed
+[02-Jan-2026 21:36:26 UTC] 🔥 Inner group before() executed
+[02-Jan-2026 21:36:26 UTC] 🎯 TestController::nestedRoute() executed
+[02-Jan-2026 21:36:26 UTC] ✅ TestMiddleware::after() executed
+[02-Jan-2026 21:55:34 UTC] PHP Deprecated:  App\Services\MetricsLogger::getMetrics(): Implicitly marking parameter $date as nullable is deprecated, the explicit nullable type must be used instead in /var/www/html/src/api/services/MetricsLogger.php on line 62
+[02-Jan-2026 21:55:34 UTC] PHP Fatal error:  Uncaught ErrorException: http_response_code(): Cannot set response code - headers already sent (output started at /var/www/html/src/api/services/MetricsLogger.php:62) in /var/www/html/src/api/helpers/globalHelpers.php:58
+Stack trace:
+#0 [internal function]: App\Core\ExceptionHandler::handleError(2, 'http_response_c...', '/var/www/html/s...', 58)
+#1 /var/www/html/src/api/helpers/globalHelpers.php(58): http_response_code(500)
+#2 /var/www/html/src/api/core/ExceptionHandler.php(98): sendJsonResponse(500, 'error', 'http_response_c...', Array)
+#3 [internal function]: App\Core\ExceptionHandler::handle(Object(ErrorException))
+#4 {main}
+  thrown in /var/www/html/src/api/helpers/globalHelpers.php on line 58
+[02-Jan-2026 21:55:34 UTC] PHP Fatal error:  Uncaught ErrorException: http_response_code(): Cannot set response code - headers already sent (output started at /var/www/html/src/api/services/MetricsLogger.php:62) in /var/www/html/src/api/helpers/globalHelpers.php:58
+Stack trace:
+#0 [internal function]: App\Core\ExceptionHandler::handleError(2, 'http_response_c...', '/var/www/html/s...', 58)
+#1 /var/www/html/src/api/helpers/globalHelpers.php(58): http_response_code(500)
+#2 /var/www/html/src/api/core/ExceptionHandler.php(98): sendJsonResponse(500, 'error', 'Uncaught ErrorE...', Array)
+#3 /var/www/html/src/api/core/ExceptionHandler.php(124): App\Core\ExceptionHandler::handle(Object(ErrorException))
+#4 [internal function]: App\Core\ExceptionHandler::handleShutdown()
+#5 {main}
+  thrown in /var/www/html/src/api/helpers/globalHelpers.php on line 58
+[02-Jan-2026 22:47:50 UTC] SLOW QUERY (761.55ms): SELECT 
+            id,
+            name,
+            sku,
+            price,
+            stock

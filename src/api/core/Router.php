@@ -8,9 +8,7 @@ class Router
     private $routes = [];
     private $middlewareRegistry = [];
     private $currentGroup = [];
-
     private string $currentRouteType = 'app'; // 'system' | 'app'
-
 
     public function __construct(private $basePath = '')
     {
@@ -29,12 +27,42 @@ class Router
         $this->middlewareRegistry[$name] = $class;
     }
 
-
     public function setRouteType(string $type): void
     {
         $this->currentRouteType = ($type === 'system') ? 'system' : 'app';
     }
 
+    /**
+     * Normalize route pattern to ensure consistent format
+     * - Always starts with /
+     * - No duplicate slashes
+     * - Preserves wildcards and parameters
+     */
+    private function normalizePattern(string $pattern): string
+    {
+        if (empty($pattern)) {
+            return '/';
+        }
+
+        // Remove leading/trailing whitespace
+        $pattern = trim($pattern);
+        
+        // Remove leading and trailing slashes temporarily
+        $pattern = trim($pattern, '/');
+        
+        // Add single leading slash
+        $pattern = '/' . $pattern;
+        
+        // Remove consecutive slashes (but preserve them in regex patterns)
+        $pattern = preg_replace('#/{2,}#', '/', $pattern);
+        
+        // Handle root route
+        if ($pattern === '/') {
+            return '/';
+        }
+
+        return $pattern;
+    }
 
     /**
      * Route grouping with shared attributes
@@ -71,9 +99,12 @@ class Router
             $tags = is_array($options['group']) ? $options['group'] : [$options['group']];
         }
 
+        // Normalize prefix
+        $prefix = $this->normalizePattern($options['prefix'] ?? '');
+
         // Merge group options
         $this->currentGroup = [
-            'prefix' => ($previousGroup['prefix'] ?? '') . ($options['prefix'] ?? ''),
+            'prefix' => ($previousGroup['prefix'] ?? '') . ($prefix !== '/' ? $prefix : ''),
             'middleware' => array_merge($previousGroup['middleware'] ?? [], $middleware),
             'before' => array_merge($previousGroup['before'] ?? [], $before),
             'after' => array_merge($previousGroup['after'] ?? [], $after),
@@ -85,16 +116,26 @@ class Router
         $this->currentGroup = $previousGroup;
     }
 
-
     /**
-     * Enhanced add method with middleware support
+     * Enhanced add method with middleware support and auto-normalization
      */
     public function add(array $config): void
     {
-        // Apply group prefix
+        // Get and normalize the pattern
         $pattern = $config['url'] ?? $config['pattern'] ?? '';
+        $pattern = $this->normalizePattern($pattern);
+
+        // Apply group prefix if exists
         if (!empty($this->currentGroup['prefix'])) {
-            $pattern = rtrim($this->currentGroup['prefix'], '/') . '/' . ltrim($pattern, '/');
+            $prefix = $this->currentGroup['prefix'];
+            // Merge prefix and pattern correctly
+            if ($pattern === '/') {
+                $pattern = $prefix;
+            } else {
+                $pattern = rtrim($prefix, '/') . $pattern;
+            }
+            // Normalize again after merging
+            $pattern = $this->normalizePattern($pattern);
         }
 
         // Merge middleware from group and route
@@ -159,10 +200,8 @@ class Router
             'middleware' => $middleware,
             'before' => $before,
             'after' => $after,
-
-            // ✅ Added: system/app classification comes from loader context
             'is_system_route' => ($this->currentRouteType === 'system'),
-            'route_type' => $this->currentRouteType, // optional but helpful for debugging
+            'route_type' => $this->currentRouteType,
         ];
 
         $this->routes[] = $route;
@@ -189,11 +228,8 @@ class Router
                 }
             }
 
-            // Ensure URI starts with /
-            $uri = '/' . trim($uri, '/');
-            if ($uri === '/') {
-                $uri = '/';
-            }
+            // Normalize incoming URI (same logic as route patterns)
+            $uri = $this->normalizePattern($uri);
 
             foreach ($this->routes as $route) {
                 if ($method !== $route['method']) {
@@ -204,7 +240,6 @@ class Router
                     array_shift($matches);
 
                     $GLOBALS['__fw_matched_route'] = $route;
-                    // ✅ Expose route type for MonitoringMiddleware shutdown logger
                     $GLOBALS['current_route_is_system'] = (bool) ($route['is_system_route'] ?? false);
 
                     // Execute BEFORE middleware/filters
@@ -247,7 +282,6 @@ class Router
             throw $e;
         }
     }
-
 
     /**
      * Execute before middleware

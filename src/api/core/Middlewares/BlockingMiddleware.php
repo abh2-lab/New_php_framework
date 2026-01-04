@@ -1,5 +1,5 @@
 <?php
-namespace App\Core\Middleware;
+namespace App\Core\Middlewares;
 
 class BlockingMiddleware extends BaseMiddleware {
     

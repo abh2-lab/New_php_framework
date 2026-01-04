@@ -1,19 +1,58 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    
-    # Block direct access to any PHP files except index.php
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteCond %{REQUEST_URI} !index\.php$
-    RewriteCond %{REQUEST_URI} \.php$
-    RewriteRule ^(.*)$ - [F,L]
-    
-    # Route all API requests through index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [QSA,L]
-</IfModule>
+# ============================================
+# SECURITY: Block direct access to PHP files
+# ============================================
 
-# Security: Deny direct access to folders
-<FilesMatch "^(routes\.php|systemRoutes\.php)$">
+# Block all PHP files by default
+<FilesMatch "\.php$">
     Require all denied
 </FilesMatch>
+
+# Allow only index.php to be executed
+<Files "index.php">
+    Require all granted
+</Files>
+
+# ============================================
+# Block route definition files specifically
+# ============================================
+
+<FilesMatch "(routes|SystemRoutes)\.php$">
+    Require all denied
+</FilesMatch>
+
+# ============================================
+# Block access to application folders
+# ============================================
+
+# Block core folder
+RewriteEngine On
+RewriteRule ^core/ - [F,L]
+
+# Block controllers folder
+RewriteRule ^controllers/ - [F,L]
+
+# Block middleware folder
+RewriteRule ^middleware/ - [F,L]
+
+# Block repositories folder
+RewriteRule ^repositories/ - [F,L]
+
+# Block services folder
+RewriteRule ^services/ - [F,L]
+
+# Block helpers folder
+RewriteRule ^helpers/ - [F,L]
+
+# Block databases folder
+RewriteRule ^databases/ - [F,L]
+
+# Disable directory listing
+Options -Indexes
+
+
+# ============================================
+# ROUTING: Route all other requests to index.php
+# ============================================
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

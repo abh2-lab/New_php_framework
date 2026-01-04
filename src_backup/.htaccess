@@ -1,9 +1,0 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    
-    # Match common API patterns: api, api2, v1, v2, admin-api, mobile
-    RewriteCond %{REQUEST_URI} ^/(api[0-9]*|v[0-9]+|admin-api|mobile|backend)/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^[^/]+/(.*)$ /api/index.php [QSA,L]
-</IfModule>

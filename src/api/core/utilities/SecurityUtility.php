@@ -4,41 +4,35 @@ namespace App\Core\Utilities;
 
 class SecurityUtility
 {
-    /**
-     * Apply security headers
-     */
     public static function applySecurityHeaders(): void
     {
-        // Remove server signature
         if (!headers_sent()) {
             header_remove('X-Powered-By');
             header_remove('Server');
         }
 
-        // XSS Protection
         header('X-XSS-Protection: 1; mode=block');
-
-        // Prevent MIME type sniffing
         header('X-Content-Type-Options: nosniff');
-
-        // Clickjacking protection
         header('X-Frame-Options: DENY');
 
-        // HSTS (HTTP Strict Transport Security) - only for HTTPS
         if (self::isHttps()) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         }
 
-        // Content Security Policy (basic)
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://cdn.jsdelivr.net");
+        // TEMPORARY: More permissive CSP for debugging
+        header(
+            "Content-Security-Policy: " .
+            "default-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; " .
+            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " .
+            "img-src 'self' data:; " .
+            "font-src 'self' https://cdnjs.cloudflare.com; " .
+            // Allow ALL connections temporarily for debugging
+            "connect-src *;"
+        );
 
-
-        // Referrer Policy
         header('Referrer-Policy: strict-origin-when-cross-origin');
     }
-
-
-
 
 
     public static function handleCORS(): void
@@ -46,13 +40,10 @@ class SecurityUtility
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
         $allowedOrigins = self::getAllowedOrigins();
 
-        // Check if wildcard (*) is allowed
-        if (in_array('*', $allowedOrigins)) {
+        if (in_array('*', $allowedOrigins, true)) {
             header("Access-Control-Allow-Origin: *");
-            // Note: Cannot use credentials with wildcard
             header("Access-Control-Allow-Credentials: false");
-        } elseif (in_array($origin, $allowedOrigins) || empty($allowedOrigins)) {
-            // Allow specific origin with credentials
+        } elseif (in_array($origin, $allowedOrigins, true) || empty($allowedOrigins)) {
             header("Access-Control-Allow-Origin: " . ($origin ?: '*'));
             header("Access-Control-Allow-Credentials: true");
         }
@@ -61,30 +52,31 @@ class SecurityUtility
         header("Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, X-API-Key, Accept");
         header("Access-Control-Max-Age: 86400");
 
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             http_response_code(200);
             exit();
         }
     }
 
-    /**
-     * Rate limiting (basic implementation)
-     */
     public static function rateLimiting(int $maxRequests = 100, int $timeWindow = 3600): void
     {
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $maxRequests = (int) ($_ENV['RATELIMITREQUESTS'] ?? $maxRequests);
+        $timeWindow = (int) ($_ENV['RATELIMITWINDOW'] ?? $timeWindow);
 
-        // Exclude system/monitoring routes from rate limiting
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+
         $excludedPaths = [
             '/monitoring',
             '/docs',
             '/service-test',
-            '/env/'
+            '/env',
+            '/test',
         ];
 
-        foreach ($excludedPaths as $path) {
-            if (strpos($requestUri, $path) !== false) {
-                return; // Skip rate limiting for these endpoints
+        foreach ($excludedPaths as $p) {
+            if (strpos($path, $p) === 0) {
+                return;
             }
         }
 
@@ -93,13 +85,15 @@ class SecurityUtility
         $cacheFile = sys_get_temp_dir() . '/' . $cacheKey;
 
         $requests = [];
-        if (file_exists($cacheFile)) {
-            $requests = json_decode(file_get_contents($cacheFile), true) ?? [];
+        if (is_file($cacheFile)) {
+            $requests = json_decode((string) file_get_contents($cacheFile), true) ?? [];
         }
 
         $currentTime = time();
-        // Remove old requests outside time window
-        $requests = array_filter($requests, fn($time) => ($currentTime - $time) < $timeWindow);
+        $requests = array_values(array_filter(
+            $requests,
+            fn($t) => ($currentTime - (int) $t) < $timeWindow
+        ));
 
         if (count($requests) >= $maxRequests) {
             http_response_code(429);
@@ -117,53 +111,50 @@ class SecurityUtility
             exit();
         }
 
-        // Add current request
         $requests[] = $currentTime;
-        file_put_contents($cacheFile, json_encode($requests));
+        file_put_contents($cacheFile, json_encode($requests), LOCK_EX);
     }
 
-
-    /**
-     * Get allowed origins from environment or default
-     */
     private static function getAllowedOrigins(): array
     {
-        $originsEnv = $_ENV['ALLOWED_ORIGINS'] ?? '';
+        $originsEnv = $_ENV['ALLOWEDORIGINS'] ?? '';
 
-        if (empty($originsEnv)) {
-            return []; // Allow all origins
+        if (trim($originsEnv) === '') {
+            return [];
         }
 
-        return array_map('trim', explode(',', $originsEnv));
+        return array_values(array_filter(array_map('trim', explode(',', $originsEnv))));
     }
 
-    /**
-     * Check if connection is HTTPS
-     */
     private static function isHttps(): bool
     {
         return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || $_SERVER['SERVER_PORT'] == 443
+            || (($_SERVER['SERVER_PORT'] ?? null) == 443)
             || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
     }
 
-    /**
-     * Get real client IP address
-     */
     private static function getClientIP(): string
     {
-        $ipKeys = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
+        $ipKeys = [
+            'HTTP_CF_CONNECTING_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP',
+            'HTTP_CLIENT_IP',
+            'REMOTE_ADDR'
+        ];
 
         foreach ($ipKeys as $key) {
-            if (!empty($_SERVER[$key])) {
-                $ips = explode(',', $_SERVER[$key]);
-                $ip = trim($ips[0]);
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            if (empty($_SERVER[$key]))
+                continue;
+
+            $parts = array_map('trim', explode(',', (string) $_SERVER[$key]));
+            foreach ($parts as $ip) {
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     return $ip;
                 }
             }
         }
 
-        return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        return '127.0.0.1';
     }
 }

@@ -16,7 +16,6 @@ class MonitoringMiddleware
 
     private static ?array $requestStartCpu = null;
 
-
     /**
      * Initialize monitoring for current request
      */
@@ -37,14 +36,10 @@ class MonitoringMiddleware
         self::$requestStartTime = microtime(true);
         self::$requestStartMemory = memory_get_usage();
 
-        self::$requestStartTime = microtime(true);
-        self::$requestStartMemory = memory_get_usage();
-
         // Capture CPU usage at start (if available)
         if (function_exists('getrusage')) {
             self::$requestStartCpu = getrusage();
         }
-
 
         // Initialize logger
         if (self::$logger === null) {
@@ -54,78 +49,6 @@ class MonitoringMiddleware
         // Register shutdown function to log after response is sent
         register_shutdown_function([self::class, 'logMetrics']);
     }
-
-    /**
-     * Log metrics after response is sent (called via shutdown function)
-     */
-    public static function logMetrics_Old(): void
-    {
-        if (!self::$enabled || self::$requestStartTime === null) {
-            return;
-        }
-
-        try {
-            // Calculate metrics
-            $responseTime = round((microtime(true) - self::$requestStartTime) * 1000, 2); // milliseconds
-            $memoryUsed = round((memory_get_usage() - self::$requestStartMemory) / 1024 / 1024, 2); // MB
-            $peakMemory = round(memory_get_peak_usage() / 1024 / 1024, 2); // MB
-
-            // Get request details
-            $method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
-            $uri = $_SERVER['REQUEST_URI'] ?? '/';
-            $endpoint = parse_url($uri, PHP_URL_PATH);
-
-            // Get response status code
-            $statusCode = http_response_code();
-            if ($statusCode === false) {
-                $statusCode = 200; // Default if not set
-            }
-
-            // Determine if this is a system route using matched route tags
-            $route = $GLOBALS['__fw_matched_route'] ?? null;
-            $tags = is_array($route['tags'] ?? null) ? $route['tags'] : [];
-            $isSystemRoute = in_array('System', $tags, true) || in_array('Monitoring', $tags, true);
-
-            // Build metric data
-            $metricData = [
-                'timestamp' => date('Y-m-d H:i:s'),
-                'method' => $method,
-                'endpoint' => $endpoint,
-                'full_uri' => $uri,
-                'response_time' => $responseTime, // ms
-                'memory_used' => $memoryUsed, // MB
-                'peak_memory' => $peakMemory, // MB
-                'status_code' => $statusCode,
-                'ip' => self::getClientIp(),
-                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
-                'is_system_route' => $isSystemRoute,
-            ];
-
-            // Add query parameters if present
-            if (!empty($_SERVER['QUERY_STRING'])) {
-                $metricData['query_string'] = $_SERVER['QUERY_STRING'];
-            }
-
-            // Add database query count if available (from connection.php)
-            if (isset($GLOBALS['query_count'])) {
-                $metricData['db_queries'] = $GLOBALS['query_count'];
-            } else {
-                $metricData['db_queries'] = 0;
-            }
-
-            // Log the metric
-            self::$logger->log($metricData);
-
-        } catch (\Exception $e) {
-            // Fail silently - don't break the application
-            error_log("MonitoringMiddleware Error: " . $e->getMessage());
-        } finally {
-            // Always decrement active requests counter, even if logging failed
-            self::decActiveRequests();
-        }
-    }
-
-
 
     /**
      * Log metrics after response is sent (called via shutdown function)
@@ -182,7 +105,7 @@ class MonitoringMiddleware
                 'endpoint' => $endpoint,
                 'full_uri' => $uri,
                 'response_time' => $responseTime, // ms
-                'cpu_time' => $cpuTimeMs, // ms (NEW)
+                'cpu_time' => $cpuTimeMs, // ms
                 'memory_used' => $memoryUsed, // MB
                 'peak_memory' => $peakMemory, // MB
                 'status_code' => $statusCode,
@@ -196,12 +119,46 @@ class MonitoringMiddleware
                 $metricData['query_string'] = $_SERVER['QUERY_STRING'];
             }
 
-            // Add database query count if available (from connection.php)
-            if (isset($GLOBALS['query_count'])) {
-                $metricData['db_queries'] = $GLOBALS['query_count'];
+            // ========== START: DATABASE METRICS ==========
+            // Add database query count
+            $dbQueries = $GLOBALS['query_count'] ?? 0;
+            $metricData['db_queries'] = $dbQueries;
+
+            // Add database execution time metrics
+            $dbTime = $GLOBALS['query_time'] ?? 0;
+            $maxDbTime = $GLOBALS['max_query_time'] ?? 0;
+
+            $metricData['db_time'] = round($dbTime, 2); // Total DB time in ms
+            $metricData['max_db_time'] = round($maxDbTime, 2); // Slowest query in ms
+
+            // Calculate average DB time per query
+            if ($dbQueries > 0) {
+                $metricData['avg_db_time'] = round($dbTime / $dbQueries, 2);
             } else {
-                $metricData['db_queries'] = 0;
+                $metricData['avg_db_time'] = 0;
             }
+
+            // Calculate DB time as percentage of total response time
+            if ($responseTime > 0) {
+                $metricData['db_percentage'] = round(($dbTime / $responseTime) * 100, 2);
+            } else {
+                $metricData['db_percentage'] = 0;
+            }
+
+            // Add database data size metrics
+            $dbDataSize = $GLOBALS['db_data_size'] ?? 0;
+            $maxDbDataSize = $GLOBALS['max_db_data_size'] ?? 0;
+
+            $metricData['db_data_size'] = round($dbDataSize, 2); // Total data size in KB
+            $metricData['max_db_data_size'] = round($maxDbDataSize, 2); // Largest query result in KB
+
+            // Calculate average data size per query
+            if ($dbQueries > 0) {
+                $metricData['avg_db_data_size'] = round($dbDataSize / $dbQueries, 2);
+            } else {
+                $metricData['avg_db_data_size'] = 0;
+            }
+            // ========== END: DATABASE METRICS ==========
 
             // Log the metric
             self::$logger->log($metricData);
@@ -217,9 +174,6 @@ class MonitoringMiddleware
             self::$requestStartCpu = null;
         }
     }
-
-
-
 
     /**
      * Get the real client IP address
@@ -273,7 +227,7 @@ class MonitoringMiddleware
             'server' => [
                 'uptime' => self::getServerUptime(),
                 'load_average' => self::getLoadAverage(),
-                'active_requests' => self::getActiveRequests(), // Step 5: expose active requests
+                'active_requests' => self::getActiveRequests(),
             ],
             'php' => [
                 'version' => PHP_VERSION,
@@ -457,7 +411,7 @@ class MonitoringMiddleware
         self::$logger->log($markerData);
     }
 
-    // ==================== Active Requests Tracking (Step 5) ====================
+    // ==================== Active Requests Tracking ====================
 
     private static function activeRequestsKey(): string
     {

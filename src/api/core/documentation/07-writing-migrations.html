@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Migration Files - Framework Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: #0d1117;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #58a6ff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #79c0ff;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            color: #a5d6ff;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        h4 {
+            color: #c9d1d9;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #c9d1d9;
+            line-height: 1.8;
+        }
+
+        .intro {
+            background: #1c2128;
+            padding: 20px;
+            border-left: 4px solid #58a6ff;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .important {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #f85149;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .important strong {
+            color: #f85149;
+        }
+
+        .tip {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #3fb950;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #3fb950;
+        }
+
+        .warning {
+            background: #1c2128;
+            padding: 15px;
+            border-left: 4px solid #d29922;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #d29922;
+        }
+
+        code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #ff7b72;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #c9d1d9;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+        .function { color: #d2a8ff; }
+        .variable { color: #ffa657; }
+        .class { color: #79c0ff; }
+        .number { color: #79c0ff; }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            color: #c9d1d9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0d1117;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #1c2128;
+            color: #58a6ff;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #30363d;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .label-sql { background: #1f6feb; color: white; }
+        .label-idempotent { background: #3fb950; color: white; }
+        .label-required { background: #f85149; color: white; }
+        .label-optional { background: #8b949e; color: white; }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            color: #58a6ff;
+        }
+
+        .file-structure {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #79c0ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Home</a>
+
+        <h1>Writing Migration Files</h1>
+
+        <div class="intro">
+            <p><strong>Migrations are SQL files that define your database schema.</strong></p>
+            <p>This framework uses a simple, file-based migration system where you write raw SQL files that are executed in order to create tables, indexes, foreign keys, and seed data.</p>
+        </div>
+
+        <h2>What are Migrations?</h2>
+
+        <p>Migrations are version-controlled SQL scripts that:</p>
+        <ul>
+            <li><strong>Define database structure:</strong> Tables, columns, indexes, constraints</li>
+            <li><strong>Are idempotent:</strong> Can be run multiple times safely without errors</li>
+            <li><strong>Are ordered:</strong> Execute in a predictable sequence</li>
+            <li><strong>Track changes:</strong> Provide a history of schema evolution</li>
+            <li><strong>Enable collaboration:</strong> Team members share the same schema</li>
+        </ul>
+
+        <h2>Migration Folder Structure</h2>
+
+        <p>All migration files are stored in:</p>
+        <div class="file-structure">
+src/api/databases/
+├── 001_init.sql
+├── 002_orders.sql
+├── 003_users.sql
+└── 004_categories.sql
+        </div>
+
+        <h3>File Naming Convention</h3>
+        <span class="label label-required">REQUIRED</span>
+
+        <p>Migration files must follow this pattern:</p>
+        <pre><code><span class="comment">-- Pattern: {number}_{description}.sql</span>
+
+<span class="comment">-- Examples:</span>
+001_init.sql
+002_orders.sql
+003_users.sql
+100_add_indexes.sql</code></pre>
+
+        <div class="important">
+            <p><strong>Important:</strong> Files are executed in natural sort order (001, 002, 003...). The numeric prefix determines execution order.</p>
+        </div>
+
+        <h2>The Migration Runner: InitController</h2>
+
+        <p>The framework provides an <code>InitController</code> that handles migration execution:</p>
+
+        <h3>Endpoint</h3>
+        <pre><code><span class="comment">// Route: POST</span>
+<span class="string">/api/init/migrate</span>
+
+<span class="comment">// Controller:</span>
+<span class="class">App\Controllers\InitController</span>@migrate</code></pre>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Scans <code>src/api/databases/</code> for all <code>.sql</code> files</li>
+            <li>Sorts files naturally (001, 002, 003...)</li>
+            <li>Disables foreign key checks: <code>SET FOREIGN_KEY_CHECKS=0</code></li>
+            <li>Executes each file's SQL statements sequentially</li>
+            <li>Re-enables foreign key checks: <code>SET FOREIGN_KEY_CHECKS=1</code></li>
+            <li>Returns success/error report</li>
+        </ol>
+
+        <h3>Response Format</h3>
+        <pre><code><span class="comment">// Success response:</span>
+{
+    <span class="string">"success"</span>: <span class="keyword">true</span>,
+    <span class="string">"message"</span>: <span class="string">"All migrations executed successfully"</span>,
+    <span class="string">"directory"</span>: <span class="string">"/path/to/databases"</span>,
+    <span class="string">"files_found"</span>: <span class="number">3</span>,
+    <span class="string">"total_statements_found"</span>: <span class="number">12</span>,
+    <span class="string">"total_statements_executed"</span>: <span class="number">12</span>,
+    <span class="string">"files"</span>: [
+        {
+            <span class="string">"file"</span>: <span class="string">"001_init.sql"</span>,
+            <span class="string">"success"</span>: <span class="keyword">true</span>,
+            <span class="string">"statements_found"</span>: <span class="number">5</span>,
+            <span class="string">"statements_executed"</span>: <span class="number">5</span>,
+            <span class="string">"errors"</span>: []
+        }
+    ]
+}</code></pre>
+
+        <h2>Writing Migration Files</h2>
+
+        <h3>Basic Structure</h3>
+        <span class="label label-sql">SQL</span>
+
+        <pre><code><span class="comment">-- ============================================</span>
+<span class="comment">-- Migration: Order System Tables</span>
+<span class="comment">-- File: 002_orders.sql</span>
+<span class="comment">-- Purpose: Create orders, order_items tables</span>
+<span class="comment">-- Version: 1.0</span>
+<span class="comment">-- Date: 2026-01-03</span>
+<span class="comment">-- ============================================</span>
+
+<span class="comment">-- Create orders table</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> orders (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    user_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    total_amount <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'pending'</span>, <span class="string">'confirmed'</span>, <span class="string">'cancelled'</span>) <span class="keyword">DEFAULT</span> <span class="string">'pending'</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_user_id (user_id),
+    <span class="keyword">INDEX</span> idx_status (status)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;</code></pre>
+
+        <h3>Key SQL Patterns</h3>
+
+        <h4>1. CREATE TABLE IF NOT EXISTS</h4>
+        <span class="label label-idempotent">IDEMPOTENT</span>
+
+        <p>Always use <code>IF NOT EXISTS</code> to make migrations idempotent:</p>
+        <pre><code><span class="keyword">CREATE TABLE IF NOT EXISTS</span> products (
+    <span class="comment">-- columns...</span>
+);</code></pre>
+
+        <div class="tip">
+            <p><strong>Why?</strong> This allows you to run migrations multiple times without getting "table already exists" errors.</p>
+        </div>
+
+        <h4>2. Column Definitions</h4>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Use Case</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>INT UNSIGNED</code></td>
+                    <td>IDs, positive integers</td>
+                    <td><code>id INT UNSIGNED AUTO_INCREMENT</code></td>
+                </tr>
+                <tr>
+                    <td><code>VARCHAR(n)</code></td>
+                    <td>Short text (names, SKUs)</td>
+                    <td><code>name VARCHAR(255) NOT NULL</code></td>
+                </tr>
+                <tr>
+                    <td><code>TEXT</code></td>
+                    <td>Long text (descriptions)</td>
+                    <td><code>description TEXT</code></td>
+                </tr>
+                <tr>
+                    <td><code>DECIMAL(10,2)</code></td>
+                    <td>Prices, amounts</td>
+                    <td><code>price DECIMAL(10,2) NOT NULL</code></td>
+                </tr>
+                <tr>
+                    <td><code>ENUM</code></td>
+                    <td>Fixed status values</td>
+                    <td><code>status ENUM('active', 'inactive')</code></td>
+                </tr>
+                <tr>
+                    <td><code>TIMESTAMP</code></td>
+                    <td>Dates and times</td>
+                    <td><code>created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3. Indexes</h4>
+        <span class="label label-sql">PERFORMANCE</span>
+
+        <pre><code><span class="comment">-- Add indexes for frequently queried columns</span>
+<span class="keyword">INDEX</span> idx_user_id (user_id),
+<span class="keyword">INDEX</span> idx_status (status),
+<span class="keyword">INDEX</span> idx_created_at (created_at),
+
+<span class="comment">-- Unique index for unique values</span>
+<span class="keyword">UNIQUE INDEX</span> idx_sku (sku)</code></pre>
+
+        <h4>4. Foreign Keys</h4>
+        <span class="label label-sql">RELATIONSHIPS</span>
+
+        <pre><code><span class="comment">-- ON DELETE CASCADE: Delete child records when parent is deleted</span>
+<span class="keyword">FOREIGN KEY</span> (order_id) <span class="keyword">REFERENCES</span> orders(id) <span class="keyword">ON DELETE CASCADE</span>,
+
+<span class="comment">-- ON DELETE RESTRICT: Prevent deletion if child records exist</span>
+<span class="keyword">FOREIGN KEY</span> (product_id) <span class="keyword">REFERENCES</span> products(id) <span class="keyword">ON DELETE RESTRICT</span></code></pre>
+
+        <h4>5. Timestamps (Auto-Management)</h4>
+
+        <pre><code><span class="comment">-- created_at: Set once on insert</span>
+created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+
+<span class="comment">-- updated_at: Auto-update on every modification</span>
+updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+
+<span class="comment">-- Nullable timestamp for optional events</span>
+cancelled_at <span class="keyword">TIMESTAMP NULL</span></code></pre>
+
+        <h4>6. Engine and Charset</h4>
+        <span class="label label-required">REQUIRED</span>
+
+        <pre><code><span class="comment">-- Always specify at the end of CREATE TABLE</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;</code></pre>
+
+        <div class="important">
+            <p><strong>Important:</strong> Always use <code>InnoDB</code> (supports transactions and foreign keys) and <code>utf8mb4</code> (full Unicode support including emojis).</p>
+        </div>
+
+        <h2>Real Framework Example</h2>
+
+        <p>Here's the actual <code>orders_system_migration.sql</code> from the framework:</p>
+
+        <pre><code><span class="comment">-- ============================================</span>
+<span class="comment">-- Orders System Migration</span>
+<span class="comment">-- Purpose: Create tables for Products, Orders, Order Items, and Transactions</span>
+<span class="comment">-- Version: 1.0</span>
+<span class="comment">-- Date: 2025-12-30</span>
+<span class="comment">-- ============================================</span>
+
+<span class="comment">-- PRODUCTS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> products (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    sku <span class="keyword">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">UNIQUE NOT NULL</span>,
+    price <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    stock <span class="keyword">INT NOT NULL DEFAULT</span> <span class="number">0</span>,
+    category <span class="keyword">VARCHAR</span>(<span class="number">100</span>),
+    description <span class="keyword">TEXT</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'active'</span>, <span class="string">'inactive'</span>) <span class="keyword">DEFAULT</span> <span class="string">'active'</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_sku (sku),
+    <span class="keyword">INDEX</span> idx_category (category),
+    <span class="keyword">INDEX</span> idx_status (status)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- ORDERS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> orders (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    user_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    total_amount <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    payment_method <span class="keyword">ENUM</span>(<span class="string">'card'</span>, <span class="string">'cash'</span>, <span class="string">'upi'</span>) <span class="keyword">NOT NULL</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'pending'</span>, <span class="string">'confirmed'</span>, <span class="string">'cancelled'</span>, <span class="string">'completed'</span>) <span class="keyword">DEFAULT</span> <span class="string">'pending'</span>,
+    notes <span class="keyword">TEXT</span>,
+    cancellation_reason <span class="keyword">TEXT</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    cancelled_at <span class="keyword">TIMESTAMP NULL</span>,
+    <span class="keyword">INDEX</span> idx_user_id (user_id),
+    <span class="keyword">INDEX</span> idx_status (status),
+    <span class="keyword">INDEX</span> idx_created_at (created_at)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- ORDER ITEMS TABLE</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> order_items (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    order_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    product_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    quantity <span class="keyword">INT NOT NULL</span>,
+    price <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    subtotal <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_order_id (order_id),
+    <span class="keyword">INDEX</span> idx_product_id (product_id),
+    <span class="keyword">FOREIGN KEY</span> (order_id) <span class="keyword">REFERENCES</span> orders(id) <span class="keyword">ON DELETE CASCADE</span>,
+    <span class="keyword">FOREIGN KEY</span> (product_id) <span class="keyword">REFERENCES</span> products(id) <span class="keyword">ON DELETE RESTRICT</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- ORDER TRANSACTIONS TABLE (Audit Log)</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> order_transactions (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    order_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    action <span class="keyword">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL COMMENT</span> <span class="string">'order_created, order_cancelled, payment_received, etc.'</span>,
+    amount <span class="keyword">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>) <span class="keyword">NOT NULL</span>,
+    payment_method <span class="keyword">VARCHAR</span>(<span class="number">50</span>),
+    status <span class="keyword">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">COMMENT</span> <span class="string">'success, failed, refunded, etc.'</span>,
+    notes <span class="keyword">TEXT</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_order_id (order_id),
+    <span class="keyword">INDEX</span> idx_action (action),
+    <span class="keyword">FOREIGN KEY</span> (order_id) <span class="keyword">REFERENCES</span> orders(id) <span class="keyword">ON DELETE CASCADE</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;
+
+<span class="comment">-- SEED DATA: Sample Products</span>
+<span class="keyword">INSERT INTO</span> products (name, sku, price, stock, category, description, status)
+<span class="keyword">VALUES</span>
+    (<span class="string">'Laptop Pro 15'</span>, <span class="string">'LAP-001'</span>, <span class="number">999.99</span>, <span class="number">10</span>, <span class="string">'Electronics'</span>, <span class="string">'High-performance laptop with 16GB RAM'</span>, <span class="string">'active'</span>),
+    (<span class="string">'Wireless Mouse'</span>, <span class="string">'MOU-001'</span>, <span class="number">29.99</span>, <span class="number">50</span>, <span class="string">'Electronics'</span>, <span class="string">'Ergonomic wireless mouse'</span>, <span class="string">'active'</span>),
+    (<span class="string">'USB-C Cable'</span>, <span class="string">'CAB-001'</span>, <span class="number">9.99</span>, <span class="number">100</span>, <span class="string">'Accessories'</span>, <span class="string">'High-speed USB-C cable'</span>, <span class="string">'active'</span>)
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> updated_at = <span class="keyword">CURRENT_TIMESTAMP</span>;</code></pre>
+
+        <h3>Breaking Down This Migration</h3>
+
+        <h4>Products Table</h4>
+        <ul>
+            <li><strong>Primary Key:</strong> <code>id</code> with auto-increment</li>
+            <li><strong>Unique Constraint:</strong> <code>sku</code> must be unique</li>
+            <li><strong>ENUM:</strong> <code>status</code> limited to 'active' or 'inactive'</li>
+            <li><strong>Indexes:</strong> On <code>sku</code>, <code>category</code>, and <code>status</code> for fast lookups</li>
+        </ul>
+
+        <h4>Orders Table</h4>
+        <ul>
+            <li><strong>DECIMAL:</strong> <code>total_amount</code> for precise currency values</li>
+            <li><strong>ENUM:</strong> <code>payment_method</code> and <code>status</code> for controlled values</li>
+            <li><strong>Nullable Timestamp:</strong> <code>cancelled_at</code> only set when order is cancelled</li>
+        </ul>
+
+        <h4>Order Items Table</h4>
+        <ul>
+            <li><strong>Foreign Key to Orders:</strong> <code>ON DELETE CASCADE</code> (delete items when order is deleted)</li>
+            <li><strong>Foreign Key to Products:</strong> <code>ON DELETE RESTRICT</code> (prevent product deletion if in orders)</li>
+        </ul>
+
+        <h4>Order Transactions Table (Audit Log)</h4>
+        <ul>
+            <li><strong>Immutable Log:</strong> Records all actions on orders</li>
+            <li><strong>Comments:</strong> Use <code>COMMENT</code> to document column purpose</li>
+        </ul>
+
+        <h4>Seed Data</h4>
+        <ul>
+            <li><strong>ON DUPLICATE KEY UPDATE:</strong> If SKU exists, just update timestamp (idempotent)</li>
+        </ul>
+
+        <h2>Seed Data Pattern</h2>
+        <span class="label label-idempotent">IDEMPOTENT</span>
+
+        <p>To insert sample data safely (without errors on re-runs):</p>
+
+        <pre><code><span class="keyword">INSERT INTO</span> products (name, sku, price, stock, category, status)
+<span class="keyword">VALUES</span>
+    (<span class="string">'Product A'</span>, <span class="string">'SKU-001'</span>, <span class="number">99.99</span>, <span class="number">10</span>, <span class="string">'Category1'</span>, <span class="string">'active'</span>),
+    (<span class="string">'Product B'</span>, <span class="string">'SKU-002'</span>, <span class="number">149.99</span>, <span class="number">5</span>, <span class="string">'Category2'</span>, <span class="string">'active'</span>)
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> 
+    updated_at = <span class="keyword">CURRENT_TIMESTAMP</span>;</code></pre>
+
+        <div class="tip">
+            <p><strong>Why <code>ON DUPLICATE KEY UPDATE</code>?</strong></p>
+            <p>This prevents "duplicate key" errors when running migrations multiple times. If the record exists (based on unique key like SKU), it just updates the timestamp instead of failing.</p>
+        </div>
+
+        <h2>Running Migrations</h2>
+
+        <h3>Via HTTP Request</h3>
+        <pre><code><span class="comment">// POST request</span>
+<span class="keyword">POST</span> http://localhost:8000/api/init/migrate
+
+<span class="comment">// No body required</span>
+
+<span class="comment">// Response:</span>
+{
+    <span class="string">"success"</span>: <span class="keyword">true</span>,
+    <span class="string">"message"</span>: <span class="string">"All migrations executed successfully"</span>,
+    <span class="string">"files_found"</span>: <span class="number">3</span>,
+    <span class="string">"total_statements_executed"</span>: <span class="number">15</span>
+}</code></pre>
+
+        <h3>Via cURL</h3>
+        <pre><code>curl -X POST http://localhost:8000/api/init/migrate</code></pre>
+
+        <h3>Via Postman</h3>
+        <ol>
+            <li>Method: <code>POST</code></li>
+            <li>URL: <code>http://localhost:8000/api/init/migrate</code></li>
+            <li>Click Send</li>
+        </ol>
+
+        <h2>Error Handling</h2>
+
+        <h3>Common Errors (Auto-Ignored)</h3>
+        <p>The migration runner automatically ignores these safe errors:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Error Code</th>
+                    <th>Description</th>
+                    <th>Why Ignored</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>23000</code></td>
+                    <td>Duplicate key entry</td>
+                    <td>Seed data already exists (ON DUPLICATE KEY UPDATE)</td>
+                </tr>
+                <tr>
+                    <td><code>42S01</code></td>
+                    <td>Table already exists</td>
+                    <td>CREATE TABLE IF NOT EXISTS still triggers this on re-run</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Real Errors</h3>
+        <p>If you get other errors, the response will show:</p>
+        <pre><code>{
+    <span class="string">"success"</span>: <span class="keyword">false</span>,
+    <span class="string">"message"</span>: <span class="string">"Migrations completed with errors"</span>,
+    <span class="string">"errors"</span>: [
+        {
+            <span class="string">"file"</span>: <span class="string">"002_orders.sql"</span>,
+            <span class="string">"statement"</span>: <span class="number">3</span>,
+            <span class="string">"code"</span>: <span class="string">"42000"</span>,
+            <span class="string">"message"</span>: <span class="string">"You have an error in your SQL syntax..."</span>
+        }
+    ]
+}</code></pre>
+
+        <h2>Migration Best Practices</h2>
+
+        <div class="tip">
+            <p><strong>✅ DO:</strong></p>
+            <ul>
+                <li>Use <code>IF NOT EXISTS</code> for all CREATE TABLE statements</li>
+                <li>Number migration files sequentially (001, 002, 003...)</li>
+                <li>Add comments explaining the purpose of each table</li>
+                <li>Use <code>DECIMAL</code> for currency, never <code>FLOAT</code></li>
+                <li>Always specify <code>ENGINE=InnoDB</code> and <code>utf8mb4</code></li>
+                <li>Add indexes on foreign keys and frequently queried columns</li>
+                <li>Use <code>ON DUPLICATE KEY UPDATE</code> for seed data</li>
+                <li>Use <code>TIMESTAMP DEFAULT CURRENT_TIMESTAMP</code> for audit fields</li>
+                <li>Document ENUM values and their meanings</li>
+                <li>Use descriptive index names (<code>idx_user_id</code>, not <code>idx1</code>)</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <p><strong>⚠️ BE CAREFUL:</strong></p>
+            <ul>
+                <li>Don't modify old migration files after they've been run</li>
+                <li>Don't delete migration files from the repository</li>
+                <li>Test migrations locally before deploying to production</li>
+                <li>Be cautious with <code>ON DELETE CASCADE</code> (can delete data unintentionally)</li>
+                <li>Backup your database before running migrations on production</li>
+            </ul>
+        </div>
+
+        <div class="important">
+            <p><strong>❌ DON'T:</strong></p>
+            <ul>
+                <li>Don't use <code>DROP TABLE</code> in migrations (destructive)</li>
+                <li>Don't use <code>FLOAT</code> for money (precision errors)</li>
+                <li>Don't forget foreign key indexes (performance issue)</li>
+                <li>Don't use MyISAM engine (no transaction support)</li>
+                <li>Don't forget <code>ON UPDATE CURRENT_TIMESTAMP</code> for updated_at</li>
+                <li>Don't hardcode data that might change (use seed scripts instead)</li>
+            </ul>
+        </div>
+
+        <h2>Common Migration Patterns</h2>
+
+        <h3>Pattern 1: User Authentication Table</h3>
+        <pre><code><span class="keyword">CREATE TABLE IF NOT EXISTS</span> users (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    email <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">UNIQUE NOT NULL</span>,
+    password_hash <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    name <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    role <span class="keyword">ENUM</span>(<span class="string">'user'</span>, <span class="string">'admin'</span>) <span class="keyword">DEFAULT</span> <span class="string">'user'</span>,
+    status <span class="keyword">ENUM</span>(<span class="string">'active'</span>, <span class="string">'inactive'</span>, <span class="string">'suspended'</span>) <span class="keyword">DEFAULT</span> <span class="string">'active'</span>,
+    email_verified_at <span class="keyword">TIMESTAMP NULL</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_email (email),
+    <span class="keyword">INDEX</span> idx_status (status)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;</code></pre>
+
+        <h3>Pattern 2: Pivot Table (Many-to-Many)</h3>
+        <pre><code><span class="keyword">CREATE TABLE IF NOT EXISTS</span> product_categories (
+    product_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    category_id <span class="keyword">INT UNSIGNED NOT NULL</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="keyword">PRIMARY KEY</span> (product_id, category_id),
+    <span class="keyword">FOREIGN KEY</span> (product_id) <span class="keyword">REFERENCES</span> products(id) <span class="keyword">ON DELETE CASCADE</span>,
+    <span class="keyword">FOREIGN KEY</span> (category_id) <span class="keyword">REFERENCES</span> categories(id) <span class="keyword">ON DELETE CASCADE</span>
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;</code></pre>
+
+        <h3>Pattern 3: Soft Deletes</h3>
+        <pre><code><span class="keyword">CREATE TABLE IF NOT EXISTS</span> posts (
+    id <span class="keyword">INT UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+    title <span class="keyword">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT NULL</span>,
+    content <span class="keyword">TEXT</span>,
+    deleted_at <span class="keyword">TIMESTAMP NULL</span>,  <span class="comment">-- NULL = active, NOT NULL = soft deleted</span>
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    updated_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="keyword">INDEX</span> idx_deleted_at (deleted_at)
+) <span class="keyword">ENGINE</span>=InnoDB <span class="keyword">DEFAULT CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_unicode_ci;</code></pre>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Problem: Foreign Key Constraint Fails</h3>
+        <p><strong>Solution:</strong> Ensure parent table is created before child table. Check migration file order.</p>
+
+        <h3>Problem: Syntax Error in SQL</h3>
+        <p><strong>Solution:</strong> Test SQL in phpMyAdmin or MySQL CLI first. Check for missing semicolons and quotes.</p>
+
+        <h3>Problem: Migration Runs but Tables Not Created</h3>
+        <p><strong>Solution:</strong> Check database connection. Verify <code>DB_NAME</code> in <code>.env</code> file.</p>
+
+        <h3>Problem: Duplicate Key Error on Seed Data</h3>
+        <p><strong>Solution:</strong> Use <code>ON DUPLICATE KEY UPDATE</code> pattern shown above.</p>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #30363d;">
+
+        <p><strong>Next:</strong> <a href="08-middleware.html">Middleware System</a></p>
+        <p><a href="index.html" class="back-link">← Back to Documentation Home</a></p>
+    </div>
+</body>
+</html>
