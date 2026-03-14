@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Controllers - Framework Documentation</title>
+    
+    <!-- Highlight.js GitHub Dark Theme for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.7;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #161b22;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 42px;
+            color: #58a6ff;
+            margin-bottom: 10px;
+            font-weight: 700;
+            border-bottom: 3px solid #21262d;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 32px;
+            color: #58a6ff;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-left: 4px solid #58a6ff;
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-size: 24px;
+            color: #79c0ff;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 20px;
+            color: #a371f7;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: #c9d1d9;
+            font-size: 16px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #c9d1d9;
+        }
+
+        code {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            color: #79c0ff;
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        pre code {
+            background: transparent !important; /* Force transparent to use pre box background */
+            border: none;
+            padding: 0;
+        }
+
+        .highlight-box {
+            background: #1c2128;
+            border-left: 4px solid #58a6ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .highlight-box.success {
+            border-left-color: #3fb950;
+        }
+
+        .highlight-box.warning {
+            border-left-color: #fbbf24;
+        }
+
+        .highlight-box.error {
+            border-left-color: #f85149;
+        }
+
+        .highlight-box.info {
+            border-left-color: #a371f7;
+        }
+
+        .method-card {
+            background: #1c2128;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .method-card h4 {
+            margin-top: 0;
+            color: #58a6ff;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .method-signature {
+            background: #0d1117;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #79c0ff;
+            margin: 10px 0;
+            border: 1px solid #30363d;
+        }
+
+        .parameter-list {
+            margin: 15px 0;
+            padding: 15px;
+            background: #0d1117;
+            border-radius: 6px;
+        }
+
+        .parameter-list dt {
+            color: #fbbf24;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .parameter-list dd {
+            color: #c9d1d9;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0d1117;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
+
+        th {
+            background: #1c2128;
+            color: #58a6ff;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        td {
+            color: #c9d1d9;
+        }
+
+        .do-dont {
+            margin: 20px 0;
+        }
+
+        .do-item {
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #3fb950;
+            background: rgba(63, 185, 80, 0.1);
+            border-radius: 4px;
+        }
+
+        .dont-item {
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #f85149;
+            background: rgba(248, 81, 73, 0.1);
+            border-radius: 4px;
+        }
+
+        .do-item:before {
+            content: "✓ ";
+            color: #3fb950;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .dont-item:before {
+            content: "✗ ";
+            color: #f85149;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .response-example {
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .response-example h5 {
+            color: #3fb950;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #58a6ff;
+            color: #0d1117;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .back-to-top:hover {
+            background: #79c0ff;
+            transform: translateY(-3px);
+        }
+
+        .architecture-box {
+            background: #0d1117;
+            border: 2px solid #30363d;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .layer {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 2px solid;
+        }
+
+        .layer-controller {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .layer-service {
+            border-color: #3fb950;
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .layer-repository {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        /* LLM Prompt Custom CSS */
+        .llm-prompt-box {
+            position: relative;
+            background: #1c2128;
+            border: 2px solid #58a6ff;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.1);
+        }
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #58a6ff;
+            color: #0d1117;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover {
+            background: #79c0ff;
+            transform: translateY(-2px);
+        }
+        #llm-prompt-text {
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #c9d1d9;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+            h2 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Writing Controllers</h1>
+        <p class="subtitle">Learn how to create controllers that handle HTTP requests and orchestrate application flow</p>
+
+        <h2>What is a Controller?</h2>
+        <p>A <strong>controller</strong> is a class responsible for handling HTTP requests, processing input, calling business logic, and returning responses. Controllers act as the bridge between the HTTP layer and your application's business logic.</p>
+
+        <div class="architecture-box">
+            <h4>Controller's Role in the Framework</h4>
+            <div class="layer layer-controller">
+                <strong>Controller Layer (YOU ARE HERE)</strong>
+                <ul style="margin-top: 10px;">
+                    <li>Receives HTTP requests from the Router</li>
+                    <li>Validates and sanitizes input data</li>
+                    <li>Calls Service methods to execute business logic</li>
+                    <li>Formats and returns JSON responses</li>
+                    <li>Handles exceptions and errors</li>
+                </ul>
+            </div>
+            <div class="layer layer-service">
+                <strong>Service Layer</strong>
+                <ul style="margin-top: 10px;">
+                    <li>Contains business rules and logic</li>
+                    <li>Orchestrates multiple repository calls</li>
+                    <li>Handles transactions</li>
+                </ul>
+            </div>
+            <div class="layer layer-repository">
+                <strong>Repository Layer</strong>
+                <ul style="margin-top: 10px;">
+                    <li>Executes database queries</li>
+                    <li>Maps data to arrays/objects</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="highlight-box warning">
+            <h4>What Controllers Should NOT Do</h4>
+            <ul>
+                <li>❌ Contain business logic (use Services)</li>
+                <li>❌ Write SQL queries directly (use Repositories)</li>
+                <li>❌ Perform complex data transformations</li>
+                <li>❌ Access the database directly (except for simple cases)</li>
+            </ul>
+        </div>
+
+        <h2>BaseController Class</h2>
+        <p>All controllers in this framework <strong>must extend BaseController</strong>, which provides essential functionality and helper methods.</p>
+
+        <h3>What BaseController Provides</h3>
+
+        <ul>
+            <li><strong>Database Access:</strong> <code>$this->db</code> - Pre-configured Database instance</li>
+            <li><strong>Environment Variables:</strong> Automatically loaded from <code>.env</code></li>
+            <li><strong>Security:</strong> Automatic HTTPS enforcement (except for CLI)</li>
+            <li><strong>Response Helpers:</strong> Pre-built methods for JSON responses</li>
+            <li><strong>Validation Helpers:</strong> Built-in request validation</li>
+            <li><strong>Input Sanitization:</strong> Automatic XSS protection</li>
+        </ul>
+
+        <h3>BaseController Constructor (Automatic)</h3>
+
+        <pre><code class="language-php">&lt;?php
+// Happens automatically when you extend BaseController
+
+public function __construct() {
+    // 1. Load environment variables from .env
+    $this->ensureEnvironmentLoaded();
+    
+    // 2. Enforce HTTPS (except CLI scripts)
+    if (php_sapi_name() !== 'cli') {
+        Security::ensureSecure();
+    }
+    
+    // 3. Initialize database connection
+    try {
+        $pdo = DatabaseConnection::pdo();
+        $this->db = new Database($pdo);
+    } catch (\Exception $e) {
+        error_log("Database initialization failed: " . $e->getMessage());
+        $this->db = null;
+    }
+}</code></pre>
+
+        <div class="highlight-box success">
+            <strong>You get all of this for free!</strong> Just extend <code>BaseController</code> and you have database access, environment variables, and security automatically configured.
+        </div>
+
+        <h2>Creating Your First Controller</h2>
+
+        <h3>File Location and Naming</h3>
+        <ul>
+            <li><strong>Location:</strong> <code>src/api/controllers/</code></li>
+            <li><strong>Naming:</strong> <code>*Controller.php</code> (e.g., <code>ProductController.php</code>)</li>
+            <li><strong>Class Name:</strong> Must match filename (e.g., <code>class ProductController</code>)</li>
+        </ul>
+
+        <h3>Basic Controller Template</h3>
+        <pre><code class="language-php">&lt;?php
+// src/api/controllers/ProductController.php
+
+namespace App\Controllers;
+
+use App\Core\BaseController;
+use App\Core\Exceptions\ValidationException;
+use App\Core\Exceptions\NotFoundException;
+use App\Services\ProductService;
+
+class ProductController extends BaseController
+{
+    private ProductService $productService;
+    
+    public function __construct()
+    {
+        parent::__construct();  // IMPORTANT: Call parent constructor
+        
+        // Initialize your services
+        $this->productService = new ProductService($this->db);
+    }
+    
+    // Your controller methods go here
+    
+    public function list()
+    {
+        // Handle GET /products/list
+    }
+    
+    public function details($id)
+    {
+        // Handle GET /products/{id}
+    }
+    
+    public function create()
+    {
+        // Handle POST /products/create
+    }
+}</code></pre>
+
+        <div class="highlight-box warning">
+            <strong>Important:</strong> Always call <code>parent::__construct()</code> in your controller's constructor to ensure the database and environment are initialized.
+        </div>
+
+        <h2>Getting Request Data</h2>
+
+        <h3>1. URL Parameters (from Route)</h3>
+
+        <pre><code class="language-php">&lt;?php
+// Route definition:
+router->add([
+    'method' => 'GET',
+    'url' => '/products/{id}',
+    'controller' => 'ProductController@details'
+]);
+
+// Controller method:
+public function details($id)
+{
+    // $id is automatically passed as a method parameter
+    // URL: /api/products/123
+    // $id = "123"
+    
+    try {
+        $product = $this->productService->getProduct($id);
+        $this->sendSuccess('Product retrieved', $product);
+    } catch (NotFoundException $e) {
+        $this->sendError($e->getMessage(), 404);
+    }
+}</code></pre>
+
+        <h3>2. Query String Parameters (GET)</h3>
+
+        <pre><code class="language-php">&lt;?php
+// URL: /api/products/list?category=electronics&limit=20
+
+public function list()
+{
+    // Get all query parameters as an associative array
+    $params = $this->getQueryParams();
+    
+    // $params = [
+    //     'category' => 'electronics',
+    //     'limit' => '20'
+    // ]
+    
+    // Automatically sanitized for XSS protection
+    
+    $products = $this->productService->getProducts($params);
+    $this->sendSuccess('Products retrieved', $products);
+}</code></pre>
+
+        <h3>3. Request Body (POST/JSON)</h3>
+
+        <pre><code class="language-php">&lt;?php
+// POST /api/products/create
+// Body: {"name": "Laptop", "price": 50000, "stock": 10}
+
+public function create()
+{
+    // Get request body data (works with JSON or form data)
+    $data = $this->getRequestData();
+    
+    // $data = [
+    //     'name' => 'Laptop',
+    //     'price' => 50000,
+    //     'stock' => 10
+    // ]
+    
+    // Automatically sanitized for XSS protection
+    
+    try {
+        $product = $this->productService->createProduct($data);
+        $this->sendSuccess('Product created', $product);
+    } catch (ValidationException $e) {
+        $this->sendValidationError($e->getMessage(), $e->getErrors());
+    }
+}</code></pre>
+
+        <h3>Request Data Methods Reference</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Purpose</th>
+                    <th>Returns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>getRequestData()</code></td>
+                    <td>Get POST/JSON body data</td>
+                    <td>Sanitized array</td>
+                </tr>
+                <tr>
+                    <td><code>getQueryParams()</code></td>
+                    <td>Get URL query parameters (?key=value)</td>
+                    <td>Sanitized array</td>
+                </tr>
+                <tr>
+                    <td><code>sanitizeInput($input)</code></td>
+                    <td>Manually sanitize data (XSS protection)</td>
+                    <td>Sanitized string/array</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Sending Responses</h2>
+        <p>BaseController provides four main response methods that return properly formatted JSON responses.</p>
+
+        <div class="method-card">
+            <h4>sendSuccess() - Success Responses (200 OK)</h4>
+            <div class="method-signature">
+                protected function sendSuccess(string $message, $data = null, array $extra = []): void
+            </div>
+            
+            <p><strong>Use for:</strong> Successful operations</p>
+            
+            <pre><code class="language-php">&lt;?php
+// Simple success
+$this->sendSuccess('Product deleted successfully');
+
+// Success with data
+$this->sendSuccess('Product retrieved', $product);
+
+// Success with extra metadata
+$this->sendSuccess('Products retrieved', $products, [
+    'total' => 150,
+    'page' => 1,
+    'perPage' => 10
+]);</code></pre>
+
+            <div class="response-example">
+                <h5>Response Format:</h5>
+                <pre><code class="language-json">{
+    "status": "success",
+    "message": "Products retrieved",
+    "data": [...],
+    "total": 150,
+    "page": 1,
+    "perPage": 10
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <h4>sendError() - Error Responses (400, 404, etc.)</h4>
+            <div class="method-signature">
+                protected function sendError(string $message, int $statusCode = 400, $data = null): void
+            </div>
+            
+            <p><strong>Use for:</strong> Client errors, not found, forbidden, etc.</p>
+            
+            <pre><code class="language-php">&lt;?php
+// Generic error (400)
+$this->sendError('Invalid product ID');
+
+// Not found (404)
+$this->sendError('Product not found', 404);
+
+// Forbidden (403)
+$this->sendError('You do not have permission to delete this product', 403);
+
+// Error with additional data
+$this->sendError('Stock insufficient', 400, [
+    'available' => 5,
+    'requested' => 10
+]);</code></pre>
+
+            <div class="response-example">
+                <h5>Response Format:</h5>
+                <pre><code class="language-json">{
+    "status": "error",
+    "message": "Product not found"
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <h4>sendValidationError() - Validation Errors (422)</h4>
+            <div class="method-signature">
+                protected function sendValidationError(string $message, array $errors): void
+            </div>
+            
+            <p><strong>Use for:</strong> Form validation failures</p>
+            
+            <pre><code class="language-php">&lt;?php
+$this->sendValidationError('Validation failed', [
+    'name' => 'Product name is required',
+    'price' => 'Price must be greater than 0',
+    'sku' => 'SKU already exists'
+]);</code></pre>
+
+            <div class="response-example">
+                <h5>Response Format:</h5>
+                <pre><code class="language-json">{
+    "status": "error",
+    "message": "Validation failed",
+    "validation_errors": {
+        "name": "Product name is required",
+        "price": "Price must be greater than 0",
+        "sku": "SKU already exists"
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <h4>sendServerError() - Server Errors (500)</h4>
+            <div class="method-signature">
+                protected function sendServerError(string $message = 'Internal server error'): void
+            </div>
+            
+            <p><strong>Use for:</strong> Unexpected server-side errors</p>
+            
+            <pre><code class="language-php">&lt;?php
+try {
+    $product = $this->productService->createProduct($data);
+    $this->sendSuccess('Product created', $product);
+} catch (\Exception $e) {
+    error_log('Product creation failed: ' . $e->getMessage());
+    $this->sendServerError('Failed to create product');
+}</code></pre>
+
+            <div class="response-example">
+                <h5>Response Format:</h5>
+                <pre><code class="language-json">{
+    "status": "error",
+    "message": "Failed to create product"
+}</code></pre>
+            </div>
+        </div>
+
+        <h2>Validation in Controllers</h2>
+
+        <h3>Method 1: validateRequired() - Simple Validation</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function create()
+{
+    $data = $this->getRequestData();
+    
+    // Check for required fields
+    $required = ['name', 'price', 'sku'];
+    $missing = $this->validateRequired($data, $required);
+    
+    if (!empty($missing)) {
+        $errors = [];
+        foreach ($missing as $field) {
+            $errors[$field] = "The {$field} field is required";
+        }
+        $this->sendValidationError('Missing required fields', $errors);
+        return;
+    }
+    
+    // Continue with creation...
+    $product = $this->productService->createProduct($data);
+    $this->sendSuccess('Product created', $product);
+}</code></pre>
+
+        <h3>Method 2: validateRequest() - Advanced Validation</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function create()
+{
+    $data = $this->getRequestData();
+    
+    // Define validation rules
+    $rules = [
+        'name' => 'required|string|min:3|max:255',
+        'email' => 'required|email',
+        'price' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'category' => 'string'
+    ];
+    
+    // Validate using ValidationUtility
+    $errors = $this->validateRequest($rules);
+    
+    if (!empty($errors)) {
+        $this->sendValidationError('Validation failed', $errors);
+        return;
+    }
+    
+    // Data is valid, proceed
+    $product = $this->productService->createProduct($data);
+    $this->sendSuccess('Product created', $product);
+}</code></pre>
+
+        <h3>Available Validation Rules</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>required</code></td>
+                    <td>Field must be present and not empty</td>
+                    <td><code>'name' => 'required'</code></td>
+                </tr>
+                <tr>
+                    <td><code>email</code></td>
+                    <td>Must be a valid email address</td>
+                    <td><code>'email' => 'required|email'</code></td>
+                </tr>
+                <tr>
+                    <td><code>numeric</code></td>
+                    <td>Must be a number</td>
+                    <td><code>'price' => 'numeric'</code></td>
+                </tr>
+                <tr>
+                    <td><code>integer</code></td>
+                    <td>Must be an integer</td>
+                    <td><code>'stock' => 'integer'</code></td>
+                </tr>
+                <tr>
+                    <td><code>string</code></td>
+                    <td>Must be a string</td>
+                    <td><code>'name' => 'string'</code></td>
+                </tr>
+                <tr>
+                    <td><code>min:n</code></td>
+                    <td>Minimum value/length</td>
+                    <td><code>'price' => 'min:0'</code></td>
+                </tr>
+                <tr>
+                    <td><code>max:n</code></td>
+                    <td>Maximum value/length</td>
+                    <td><code>'name' => 'max:255'</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Exception Handling</h2>
+
+        <p>The framework provides custom exception classes for different error scenarios.</p>
+
+        <h3>Available Exception Classes</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Exception</th>
+                    <th>Status Code</th>
+                    <th>When to Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>NotFoundException</code></td>
+                    <td>404</td>
+                    <td>Resource not found</td>
+                </tr>
+                <tr>
+                    <td><code>ValidationException</code></td>
+                    <td>422</td>
+                    <td>Validation errors</td>
+                </tr>
+                <tr>
+                    <td><code>DatabaseException</code></td>
+                    <td>500</td>
+                    <td>Database errors</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Exception Handling Pattern</h3>
+
+        <pre><code class="language-php">&lt;?php
+use App\Core\Exceptions\NotFoundException;
+use App\Core\Exceptions\ValidationException;
+use App\Core\Exceptions\DatabaseException;
+
+public function details($id)
+{
+    try {
+        // Call service method
+        $product = $this->productService->getProduct($id);
+        $this->sendSuccess('Product retrieved', $product);
+        
+    } catch (NotFoundException $e) {
+        // Handle not found (404)
+        $this->sendError($e->getMessage(), 404);
+        
+    } catch (ValidationException $e) {
+        // Handle validation errors (422)
+        $this->sendValidationError($e->getMessage(), $e->getErrors());
+        
+    } catch (DatabaseException $e) {
+        // Handle database errors (500)
+        error_log('Database error: ' . $e->getMessage());
+        $this->sendServerError('Database error occurred');
+        
+    } catch (\Exception $e) {
+        // Handle unexpected errors (500)
+        error_log('Unexpected error: ' . $e->getMessage());
+        $this->sendServerError('An unexpected error occurred');
+    }
+}</code></pre>
+
+        <h2>Complete Controller Examples</h2>
+
+        <h3>ProductController - Full Implementation</h3>
+
+        <pre><code class="language-php">&lt;?php
+
+namespace App\Controllers;
+
+use App\Core\BaseController;
+use App\Core\Exceptions\ValidationException;
+use App\Core\Exceptions\NotFoundException;
+use App\Services\ProductService;
+
+class ProductController extends BaseController
+{
+    private ProductService $productService;
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->productService = new ProductService($this->db);
+    }
+    
+    /**
+     * GET /products/list
+     * Get list of products with optional filters
+     */
+    public function list()
+    {
+        try {
+            // Get query parameters
+            $filters = $this->getQueryParams();
+            
+            // Call service
+            $products = $this->productService->getProducts($filters);
+            
+            // Send success response
+            $this->sendSuccess('Products retrieved', $products);
+            
+        } catch (\Exception $e) {
+            error_log('Error fetching products: ' . $e->getMessage());
+            $this->sendServerError('Failed to retrieve products');
+        }
+    }
+    
+    /**
+     * GET /products/{id}
+     * Get single product by ID
+     */
+    public function details($id)
+    {
+        try {
+            // Call service
+            $product = $this->productService->getProduct($id);
+            
+            // Send success response
+            $this->sendSuccess('Product retrieved', $product);
+            
+        } catch (NotFoundException $e) {
+            $this->sendError($e->getMessage(), 404);
+            
+        } catch (\Exception $e) {
+            error_log('Error fetching product: ' . $e->getMessage());
+            $this->sendServerError('Failed to retrieve product');
+        }
+    }
+    
+    /**
+     * POST /products/create
+     * Create a new product
+     */
+    public function create()
+    {
+        try {
+            // Get request data
+            $data = $this->getRequestData();
+            
+            // Validate required fields
+            $required = ['name', 'sku', 'price'];
+            $missing = $this->validateRequired($data, $required);
+            
+            if (!empty($missing)) {
+                $errors = [];
+                foreach ($missing as $field) {
+                    $errors[$field] = "The {$field} field is required";
+                }
+                $this->sendValidationError('Missing required fields', $errors);
+                return;
+            }
+            
+            // Call service to create product
+            $product = $this->productService->createProduct($data);
+            
+            // Send success response
+            $this->sendSuccess('Product created successfully', $product);
+            
+        } catch (ValidationException $e) {
+            $this->sendValidationError($e->getMessage(), $e->getErrors());
+            
+        } catch (\Exception $e) {
+            error_log('Error creating product: ' . $e->getMessage());
+            $this->sendServerError('Failed to create product');
+        }
+    }
+    
+    /**
+     * POST /products/update
+     * Update an existing product
+     */
+    public function update()
+    {
+        try {
+            // Get request data
+            $data = $this->getRequestData();
+            
+            // Validate product ID
+            if (empty($data['productid'])) {
+                $this->sendValidationError('Product ID is required', [
+                    'productid' => 'Product ID is required'
+                ]);
+                return;
+            }
+            
+            // Call service to update product
+            $product = $this->productService->updateProduct($data['productid'], $data);
+            
+            // Send success response
+            $this->sendSuccess('Product updated successfully', $product);
+            
+        } catch (NotFoundException $e) {
+            $this->sendError($e->getMessage(), 404);
+            
+        } catch (ValidationException $e) {
+            $this->sendValidationError($e->getMessage(), $e->getErrors());
+            
+        } catch (\Exception $e) {
+            error_log('Error updating product: ' . $e->getMessage());
+            $this->sendServerError('Failed to update product');
+        }
+    }
+}</code></pre>
+
+        <h3>OrderController - Full Implementation</h3>
+
+        <pre><code class="language-php">&lt;?php
+
+namespace App\Controllers;
+
+use App\Core\BaseController;
+use App\Core\Exceptions\ValidationException;
+use App\Core\Exceptions\NotFoundException;
+use App\Services\OrderService;
+
+class OrderController extends BaseController
+{
+    private OrderService $orderService;
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->orderService = new OrderService($this->db);
+    }
+    
+    /**
+     * POST /orders/create
+     * Create a new order with items
+     */
+    public function create()
+    {
+        try {
+            // Get request data
+            $data = $this->getRequestData();
+            
+            // Validate required fields
+            $required = ['userid', 'paymentmethod', 'items'];
+            $missing = $this->validateRequired($data, $required);
+            
+            if (!empty($missing)) {
+                $errors = [];
+                foreach ($missing as $field) {
+                    $errors[$field] = "The {$field} field is required";
+                }
+                $this->sendValidationError('Missing required fields', $errors);
+                return;
+            }
+            
+            // Validate items array
+            if (empty($data['items']) || !is_array($data['items'])) {
+                $this->sendValidationError('Invalid order data', [
+                    'items' => 'Items must be a non-empty array'
+                ]);
+                return;
+            }
+            
+            // Extract order data and items
+            $orderData = [
+                'userid' => $data['userid'],
+                'paymentmethod' => $data['paymentmethod'],
+                'totalamount' => $data['totalamount'] ?? 0,
+                'notes' => $data['notes'] ?? null
+            ];
+            
+            $items = $data['items'];
+            
+            // Call service to create order
+            $order = $this->orderService->createOrder($orderData, $items);
+            
+            // Send success response
+            $this->sendSuccess('Order created successfully', $order);
+            
+        } catch (ValidationException $e) {
+            $this->sendValidationError($e->getMessage(), $e->getErrors());
+            
+        } catch (\Exception $e) {
+            error_log('Error creating order: ' . $e->getMessage());
+            $this->sendServerError('Failed to create order');
+        }
+    }
+    
+    /**
+     * GET /orders/details
+     * Get order details by ID
+     */
+    public function details()
+    {
+        try {
+            // Get order ID from query params
+            $params = $this->getQueryParams();
+            $orderId = $params['orderid'] ?? null;
+            
+            if (empty($orderId)) {
+                $this->sendValidationError('Order ID is required', [
+                    'orderid' => 'Order ID is required'
+                ]);
+                return;
+            }
+            
+            // Call service
+            $order = $this->orderService->getOrderDetails($orderId);
+            
+            // Send success response
+            $this->sendSuccess('Order details retrieved', $order);
+            
+        } catch (NotFoundException $e) {
+            $this->sendError($e->getMessage(), 404);
+            
+        } catch (\Exception $e) {
+            error_log('Error fetching order: ' . $e->getMessage());
+            $this->sendServerError('Failed to retrieve order details');
+        }
+    }
+    
+    /**
+     * POST /orders/cancel
+     * Cancel an order and restore stock
+     */
+    public function cancel()
+    {
+        try {
+            // Get request data
+            $data = $this->getRequestData();
+            
+            // Validate required fields
+            $required = ['orderid', 'reason'];
+            $missing = $this->validateRequired($data, $required);
+            
+            if (!empty($missing)) {
+                $errors = [];
+                foreach ($missing as $field) {
+                    $errors[$field] = "The {$field} field is required";
+                }
+                $this->sendValidationError('Missing required fields', $errors);
+                return;
+            }
+            
+            // Call service to cancel order
+            $this->orderService->cancelOrder($data['orderid'], $data['reason']);
+            
+            // Send success response
+            $this->sendSuccess('Order cancelled successfully');
+            
+        } catch (NotFoundException $e) {
+            $this->sendError($e->getMessage(), 404);
+            
+        } catch (ValidationException $e) {
+            $this->sendValidationError($e->getMessage(), $e->getErrors());
+            
+        } catch (\Exception $e) {
+            error_log('Error cancelling order: ' . $e->getMessage());
+            $this->sendServerError('Failed to cancel order');
+        }
+    }
+}</code></pre>
+
+        <h2>Controller Best Practices</h2>
+
+        <div class="do-dont">
+            <h3 style="color: #3fb950;">✓ DO</h3>
+            <div class="do-item">Keep controllers thin - delegate logic to services</div>
+            <div class="do-item">Always call <code>parent::__construct()</code></div>
+            <div class="do-item">Use try-catch blocks for exception handling</div>
+            <div class="do-item">Validate input before calling services</div>
+            <div class="do-item">Use appropriate response methods (<code>sendSuccess</code>, <code>sendError</code>, etc.)</div>
+            <div class="do-item">Log errors with <code>error_log()</code></div>
+            <div class="do-item">Return early on validation failures</div>
+            <div class="do-item">Use type hints for service dependencies</div>
+            
+            <h3 style="color: #f85149; margin-top: 30px;">✗ DON'T</h3>
+            <div class="dont-item">Write business logic in controllers</div>
+            <div class="dont-item">Access database directly (except simple cases)</div>
+            <div class="dont-item">Forget to handle exceptions</div>
+            <div class="dont-item">Return raw arrays or strings - use response methods</div>
+            <div class="dont-item">Mix HTML rendering with API controllers</div>
+            <div class="dont-item">Hardcode values - use environment variables</div>
+            <div class="dont-item">Skip input validation</div>
+        </div>
+
+        <h2>Common Controller Patterns</h2>
+
+        <h3>Pattern 1: List with Pagination/Filters</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function list()
+{
+    try {
+        $filters = $this->getQueryParams();
+        
+        // Extract pagination params
+        $page = $filters['page'] ?? 1;
+        $limit = $filters['limit'] ?? 10;
+        
+        // Get data from service
+        $result = $this->productService->getProducts($filters);
+        
+        // Send with metadata
+        $this->sendSuccess('Products retrieved', $result['data'], [
+            'total' => $result['total'],
+            'page' => $page,
+            'limit' => $limit
+        ]);
+        
+    } catch (\Exception $e) {
+        $this->sendServerError('Failed to retrieve products');
+    }
+}</code></pre>
+
+        <h3>Pattern 2: Create with Validation</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function create()
+{
+    try {
+        $data = $this->getRequestData();
+        
+        // Validate
+        $required = ['name', 'price'];
+        $missing = $this->validateRequired($data, $required);
+        if (!empty($missing)) {
+            $errors = array_fill_keys($missing, 'This field is required');
+            $this->sendValidationError('Validation failed', $errors);
+            return;
+        }
+        
+        // Create
+        $product = $this->productService->createProduct($data);
+        $this->sendSuccess('Product created', $product);
+        
+    } catch (ValidationException $e) {
+        $this->sendValidationError($e->getMessage(), $e->getErrors());
+    } catch (\Exception $e) {
+        $this->sendServerError('Failed to create product');
+    }
+}</code></pre>
+
+        <h3>Pattern 3: Update Existing Resource</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function update()
+{
+    try {
+        $data = $this->getRequestData();
+        
+        // Validate ID
+        if (empty($data['id'])) {
+            $this->sendError('Product ID is required', 400);
+            return;
+        }
+        
+        // Update
+        $product = $this->productService->updateProduct($data['id'], $data);
+        $this->sendSuccess('Product updated', $product);
+        
+    } catch (NotFoundException $e) {
+        $this->sendError($e->getMessage(), 404);
+    } catch (ValidationException $e) {
+        $this->sendValidationError($e->getMessage(), $e->getErrors());
+    } catch (\Exception $e) {
+        $this->sendServerError('Failed to update product');
+    }
+}</code></pre>
+
+        <h3>Pattern 4: Delete with Confirmation</h3>
+
+        <pre><code class="language-php">&lt;?php
+public function delete()
+{
+    try {
+        $data = $this->getRequestData();
+        
+        // Validate ID
+        if (empty($data['id'])) {
+            $this->sendError('Product ID is required', 400);
+            return;
+        }
+        
+        // Delete
+        $this->productService->deleteProduct($data['id']);
+        $this->sendSuccess('Product deleted successfully');
+        
+    } catch (NotFoundException $e) {
+        $this->sendError($e->getMessage(), 404);
+    } catch (\Exception $e) {
+        $this->sendServerError('Failed to delete product');
+    }
+}</code></pre>
+
+        <h2>Method Naming Conventions</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Operation</th>
+                    <th>Method Name</th>
+                    <th>Alternative</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>List all resources</td>
+                    <td><code>list()</code></td>
+                    <td><code>index()</code></td>
+                    <td>GET /products/list</td>
+                </tr>
+                <tr>
+                    <td>Get single resource</td>
+                    <td><code>details($id)</code></td>
+                    <td><code>show($id)</code></td>
+                    <td>GET /products/{id}</td>
+                </tr>
+                <tr>
+                    <td>Create new resource</td>
+                    <td><code>create()</code></td>
+                    <td><code>store()</code></td>
+                    <td>POST /products/create</td>
+                </tr>
+                <tr>
+                    <td>Update resource</td>
+                    <td><code>update()</code></td>
+                    <td>-</td>
+                    <td>POST /products/update</td>
+                </tr>
+                <tr>
+                    <td>Delete resource</td>
+                    <td><code>delete()</code></td>
+                    <td><code>destroy()</code></td>
+                    <td>POST /products/delete</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Next Steps</h2>
+        <p>Now that you understand controllers, continue learning about:</p>
+
+        <ul>
+            <li><strong>Services:</strong> Learn how to implement business logic properly</li>
+            <li><strong>Repositories:</strong> Master database queries and data access</li>
+            <li><strong>Middleware:</strong> Create custom request filters</li>
+            <li><strong>Validation:</strong> Advanced validation techniques</li>
+            <li><strong>Exception Handling:</strong> Custom exception classes</li>
+        </ul>
+
+        <div class="highlight-box success">
+            <h4>🎉 You Now Understand Controllers!</h4>
+            <p>You can now create controllers that handle requests, validate data, call services, and return properly formatted responses. The next documentation will show you how to implement the business logic layer (Services).</p>
+        </div>
+
+        <!-- NEW LLM PROMPT SECTION -->
+        <h2 id="llm-prompt">🤖 LLM Controller Generator Prompt</h2>
+        <p>Use this pre-configured system prompt to generate framework-compliant controllers using any LLM (ChatGPT, Claude, Gemini, etc.). Just click "Copy Prompt", paste it into your AI of choice, and add your specific controller requirements at the bottom!</p>
+        
+        <div class="llm-prompt-box">
+            <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+            <div id="llm-prompt-text">You are an expert PHP developer working with a custom MVC framework. 
+Your task is to write a Controller class based on the requirements I provide.
+
+STRICT FRAMEWORK RULES TO FOLLOW:
+1. Class & Namespace:
+   - Namespace must be `App\Controllers`.
+   - The class MUST extend `App\Core\BaseController`.
+   - The constructor MUST call `parent::__construct()` before initializing any services.
+
+2. Architecture & Logic:
+   - NO business logic in the controller. Delegate all business rules, queries, and complex operations to Service classes.
+   - Inject the Database instance using `$this->db` into the services (e.g., `new UserService($this->db)`).
+
+3. Request Handling:
+   - Use `$this->getRequestData()` to retrieve POST/JSON body payloads.
+   - Use `$this->getQueryParams()` to retrieve GET query string parameters.
+   - Use `$this->validateRequired($data, ['field1', 'field2'])` to check for missing required fields.
+
+4. Responses (MUST use BaseController helpers):
+   - Success (200): `$this->sendSuccess('Message', $data, $extraMetaArray)`
+   - Error (400/403/404): `$this->sendError('Error message', 400)`
+   - Validation Error (422): `$this->sendValidationError('Message', $errorsArray)`
+   - Server Error (500): `$this->sendServerError('Message')`
+
+5. Exception Handling:
+   - Wrap operations in `try-catch` blocks.
+   - Catch `App\Core\Exceptions\ValidationException` -> use `sendValidationError()`.
+   - Catch `App\Core\Exceptions\NotFoundException` -> use `sendError(..., 404)`.
+   - Catch general `\Exception` -> log using `error_log()` and return `sendServerError()`.
+
+I will now provide the specific controller name, methods, and features I need. Please generate ONLY the complete, well-commented PHP code for the controller.
+
+REQUIREMENTS:
+[INSERT YOUR SPECIFIC CONTROLLER NAME AND REQUIRED ENDPOINTS/METHODS HERE]</div>
+        </div>
+
+    </div>
+
+    <a href="#" class="back-to-top">↑ Back to Top</a>
+
+    <!-- Highlight.js Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    
+    <!-- Initialize Highlight.js and Copy Prompt Script -->
+    <script>
+        // Start Syntax Highlighting
+        hljs.highlightAll();
+
+        // Copy functionality
+        function copyPrompt() {
+            const promptText = document.getElementById('llm-prompt-text').innerText;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied! ✓';
+                btn.style.background = '#3fb950';
+                btn.style.color = '#fff';
+                
+                setTimeout(() => { 
+                    btn.innerText = originalText; 
+                    btn.style.background = '#58a6ff';
+                    btn.style.color = '#0d1117';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

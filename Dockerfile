@@ -1,40 +1,28 @@
-# Use official PHP 8.4 Apache image
-FROM php:8.4-apache
+# Use the official PHP Apache image
+FROM php:8.2-apache
 
 # Install system dependencies
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        libpng-dev \
-        libjpeg62-turbo-dev \
-        libfreetype6-dev \
-        libzip-dev \
-        zip \
-        unzip \
-        wget; \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install APCu for caching
-ENV APCU_VERSION=5.1.26
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends $PHPIZE_DEPS; \
-    pecl install apcu-$APCU_VERSION; \
-    docker-php-ext-enable apcu; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli zip; \
-    rm -rf /tmp/pear; \
-    apt-get purge -y --auto-remove $PHPIZE_DEPS; \
-    rm -rf /var/lib/apt/lists/*
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli zip
 
-# Enable Apache modules
-RUN set -eux; \
-    a2enmod rewrite; \
-    echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
-# -----------------------------------------------------------
-# FIX: Write the correct Apache config directly
-# -----------------------------------------------------------
+# Set ServerName
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Apache virtual host — point DocumentRoot to /var/www/html/src
 RUN echo '<VirtualHost *:80>\n\
     ServerAdmin webmaster@localhost\n\
     DocumentRoot /var/www/html/src\n\
@@ -49,38 +37,30 @@ RUN echo '<VirtualHost *:80>\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
+# PHP settings
+RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/custom.ini && \
+    echo "max_execution_time = 600" >> /usr/local/etc/php/conf.d/custom.ini && \
+    echo "max_input_time = 600" >> /usr/local/etc/php/conf.d/custom.ini && \
+    echo "post_max_size = 128M" >> /usr/local/etc/php/conf.d/custom.ini && \
+    echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/custom.ini && \
+    echo "max_input_vars = 5000" >> /usr/local/etc/php/conf.d/custom.ini
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Configure PHP settings
-RUN set -eux; \
-    { \
-        echo "memory_limit = 512M"; \
-        echo "max_execution_time = 600"; \
-        echo "max_input_time = 600"; \
-        echo "post_max_size = 128M"; \
-        echo "upload_max_filesize = 128M"; \
-        echo "max_input_vars = 5000"; \
-        echo "apc.enable_cli = 1"; \
-    } > /usr/local/etc/php/conf.d/custom.ini
-
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files
-COPY composer.json ./
-
-# Install PHP dependencies
-RUN composer install --no-interaction --no-progress --prefer-dist
+# Copy composer files and install dependencies
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --no-progress --prefer-dist --no-dev
 
 # Copy application files
-COPY ./src ./src
-COPY .env ./
+COPY src/ ./src/
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Expose port 80
 EXPOSE 80

@@ -45,6 +45,46 @@ function ppp($ke)
     }
 }
 
+
+
+
+/**
+ * Smart debug JSON print function - prints data as JSON (similar to pp but in JSON format)
+ * Only plain text output, no data type shown
+ */
+function pj($data)
+{
+    if (!empty($_ENV['DEBUG_MODE']) && ($_ENV['DEBUG_MODE'] === 'true' || $_ENV['DEBUG_MODE'] === '1')) {
+
+        $backtrace = debug_backtrace()[0];
+        $file = $backtrace['file'];
+        $line = $backtrace['line'];
+
+        // Always output as plain text (no HTML)
+        echo "\n\n--- pj ---\n";
+        echo "File: " . $file . " | ";
+        echo "Line: " . $line . "\n";
+        echo "-------------------------------\n";
+
+        // Convert to JSON with pretty printing
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        if ($json === false) {
+            // If JSON encoding fails, fall back to print_r for the data
+            echo "JSON Encode Error: " . json_last_error_msg() . "\n";
+            print_r($data);
+        } else {
+            echo $json;
+        }
+
+        echo "\n-------------------------------\n";
+        echo "--- /pj ---\n\n";
+    }
+}
+
+
+
+
 /**
  * Send a standardized JSON response and exit.
  */

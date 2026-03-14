@@ -1,10 +1,5 @@
 <?php
 
-
-error_log("API index.php was called! URI: " . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
-
-
-
 /**
  * Application Entry Point
  * Clean bootstrap with proper output buffering for middleware support
@@ -29,18 +24,20 @@ if (file_exists(__DIR__ . '/../../.env')) {
     $dotenv->safeLoad();
 }
 
-// Configure error reporting (FIX: use SHOW_ERRORS from .env)
-if (!empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1')) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', '1');
-    ini_set('display_startup_errors', '1');
-    ini_set('log_errors', '1');
-    ini_set('error_log', __DIR__ . '/php-error.log');
-} else {
-    error_reporting(0);
-    ini_set('display_errors', '0');
-    ini_set('display_startup_errors', '0');
-}
+// Configure error visibility only
+$showErrors = !empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1');
+
+// Keep all PHP errors active so ExceptionHandler::handleError() can catch them
+error_reporting(E_ALL);
+ini_set('display_errors', $showErrors ? '1' : '0');
+ini_set('display_startup_errors', $showErrors ? '1' : '0');
+
+// Disable native PHP file logging here.
+// Centralized logging should be handled by ExceptionHandler / Logger.
+ini_set('log_errors', '1');
+
+// SETTING DEFAULT TIMEZONE
+date_default_timezone_set($_ENV['DB_TIMEZONE'] ?? 'Asia/Kolkata');
 
 // ============================================
 // 2. SECURITY (Global Utilities)
@@ -85,7 +82,6 @@ ob_start();
 // ============================================
 
 $basePath = '/api';
-// $basePath = $_ENV['API_BASE_PATH'] ?? '';
 $router = new Router($basePath);
 
 // Load routes
@@ -98,6 +94,8 @@ require_once __DIR__ . '/routes.php';
 // ============================================
 // 6. SET CONTENT TYPE (before dispatch)
 // ============================================
+
+// pp($_ENV);
 
 if (!$isHtmlRoute && !headers_sent()) {
     header('Content-Type: application/json; charset=utf-8');

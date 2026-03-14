@@ -16,12 +16,22 @@ $router->add([
     'group' => 'System'
 ]);
 
+
+$router->add([
+    'method' => 'GET',
+    'url' => 'docs/random-db-value',
+    'controller' => 'DocsController@getRandomDbValue',
+    'visible' => false, // Hide from the API docs interface
+    'group' => 'System'
+]);
+
+
 $router->add([
     'method' => 'GET',
     'url' => '/service-test',
     'controller' => 'ServiceTesterController@index',
     'desc' => 'Service tester UI',
-    'visible' => true,
+    'visible' => false,
     'group' => 'System'
 ]);
 
@@ -81,7 +91,7 @@ $router->add([
     'url' => 'repository-test',
     'controller' => 'RepositoryTesterController@index',
     'desc' => 'Repository tester UI',
-    'visible' => true,
+    'visible' => false,
     'group' => 'System'
 ]);
 
@@ -167,7 +177,7 @@ $router->add([
     'url' => '/monitoring',
     'controller' => 'MonitoringController@index',
     'desc' => 'System monitoring dashboard',
-    'visible' => true,
+    'visible' => false,
     'group' => 'Monitoring'
 ]);
 
@@ -185,7 +195,7 @@ $router->add([
     'url' => '/monitoring/history',
     'controller' => 'MonitoringController@history',
     'desc' => 'Get historical metrics',
-    'visible' => true,
+    'visible' => false,
     'group' => 'Monitoring'
 ]);
 
@@ -194,7 +204,7 @@ $router->add([
     'url' => '/monitoring/health',
     'controller' => 'MonitoringController@health',
     'desc' => 'System health check',
-    'visible' => true,
+    'visible' => false,
     'group' => 'Monitoring'
 ]);
 
@@ -203,7 +213,7 @@ $router->add([
     'url' => '/monitoring/stats',
     'controller' => 'MonitoringController@stats',
     'desc' => 'Endpoint statistics',
-    'visible' => true,
+    'visible' => false,
     'group' => 'Monitoring'
 ]);
 
@@ -212,7 +222,7 @@ $router->add([
     'url' => '/monitoring/clear',
     'controller' => 'MonitoringController@clear',
     'desc' => 'Clear all monitoring logs',
-    'visible' => true,
+    'visible' => false,
     'group' => 'Monitoring'
 ]);
 
@@ -226,3 +236,49 @@ $router->add([
     'visible' => false,
     'group' => 'Monitoring'
 ]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------
+// AGENT CHAT TOOLS
+// ---------------------------------------------------
+
+
+// AI ORCHESTRATOR ─────────────────────────────────────────────
+$router->add([
+    'method' => 'GET',
+    'url' => 'ai-orchestrator',
+    'controller' => 'AIOrchestratorController@index',
+    'desc' => 'AI Orchestrator — unified testing UI powered by Groq',
+    'visible' => false,
+    'group' => 'System',
+]);
+$router->add([
+    'method' => 'POST',
+    'url' => 'ai-orchestrator/run',
+    'controller' => 'AIOrchestratorController@run',
+    'desc' => 'Execute AI-assisted API / Service / Repo test',
+    'visible' => false,
+    'group' => 'System',
+]);
+$router->add([
+    'method' => 'GET',
+    'url' => 'ai-orchestrator/routes-catalog',
+    'controller' => 'AIOrchestratorController@routesCatalog',
+    'desc' => 'Returns registered routes as JSON (internal use)',
+    'visible' => false,
+    'group' => 'System',
+]);
+
+
+

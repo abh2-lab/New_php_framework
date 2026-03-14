@@ -9,6 +9,7 @@ services:
       # 2. Persist the vendor directory generated during the build
       # (Prevents the volume above from overwriting installed dependencies)
       - /var/www/html/vendor
+      - ./src/uploads:/var/www/html/src/uploads
       
     env_file:
       - .env
@@ -36,6 +37,12 @@ services:
       - "8080:80"
     environment:
       - PMA_HOST=db
+      - PHP_UPLOAD_MAX_FILESIZE=64M
+      - PHP_POST_MAX_SIZE=64M
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_MAX_EXECUTION_TIME=300
+      - UPLOAD_LIMIT=300M
+
     depends_on:
       - db
 

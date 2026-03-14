@@ -35,7 +35,7 @@ class SecurityUtility
     }
 
 
-    public static function handleCORS(): void
+    public static function handleCORS_old(): void
     {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
         $allowedOrigins = self::getAllowedOrigins();
@@ -60,8 +60,8 @@ class SecurityUtility
 
     public static function rateLimiting(int $maxRequests = 100, int $timeWindow = 3600): void
     {
-        $maxRequests = (int) ($_ENV['RATELIMITREQUESTS'] ?? $maxRequests);
-        $timeWindow = (int) ($_ENV['RATELIMITWINDOW'] ?? $timeWindow);
+        $maxRequests = (int) ($_ENV['RATE_LIMIT_REQUESTS'] ?? $maxRequests);
+        $timeWindow = (int) ($_ENV['RATE_LIMIT_WINDOW'] ?? $timeWindow);
 
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
         $path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
@@ -117,7 +117,7 @@ class SecurityUtility
 
     private static function getAllowedOrigins(): array
     {
-        $originsEnv = $_ENV['ALLOWEDORIGINS'] ?? '';
+        $originsEnv = $_ENV['ALLOWED_ORIGINS'] ?? '';
 
         if (trim($originsEnv) === '') {
             return [];
@@ -157,4 +157,40 @@ class SecurityUtility
 
         return '127.0.0.1';
     }
+
+
+
+
+    public static function handleCORS(): void
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowedOrigins = self::getAllowedOrigins();
+
+        // 1. If the request's origin is in our allowed list (.env), explicitly allow it
+        if ($origin && in_array($origin, $allowedOrigins, true)) {
+            header("Access-Control-Allow-Origin: $origin");
+            header("Access-Control-Allow-Credentials: true"); // CRITICAL for cookies!
+            header("Vary: Origin");
+        }
+        // 2. Fallback for public API endpoints without cookies (e.g. Mobile Apps / Server-to-Server)
+        else {
+            header("Access-Control-Allow-Origin: *");
+            // Browsers throw errors if Credentials=true when Origin=*
+            header("Access-Control-Allow-Credentials: false");
+        }
+
+        // 3. Allow standard headers + Content-Type (required for JSON)
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Accept");
+        header("Access-Control-Max-Age: 86400"); // Cache the preflight for 24 hours
+
+        // 4. Handle the Preflight OPTIONS request
+        // The browser sends this before actual requests to check permissions.
+        // We MUST exit here so the preflight doesn't trigger the Router or Controllers.
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+            http_response_code(204); // 204 No Content is the standard response for OPTIONS
+            exit(0);
+        }
+    }
+
 }

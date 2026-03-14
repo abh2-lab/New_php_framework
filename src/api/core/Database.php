@@ -5,6 +5,7 @@ namespace App\Core;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use App\Core\Exceptions\DatabaseException;
 
 /**
@@ -20,352 +21,145 @@ class Database
     private array $transactionLog = [];
     private bool $debug = false;
 
-    /**
-     * Constructor
-     *
-     * @param PDO $connection PDO connection instance (required)
-     */
     public function __construct(PDO $connection)
     {
         $this->conn = $connection;
-
-        $this->debug = !empty($_ENV['DEBUG_MODE']) &&
-            ($_ENV['DEBUG_MODE'] === 'true' || $_ENV['DEBUG_MODE'] === '1');
+        // Simple debug check
+        $this->debug = !empty($_ENV['DEBUG_MODE']) && ($_ENV['DEBUG_MODE'] === 'true' || $_ENV['DEBUG_MODE'] === '1');
     }
 
-
-
-
-    public function query(array $config)
-{
-    $query = $config['query'] ?? null;
-    $params = $config['params'] ?? [];
-    $fetchAssoc = $config['fetchAssoc'] ?? true;
-    $withSuccess = $config['withSuccess'] ?? false;
-    $returnSql = $config['returnSql'] ?? false;
-
-    if (!$query) {
-        throw new DatabaseException('SQL query is required');
-    }
-
-    try {
-        if ($returnSql) {
-            return $this->interpolateQuery($query, $params);
-        }
-
-        $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        $stmt = $this->conn->prepare($query);
-
-        // ========== START: NEW CODE - DB Time Tracking ==========
-        // Initialize global DB trackers if not set
-        if (!isset($GLOBALS['query_count'])) {
-            $GLOBALS['query_count'] = 0;
-        }
-        if (!isset($GLOBALS['query_time'])) {
-            $GLOBALS['query_time'] = 0;
-        }
-        if (!isset($GLOBALS['max_query_time'])) {
-            $GLOBALS['max_query_time'] = 0;
-        }
-
-        // Increment query counter
-        $GLOBALS['query_count']++;
-
-        // Start timing this query
-        $queryStartTime = microtime(true);
-        // ========== END: NEW CODE ==========
-
-        if (!$stmt->execute($params)) {
-            throw new DatabaseException(implode(', ', $stmt->errorInfo()));
-        }
-
-        // ========== START: NEW CODE - Calculate & Store Query Time ==========
-        // Calculate query execution time in milliseconds
-        $queryDuration = round((microtime(true) - $queryStartTime) * 1000, 2);
-
-        // Accumulate total query time
-        $GLOBALS['query_time'] += $queryDuration;
-
-        // Track maximum query time
-        if ($queryDuration > $GLOBALS['max_query_time']) {
-            $GLOBALS['max_query_time'] = $queryDuration;
-        }
-
-        // Log slow queries (>500ms) in debug mode
-        if ($this->debug && $queryDuration > 500) {
-            error_log("SLOW QUERY ({$queryDuration}ms): " . substr($query, 0, 100));
-        }
-        // ========== END: NEW CODE ==========
-
-        if ($this->inTransaction) {
-            $this->transactionLog[] = [
-                'query' => $query,
-                'params' => $params,
-                'time' => microtime(true)
-            ];
-        }
-
-        $rows = $stmt->fetchAll($fetchAssoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
-
-        // ========== START: NEW CODE - Track Data Size ==========
-        // Initialize global data size tracker if not set
-        if (!isset($GLOBALS['db_data_size'])) {
-            $GLOBALS['db_data_size'] = 0;
-        }
-
-        // Calculate size of returned data in KB
-        $dataSize = strlen(serialize($rows)) / 1024; // Convert bytes to KB
-        $GLOBALS['db_data_size'] += $dataSize;
-
-        // Track max data size for a single query
-        if (!isset($GLOBALS['max_db_data_size'])) {
-            $GLOBALS['max_db_data_size'] = 0;
-        }
-        if ($dataSize > $GLOBALS['max_db_data_size']) {
-            $GLOBALS['max_db_data_size'] = $dataSize;
-        }
-        // ========== END: NEW CODE ==========
-
-        if ($withSuccess) {
-            $result = [
-                'success' => true,
-                'affected_rows' => $stmt->rowCount(),
-                'id' => null,
-                'data' => $rows
-            ];
-
-            if (stripos(trim($query), 'insert') === 0) {
-                $result['id'] = (int)$this->conn->lastInsertId();
-            }
-
-            if (stripos(trim($query), 'update') === 0 && isset($params[':id'])) {
-                $result['id'] = $params[':id'];
-            }
-
-            return $result;
-        }
-
-        return $rows;
-
-    } catch (PDOException $e) {
-        if ($this->debug) {
-            error_log("Database Error: " . $e->getMessage() . " | Query: " . $query);
-        }
-        throw new DatabaseException($e->getMessage(), (int)$e->getCode(), $e);
-    }
-}
-
-
-
-    public function query_old2(array $config)
+    /**
+     * Internal Executor: Handles logging, timing, and error mapping
+     */
+    private function executeStatement(string $sql, array $params = []): PDOStatement
     {
-        $query = $config['query'] ?? null;
-        $params = $config['params'] ?? [];
-        $fetchAssoc = $config['fetchAssoc'] ?? true;
-        $withSuccess = $config['withSuccess'] ?? false;
-        $returnSql = $config['returnSql'] ?? false;
-
-        if (!$query) {
-            throw new DatabaseException('SQL query is required');
-        }
-
         try {
-            if ($returnSql) {
-                return $this->interpolateQuery($query, $params);
-            }
-
+            // Ensure parameters are not emulated (native types)
             $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            $stmt = $this->conn->prepare($query);
 
-            // ========== START: NEW CODE - DB Time Tracking ==========
-            // Initialize global DB trackers if not set
-            if (!isset($GLOBALS['query_count'])) {
+            $stmt = $this->conn->prepare($sql);
+
+            // Global Performance Tracking
+            if (!isset($GLOBALS['query_count']))
                 $GLOBALS['query_count'] = 0;
-            }
-            if (!isset($GLOBALS['query_time'])) {
+            if (!isset($GLOBALS['query_time']))
                 $GLOBALS['query_time'] = 0;
-            }
-            if (!isset($GLOBALS['max_query_time'])) {
+            if (!isset($GLOBALS['max_query_time']))
                 $GLOBALS['max_query_time'] = 0;
-            }
 
-            // Increment query counter
             $GLOBALS['query_count']++;
-
-            // Start timing this query
-            $queryStartTime = microtime(true);
-            // ========== END: NEW CODE ==========
+            $startTime = microtime(true);
 
             if (!$stmt->execute($params)) {
                 throw new DatabaseException(implode(', ', $stmt->errorInfo()));
             }
 
-            // ========== START: NEW CODE - Calculate & Store Query Time ==========
-            // Calculate query execution time in milliseconds
-            $queryDuration = round((microtime(true) - $queryStartTime) * 1000, 2);
-
-            // Accumulate total query time
-            $GLOBALS['query_time'] += $queryDuration;
-
-            // Track maximum query time
-            if ($queryDuration > $GLOBALS['max_query_time']) {
-                $GLOBALS['max_query_time'] = $queryDuration;
+            // Timing
+            $duration = round((microtime(true) - $startTime) * 1000, 2);
+            $GLOBALS['query_time'] += $duration;
+            if ($duration > $GLOBALS['max_query_time']) {
+                $GLOBALS['max_query_time'] = $duration;
             }
 
-            // Log slow queries (>500ms) in debug mode
-            if ($this->debug && $queryDuration > 500) {
-                error_log("SLOW QUERY ({$queryDuration}ms): " . substr($query, 0, 100));
+            // Slow Query Log
+            if ($this->debug && $duration > 500) {
+                error_log("SLOW QUERY ({$duration}ms): " . substr($sql, 0, 100));
             }
-            // ========== END: NEW CODE ==========
 
+            // Transaction Logging
             if ($this->inTransaction) {
                 $this->transactionLog[] = [
-                    'query' => $query,
+                    'query' => $sql,
                     'params' => $params,
                     'time' => microtime(true)
                 ];
             }
 
-            $rows = $stmt->fetchAll($fetchAssoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
-
-            if ($withSuccess) {
-                $result = [
-                    'success' => true,
-                    'affected_rows' => $stmt->rowCount(),
-                    'id' => null,
-                    'data' => $rows
-                ];
-
-                if (stripos(trim($query), 'insert') === 0) {
-                    $result['id'] = (int) $this->conn->lastInsertId();
-                }
-
-                if (stripos(trim($query), 'update') === 0 && isset($params[':id'])) {
-                    $result['id'] = $params[':id'];
-                }
-
-                return $result;
-            }
-
-            return $rows;
+            return $stmt;
 
         } catch (PDOException $e) {
             if ($this->debug) {
-                error_log("Database Error: " . $e->getMessage() . " | Query: " . $query);
+                error_log("Database Error: " . $e->getMessage() . " | Query: " . $sql);
             }
             throw new DatabaseException($e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 
-
-    public function query_old(array $config)
+    /**
+     * SELECT multiple rows
+     * @return array[] Array of associative arrays
+     */
+    public function query(string $sql, array $params = []): array
     {
-        $query = $config['query'] ?? null;
-        $params = $config['params'] ?? [];
-        $fetchAssoc = $config['fetchAssoc'] ?? true;
-        $withSuccess = $config['withSuccess'] ?? false;
-        $returnSql = $config['returnSql'] ?? false;
-
-        if (!$query) {
-            throw new DatabaseException('SQL query is required');
-        }
-
-        try {
-            if ($returnSql) {
-                return $this->interpolateQuery($query, $params);
-            }
-
-            $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            $stmt = $this->conn->prepare($query);
-
-            // ========== START: NEW CODE - DB Time Tracking ==========
-            // Initialize global DB time trackers if not set
-            if (!isset($GLOBALS['query_time'])) {
-                $GLOBALS['query_time'] = 0;
-            }
-            if (!isset($GLOBALS['max_query_time'])) {
-                $GLOBALS['max_query_time'] = 0;
-            }
-
-            // Start timing this query
-            $queryStartTime = microtime(true);
-            // ========== END: NEW CODE ==========
-
-            if (!$stmt->execute($params)) {
-                throw new DatabaseException(implode(', ', $stmt->errorInfo()));
-            }
-
-            // ========== START: NEW CODE - Calculate & Store Query Time ==========
-            // Calculate query execution time in milliseconds
-            $queryDuration = round((microtime(true) - $queryStartTime) * 1000, 2);
-
-            // Accumulate total query time
-            $GLOBALS['query_time'] += $queryDuration;
-
-            // Track maximum query time
-            if ($queryDuration > $GLOBALS['max_query_time']) {
-                $GLOBALS['max_query_time'] = $queryDuration;
-            }
-
-            // Log slow queries (>500ms) in debug mode
-            if ($this->debug && $queryDuration > 500) {
-                error_log("SLOW QUERY ({$queryDuration}ms): " . substr($query, 0, 100));
-            }
-            // ========== END: NEW CODE ==========
-
-            if ($this->inTransaction) {
-                $this->transactionLog[] = [
-                    'query' => $query,
-                    'params' => $params,
-                    'time' => microtime(true)
-                ];
-            }
-
-            $rows = $stmt->fetchAll($fetchAssoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
-
-            if ($withSuccess) {
-                $result = [
-                    'success' => true,
-                    'affected_rows' => $stmt->rowCount(),
-                    'id' => null,
-                    'data' => $rows
-                ];
-
-                if (stripos(trim($query), 'insert') === 0) {
-                    $result['id'] = (int) $this->conn->lastInsertId();
-                }
-
-                if (stripos(trim($query), 'update') === 0 && isset($params[':id'])) {
-                    $result['id'] = $params[':id'];
-                }
-
-                return $result;
-            }
-
-            return $rows;
-
-        } catch (PDOException $e) {
-            if ($this->debug) {
-                error_log("Database Error: " . $e->getMessage() . " | Query: " . $query);
-            }
-            throw new DatabaseException($e->getMessage(), (int) $e->getCode(), $e);
-        }
+        $stmt = $this->executeStatement($sql, $params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->trackDataSize($rows);
+        return $rows;
     }
+
+    /**
+     * Alias for query()
+     */
+    public function select(string $sql, array $params = []): array
+    {
+        return $this->query($sql, $params);
+    }
+
+    /**
+     * SELECT single row
+     * @return array|null Associative array or null if not found
+     */
+    public function first(string $sql, array $params = []): ?array
+    {
+        if (stripos($sql, 'LIMIT') === false) {
+            $sql .= " LIMIT 1";
+        }
+        $stmt = $this->executeStatement($sql, $params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->trackDataSize($rows);
+
+        return $rows[0] ?? null;
+    }
+
+    /**
+     * INSERT query
+     * @return int The Last Insert ID
+     */
+    public function insert(string $sql, array $params = []): int
+    {
+        $this->executeStatement($sql, $params);
+        return (int) $this->conn->lastInsertId();
+    }
+
+    /**
+     * UPDATE query
+     * @return int Number of affected rows
+     */
+    public function update(string $sql, array $params = []): int
+    {
+        $stmt = $this->executeStatement($sql, $params);
+        return $stmt->rowCount();
+    }
+
+    /**
+     * DELETE query
+     * @return int Number of affected rows
+     */
+    public function delete(string $sql, array $params = []): int
+    {
+        $stmt = $this->executeStatement($sql, $params);
+        return $stmt->rowCount();
+    }
+
+    // --- Transaction Methods (Standard) ---
 
     public function beginTransaction(): bool
     {
-        if ($this->inTransaction) {
+        if ($this->inTransaction)
             throw new DatabaseException('Transaction already in progress');
-        }
-
         try {
-            $this->transactionLog = [];
             $this->inTransaction = $this->conn->beginTransaction();
-
-            if ($this->debug) {
-                error_log("Transaction started");
-            }
-
+            $this->transactionLog = [];
             return $this->inTransaction;
         } catch (PDOException $e) {
             throw new DatabaseException('Failed to begin transaction: ' . $e->getMessage());
@@ -374,50 +168,35 @@ class Database
 
     public function commit(): bool
     {
-        if (!$this->inTransaction) {
-            throw new DatabaseException('No active transaction to commit');
-        }
-
+        if (!$this->inTransaction)
+            throw new DatabaseException('No active transaction');
         try {
-            $result = $this->conn->commit();
+            $res = $this->conn->commit();
             $this->inTransaction = false;
-
-            if ($this->debug) {
-                error_log('Transaction committed with ' . count($this->transactionLog) . ' queries');
-            }
-
             $this->transactionLog = [];
-            return $result;
+            return $res;
         } catch (PDOException $e) {
-            throw new DatabaseException('Failed to commit transaction: ' . $e->getMessage());
+            throw new DatabaseException('Failed to commit: ' . $e->getMessage());
         }
     }
 
     public function rollback(): bool
     {
-        if (!$this->inTransaction) {
-            throw new DatabaseException('No active transaction to rollback');
-        }
-
+        if (!$this->inTransaction)
+            throw new DatabaseException('No active transaction');
         try {
-            $result = $this->conn->rollBack();
+            $res = $this->conn->rollBack();
             $this->inTransaction = false;
-
-            if ($this->debug) {
-                error_log('Transaction rolled back. Queries executed: ' . count($this->transactionLog));
-            }
-
             $this->transactionLog = [];
-            return $result;
+            return $res;
         } catch (PDOException $e) {
-            throw new DatabaseException('Failed to rollback transaction: ' . $e->getMessage());
+            throw new DatabaseException('Failed to rollback: ' . $e->getMessage());
         }
     }
 
     public function transaction(callable $callback)
     {
         $this->beginTransaction();
-
         try {
             $result = $callback($this);
             $this->commit();
@@ -428,81 +207,40 @@ class Database
         }
     }
 
-    public function inTransaction(): bool
-    {
-        return $this->inTransaction;
-    }
-
-    public function getTransactionLog(): array
-    {
-        return $this->transactionLog;
-    }
+    // --- Accessor for raw PDO (Required for Migrations) ---
 
     public function getConnection(): PDO
     {
         return $this->conn;
     }
 
-    public function select(string $query, array $params = []): array
+    // --- Helpers ---
+
+    private function trackDataSize(array $rows): void
     {
-        return $this->query([
-            'query' => $query,
-            'params' => $params
-        ]);
+        if (!isset($GLOBALS['db_data_size']))
+            $GLOBALS['db_data_size'] = 0;
+        if (!isset($GLOBALS['max_db_data_size']))
+            $GLOBALS['max_db_data_size'] = 0;
+        $size = strlen(serialize($rows)) / 1024;
+        $GLOBALS['db_data_size'] += $size;
+        if ($size > $GLOBALS['max_db_data_size'])
+            $GLOBALS['max_db_data_size'] = $size;
     }
 
-    public function insert(string $query, array $params = []): array
-    {
-        return $this->query([
-            'query' => $query,
-            'params' => $params,
-            'withSuccess' => true
-        ]);
-    }
-
-    public function update(string $query, array $params = []): array
-    {
-        return $this->query([
-            'query' => $query,
-            'params' => $params,
-            'withSuccess' => true
-        ]);
-    }
-
-    public function delete(string $query, array $params = []): array
-    {
-        return $this->query([
-            'query' => $query,
-            'params' => $params,
-            'withSuccess' => true
-        ]);
-    }
-
-    public function first(string $query, array $params = []): ?array
-    {
-        $results = $this->select($query, $params);
-        return $results[0] ?? null;
-    }
-
-    private function interpolateQuery(string $query, array $params): string
+    public function getRawSql(string $query, array $params): string
     {
         $keys = array_keys($params);
         $values = array_values($params);
-
-        return array_reduce($keys, function ($interpolatedQuery, $key) use ($values, $keys) {
-            $value = $values[array_search($key, $keys)];
-
-            if (is_string($value)) {
-                $value = $this->conn->quote($value);
-            } elseif (is_array($value)) {
-                $value = implode(',', array_map([$this->conn, 'quote'], $value));
-            } elseif (is_null($value)) {
-                $value = 'NULL';
-            } elseif (is_bool($value)) {
-                $value = $value ? '1' : '0';
-            }
-
-            return str_replace($key, $value, $interpolatedQuery);
+        return array_reduce($keys, function ($interpolated, $key) use ($values, $keys) {
+            $val = $values[array_search($key, $keys)];
+            if (is_string($val))
+                $val = $this->conn->quote($val);
+            elseif (is_bool($val))
+                $val = $val ? '1' : '0';
+            elseif (is_null($val))
+                $val = 'NULL';
+            return str_replace($key, $val, $interpolated);
         }, $query);
     }
 }

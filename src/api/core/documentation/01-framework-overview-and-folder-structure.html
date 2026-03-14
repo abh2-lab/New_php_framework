@@ -5,845 +5,466 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Framework Overview & Folder Structure</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            line-height: 1.7;
-            padding: 20px;
+            background: #0d1117; color: #c9d1d9; line-height: 1.7; padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #161b22;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            max-width: 1200px; margin: 0 auto; background: #161b22;
+            border-radius: 12px; padding: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
-
-        h1 {
-            font-size: 42px;
-            color: #58a6ff;
-            margin-bottom: 10px;
-            font-weight: 700;
-            border-bottom: 3px solid #21262d;
-            padding-bottom: 15px;
-        }
-
-        h2 {
-            font-size: 32px;
-            color: #58a6ff;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            border-left: 4px solid #58a6ff;
-            padding-left: 15px;
-        }
-
-        h3 {
-            font-size: 24px;
-            color: #79c0ff;
-            margin-top: 35px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        h4 {
-            font-size: 20px;
-            color: #a371f7;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        p {
-            margin-bottom: 16px;
-            color: #c9d1d9;
-            font-size: 16px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #8b949e;
-            margin-bottom: 30px;
-        }
-
-        ul, ol {
-            margin: 15px 0 15px 30px;
-        }
-
-        li {
-            margin-bottom: 10px;
-            color: #c9d1d9;
-        }
-
+        h1 { font-size: 42px; color: #58a6ff; margin-bottom: 10px; font-weight: 700; border-bottom: 3px solid #21262d; padding-bottom: 15px; }
+        h2 { font-size: 32px; color: #58a6ff; margin-top: 50px; margin-bottom: 20px; font-weight: 600; border-left: 4px solid #58a6ff; padding-left: 15px; }
+        h3 { font-size: 24px; color: #79c0ff; margin-top: 35px; margin-bottom: 15px; font-weight: 600; }
+        h4 { font-size: 20px; color: #a371f7; margin-top: 25px; margin-bottom: 12px; font-weight: 600; }
+        p { margin-bottom: 16px; color: #c9d1d9; font-size: 16px; }
+        .subtitle { font-size: 18px; color: #8b949e; margin-bottom: 30px; }
+        ul, ol { margin: 15px 0 15px 30px; }
+        li { margin-bottom: 10px; color: #c9d1d9; }
         code {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            color: #79c0ff;
+            background: #0d1117; border: 1px solid #30363d; padding: 3px 8px;
+            border-radius: 4px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px; color: #79c0ff;
         }
-
         pre {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 20px;
-            overflow-x: auto;
-            margin: 20px 0;
+            background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+            padding: 20px; overflow-x: auto; margin: 20px 0;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 14px; line-height: 1.6;
         }
+        pre code { background: none; border: none; padding: 0; color: #c9d1d9; }
 
-        pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            color: #c9d1d9;
-        }
-
+        /* ═══════════════════════════════════════════════
+           FOLDER TREE
+        ═══════════════════════════════════════════════ */
         .folder-tree {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 25px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
-            line-height: 1.8;
-            color: #c9d1d9;
+            border-radius: 10px;
+            padding: 28px 32px;
             overflow-x: auto;
             margin: 20px 0;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+            font-size: 13.5px;
+            line-height: 1.9;
+            /* THE CRITICAL FIX — preserves every newline in the source */
+            white-space: pre;
         }
 
-        .folder-tree .folder {
-            color: #fbbf24;
-            font-weight: 600;
-        }
+        /* Folders — amber */
+        .folder-tree .folder   { color: #fbbf24; font-weight: 700; }
+        /* PHP files — cornflower blue */
+        .folder-tree .file     { color: #79c0ff; }
+        /* SQL files — green italic */
+        .folder-tree .file-sql { color: #3fb950; font-style: italic; }
+        /* HTML / doc files — orange */
+        .folder-tree .file-html{ color: #f97316; }
+        /* JSON files — soft purple */
+        .folder-tree .file-json{ color: #d2a8ff; }
+        /* .env files — coral/red */
+        .folder-tree .file-env { color: #ff7b72; }
+        /* yaml / Dockerfile — dark gold */
+        .folder-tree .file-yml { color: #c9a84c; }
+        /* tree branch characters */
+        .folder-tree .tree     { color: #444c56; user-select: none; }
+        /* inline comments */
+        .folder-tree .comment  { color: #6e7681; font-style: italic; font-size: 12.5px; }
 
-        .folder-tree .file {
-            color: #79c0ff;
-        }
-
-        .folder-tree .comment {
-            color: #8b949e;
-            font-style: italic;
-        }
-
-        .highlight-box {
-            background: #1c2128;
-            border-left: 4px solid #58a6ff;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-
-        .highlight-box.success {
-            border-left-color: #3fb950;
-        }
-
-        .highlight-box.warning {
-            border-left-color: #fbbf24;
-        }
-
-        .highlight-box.info {
-            border-left-color: #a371f7;
-        }
-
-        .tool-card {
-            background: #1c2128;
-            border: 2px solid #30363d;
-            border-radius: 10px;
-            padding: 25px;
-            margin: 25px 0;
-            transition: all 0.3s ease;
-        }
-
-        .tool-card:hover {
-            border-color: #58a6ff;
-            box-shadow: 0 4px 16px rgba(88, 166, 255, 0.2);
-        }
-
-        .tool-card h4 {
-            margin-top: 0;
-            color: #58a6ff;
-            font-size: 22px;
-        }
-
-        .tool-card .route {
-            background: #0d1117;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
-            color: #3fb950;
+        /* inline SYSTEM / APP badges */
+        .badge-t {
             display: inline-block;
-            margin: 10px 0;
-            border: 1px solid #30363d;
+            font-size: 10px; font-weight: 800;
+            padding: 1px 7px; border-radius: 4px;
+            vertical-align: middle; text-transform: uppercase;
+            margin: 0 5px; line-height: 1.7;
+            /* keep badge text from being wrapped */
+            white-space: nowrap;
+        }
+        .badge-t.sys {
+            background: rgba(163,113,247,0.18); color: #c084fc;
+            border: 1px solid rgba(163,113,247,0.45);
+        }
+        .badge-t.app {
+            background: rgba(88,166,255,0.15); color: #58a6ff;
+            border: 1px solid rgba(88,166,255,0.4);
         }
 
-        .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-right: 8px;
-            margin-bottom: 8px;
-        }
-
-        .badge-system {
-            background: rgba(163, 113, 247, 0.2);
-            color: #a371f7;
-            border: 1px solid #a371f7;
-        }
-
-        .badge-app {
-            background: rgba(88, 166, 255, 0.2);
-            color: #58a6ff;
-            border: 1px solid #58a6ff;
-        }
-
-        .badge-dev {
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
-            border: 1px solid #fbbf24;
-        }
-
-        .feature-list {
-            list-style: none;
-            margin-left: 0;
-        }
-
-        .feature-list li:before {
-            content: "✓";
-            color: #3fb950;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .architecture-flow {
-            background: #0d1117;
-            border: 2px solid #30363d;
-            border-radius: 8px;
-            padding: 30px;
-            margin: 25px 0;
-            text-align: center;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 16px;
-        }
-
-        .flow-arrow {
-            color: #58a6ff;
-            font-size: 24px;
-            margin: 10px 0;
-        }
-
-        .flow-step {
-            background: #1c2128;
-            padding: 15px 25px;
-            border-radius: 8px;
-            display: inline-block;
-            margin: 10px;
-            border: 2px solid #30363d;
-            color: #79c0ff;
-            font-weight: 600;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: #0d1117;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #30363d;
-        }
-
-        th {
-            background: #1c2128;
-            color: #58a6ff;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        td {
-            color: #c9d1d9;
-        }
-
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #58a6ff;
-            color: #0d1117;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .back-to-top:hover {
-            background: #79c0ff;
-            transform: translateY(-3px);
-        }
-
+        .highlight-box { background: #1c2128; border-left: 4px solid #58a6ff; padding: 20px; margin: 20px 0; border-radius: 6px; }
+        .highlight-box.success { border-left-color: #3fb950; }
+        .highlight-box.warning { border-left-color: #fbbf24; }
+        .highlight-box.info    { border-left-color: #a371f7; }
+        .tool-card { background: #1c2128; border: 2px solid #30363d; border-radius: 10px; padding: 25px; margin: 25px 0; transition: all 0.3s ease; }
+        .tool-card:hover { border-color: #58a6ff; box-shadow: 0 4px 16px rgba(88,166,255,0.2); }
+        .tool-card h4 { margin-top: 0; color: #58a6ff; font-size: 22px; }
+        .tool-card .route { background: #0d1117; padding: 8px 15px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; color: #3fb950; display: inline-block; margin: 10px 0; border: 1px solid #30363d; }
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-right: 8px; margin-bottom: 8px; }
+        .badge-system { background: rgba(163,113,247,0.2); color: #a371f7; border: 1px solid #a371f7; }
+        .badge-app    { background: rgba(88,166,255,0.2);  color: #58a6ff; border: 1px solid #58a6ff; }
+        .badge-dev    { background: rgba(251,191,36,0.2);  color: #fbbf24; border: 1px solid #fbbf24; }
+        .feature-list { list-style: none; margin-left: 0; }
+        .feature-list li:before { content: "✓"; color: #3fb950; font-weight: bold; margin-right: 10px; }
+        .architecture-flow { background: #0d1117; border: 2px solid #30363d; border-radius: 8px; padding: 30px; margin: 25px 0; text-align: center; font-family: 'Consolas', 'Monaco', monospace; font-size: 16px; }
+        .flow-arrow { color: #58a6ff; font-size: 24px; margin: 10px 0; }
+        .flow-step { background: #1c2128; padding: 15px 25px; border-radius: 8px; display: inline-block; margin: 10px; border: 2px solid #30363d; color: #79c0ff; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #0d1117; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #30363d; }
+        th { background: #1c2128; color: #58a6ff; font-weight: 600; font-size: 16px; }
+        td { color: #c9d1d9; }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; background: #58a6ff; color: #0d1117; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 12px rgba(88,166,255,0.3); transition: all 0.3s ease; }
+        .back-to-top:hover { background: #79c0ff; transform: translateY(-3px); }
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 32px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-
-            .folder-tree {
-                font-size: 12px;
-            }
+            .container { padding: 20px; }
+            h1 { font-size: 32px; }
+            h2 { font-size: 26px; }
+            .folder-tree { font-size: 11px; padding: 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Framework Overview &amp; Folder Structure</h1>
-        <p class="subtitle">A comprehensive guide to understanding the architecture, components, and organization of this custom PHP framework</p>
+<div class="container">
+    <h1>Framework Overview &amp; Folder Structure</h1>
+    <p class="subtitle">A comprehensive guide to understanding the architecture, components, and organization of this custom PHP framework</p>
 
-        <h2>Framework Philosophy</h2>
-        <p>This framework is built on the principle of <strong>strict separation of concerns</strong> and follows a layered architecture pattern. It enforces clean code practices by separating business logic, data access, and presentation layers into distinct components.</p>
+    <h2>Framework Philosophy</h2>
+    <p>This framework is built on the principle of <strong>strict separation of concerns</strong> and follows a layered architecture pattern. It enforces clean code practices by separating business logic, data access, and presentation layers into distinct components.</p>
+    <div class="highlight-box info">
+        <h4>Core Principles</h4>
+        <ul>
+            <li><strong>Controller-Service-Repository Pattern:</strong> Clear separation between request handling, business logic, and data access</li>
+            <li><strong>System vs Application Routes:</strong> Framework tools are isolated from your business logic</li>
+            <li><strong>Convention over Configuration:</strong> Predictable file structure and naming conventions</li>
+            <li><strong>Development Tools First:</strong> Built-in testing, monitoring, and debugging capabilities</li>
+        </ul>
+    </div>
 
-        <div class="highlight-box info">
-            <h4>Core Principles</h4>
-            <ul>
-                <li><strong>Controller-Service-Repository Pattern:</strong> Clear separation between request handling, business logic, and data access</li>
-                <li><strong>System vs Application Routes:</strong> Framework tools are isolated from your business logic</li>
-                <li><strong>Convention over Configuration:</strong> Predictable file structure and naming conventions</li>
-                <li><strong>Development Tools First:</strong> Built-in testing, monitoring, and debugging capabilities</li>
-            </ul>
-        </div>
+    <h2>Request Flow Architecture</h2>
+    <p>Understanding how a request flows through the framework is crucial for effective development.</p>
+    <div class="architecture-flow">
+        <div class="flow-step">Client Request</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">index.php (Entry Point)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Router (routes.php)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Middleware (before)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Controller</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Service (Business Logic)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Repository (Data Access)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Database</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Response (JSON)</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Middleware (after)</div>
+    </div>
 
-        <h2>Request Flow Architecture</h2>
-        <p>Understanding how a request flows through the framework is crucial for effective development.</p>
+    <h2>Complete Folder Structure</h2>
+    <p>Each folder has a specific, single purpose. <span class="badge badge-system">SYSTEM</span> files are framework-owned &mdash; <strong>do not modify them.</strong> <span class="badge badge-app">APP</span> files are yours to create and edit.</p>
+<div class="folder-tree"><span class="folder">framework/</span>
+<span class="tree">│</span>
+<span class="tree">├──</span> <span class="file-env">.env</span>                              <span class="comment">// Environment config — never commit this</span>
+<span class="tree">├──</span> <span class="file-env">.env.example</span>                     <span class="comment">// Commit this as a safe template</span>
+<span class="tree">├──</span> <span class="file-json">composer.json</span>                    <span class="comment">// PHP dependencies</span>
+<span class="tree">├──</span> <span class="file-yml">docker-compose.yml</span>               <span class="comment">// Docker setup</span>
+<span class="tree">├──</span> <span class="file-yml">Dockerfile</span>                       <span class="comment">// Docker image configuration</span>
+<span class="tree">│</span>
+<span class="tree">└──</span> <span class="folder">src/</span>                              <span class="comment">// Source code root</span>
+    <span class="tree">├──</span> <span class="file">index.php</span>                     <span class="comment">// Public entry point (all requests land here)</span>
+    <span class="tree">├──</span> <span class="file-html">curl_runner2.html</span>             <span class="comment">// GUI HTTP testing tool</span>
+    <span class="tree">│</span>
+    <span class="tree">└──</span> <span class="folder">api/</span>                          <span class="comment">// API application root</span>
+        <span class="tree">├──</span> <span class="file">index.php</span>                 <span class="comment">// API bootstrap — routing starts here</span>
+        <span class="tree">├──</span> <span class="file">routes.php</span>                <span class="comment">// YOUR application routes (add routes here)</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">controllers/</span>              <span class="comment">// Request handlers — one class per domain</span>
+        <span class="tree">│   ├──</span> <span class="file">DocsController.php</span>            <span class="badge-t sys">SYSTEM</span> <span class="comment">// Interactive API documentation UI</span>
+        <span class="tree">│   ├──</span> <span class="file">InitController.php</span>            <span class="badge-t sys">SYSTEM</span> <span class="comment">// Database migration runner</span>
+        <span class="tree">│   ├──</span> <span class="file">MonitoringController.php</span>      <span class="badge-t sys">SYSTEM</span> <span class="comment">// Real-time performance dashboard</span>
+        <span class="tree">│   ├──</span> <span class="file">ServiceTesterController.php</span>   <span class="badge-t sys">SYSTEM</span> <span class="comment">// Service layer testing tool</span>
+        <span class="tree">│   ├──</span> <span class="file">RepositoryTesterController.php</span> <span class="badge-t sys">SYSTEM</span> <span class="comment">// Repository layer testing tool</span>
+        <span class="tree">│   ├──</span> <span class="file">YourController.php</span>            <span class="badge-t app">APP</span>    <span class="comment">// e.g. ProductController.php</span>
+        <span class="tree">│   └──</span> <span class="file">AnotherController.php</span>         <span class="badge-t app">APP</span>    <span class="comment">// e.g. OrderController.php</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">services/</span>                 <span class="comment">// Business logic — no HTTP, no raw SQL here</span>
+        <span class="tree">│   ├──</span> <span class="file">MetricsLogger.php</span>             <span class="badge-t sys">SYSTEM</span> <span class="comment">// Monitoring metrics writer</span>
+        <span class="tree">│   ├──</span> <span class="file">YourService.php</span>               <span class="badge-t app">APP</span>    <span class="comment">// e.g. ProductService.php</span>
+        <span class="tree">│   └──</span> <span class="file">AnotherService.php</span>            <span class="badge-t app">APP</span>    <span class="comment">// e.g. OrderService.php</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">repositories/</span>             <span class="comment">// Data access — SQL queries only, no business logic</span>
+        <span class="tree">│   ├──</span> <span class="file">YourRepository.php</span>            <span class="badge-t app">APP</span>    <span class="comment">// e.g. ProductRepository.php</span>
+        <span class="tree">│   └──</span> <span class="file">AnotherRepository.php</span>         <span class="badge-t app">APP</span>    <span class="comment">// e.g. OrderRepository.php</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">databases/</span>                <span class="comment">// SQL migration files</span>
+        <span class="tree">│   └──</span> <span class="file-sql">001_your_schema.sql</span>           <span class="comment">// Use numeric prefix to control order</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">helpers/</span>                  <span class="comment">// Global utility functions</span>
+        <span class="tree">│   ├──</span> <span class="file">globalHelpers.php</span>             <span class="comment">// Your custom helpers (available everywhere)</span>
+        <span class="tree">│   └──</span> <span class="file">_autoload_helpers.php</span>         <span class="comment">// Auto-loads all helper files on bootstrap</span>
+        <span class="tree">│</span>
+        <span class="tree">├──</span> <span class="folder">logs/</span>                     <span class="comment">// Runtime logs — auto-created, add to .gitignore</span>
+        <span class="tree">│   └──</span> <span class="folder">monitoring/</span>               <span class="comment">// Per-day JSON files from MonitoringMiddleware</span>
+        <span class="tree">│       └──</span> <span class="file-json">YYYY-MM-DD.json</span>           <span class="comment">// e.g. 2026-02-21.json</span>
+        <span class="tree">│</span>
+        <span class="tree">└──</span> <span class="folder">core/</span>                     <span class="comment">// ⚠️  Framework internals — DO NOT MODIFY</span>
+            <span class="tree">├──</span> <span class="file">Router.php</span>                    <span class="badge-t sys">SYSTEM</span> <span class="comment">// Route matching &amp; dispatching</span>
+            <span class="tree">├──</span> <span class="file">BaseController.php</span>            <span class="badge-t sys">SYSTEM</span> <span class="comment">// Parent class for all controllers</span>
+            <span class="tree">├──</span> <span class="file">Database.php</span>                  <span class="badge-t sys">SYSTEM</span> <span class="comment">// PDO abstraction &amp; query helpers</span>
+            <span class="tree">├──</span> <span class="file">ExceptionHandler.php</span>          <span class="badge-t sys">SYSTEM</span> <span class="comment">// Global uncaught exception handler</span>
+            <span class="tree">├──</span> <span class="file">Security.php</span>                  <span class="badge-t sys">SYSTEM</span> <span class="comment">// Security utilities</span>
+            <span class="tree">├──</span> <span class="file">SystemRoutes.php</span>              <span class="badge-t sys">SYSTEM</span> <span class="comment">// Auto-loaded framework tool routes</span>
+            <span class="tree">│</span>
+            <span class="tree">├──</span> <span class="folder">Config/</span>
+            <span class="tree">│   ├──</span> <span class="file">DatabaseConnection.php</span>    <span class="badge-t sys">SYSTEM</span> <span class="comment">// DB singleton (env-aware PDO)</span>
+            <span class="tree">│   └──</span> <span class="file">connection.php</span>            <span class="badge-t sys">SYSTEM</span> <span class="comment">// Transaction helpers &amp; legacy RunQuery</span>
+            <span class="tree">│</span>
+            <span class="tree">├──</span> <span class="folder">Exceptions/</span>
+            <span class="tree">│   ├──</span> <span class="file">BaseException.php</span>         <span class="badge-t sys">SYSTEM</span> <span class="comment">// Base exception class</span>
+            <span class="tree">│   ├──</span> <span class="file">DatabaseException.php</span>     <span class="badge-t sys">SYSTEM</span> <span class="comment">// Database-level errors</span>
+            <span class="tree">│   ├──</span> <span class="file">NotFoundException.php</span>     <span class="badge-t sys">SYSTEM</span> <span class="comment">// HTTP 404</span>
+            <span class="tree">│   └──</span> <span class="file">ValidationException.php</span>   <span class="badge-t sys">SYSTEM</span> <span class="comment">// HTTP 422 Validation errors</span>
+            <span class="tree">│</span>
+            <span class="tree">├──</span> <span class="folder">Middlewares/</span>
+            <span class="tree">│   ├──</span> <span class="file">MiddlewareInterface.php</span>   <span class="badge-t sys">SYSTEM</span> <span class="comment">// Middleware contract</span>
+            <span class="tree">│   ├──</span> <span class="file">BaseMiddleware.php</span>        <span class="badge-t sys">SYSTEM</span> <span class="comment">// Abstract before/after hooks</span>
+            <span class="tree">│   ├──</span> <span class="file">AuthMiddleware.php</span>        <span class="badge-t app">APP</span>    <span class="comment">// JWT authentication guard</span>
+            <span class="tree">│   ├──</span> <span class="file">AdminMiddleware.php</span>       <span class="badge-t app">APP</span>    <span class="comment">// Admin-role authorization</span>
+            <span class="tree">│   ├──</span> <span class="file">LogMiddleware.php</span>         <span class="badge-t sys">SYSTEM</span> <span class="comment">// Request logging</span>
+            <span class="tree">│   └──</span> <span class="file">MonitoringMiddleware.php</span>  <span class="badge-t sys">SYSTEM</span> <span class="comment">// Per-request metric capture</span>
+            <span class="tree">│</span>
+            <span class="tree">├──</span> <span class="folder">utilities/</span>
+            <span class="tree">│   ├──</span> <span class="file">SecurityUtility.php</span>       <span class="badge-t sys">SYSTEM</span> <span class="comment">// XSS, CSRF, sanitization helpers</span>
+            <span class="tree">│   └──</span> <span class="file">ValidationUtility.php</span>     <span class="badge-t sys">SYSTEM</span> <span class="comment">// Field validation helpers</span>
+            <span class="tree">│</span>
+            <span class="tree">└──</span> <span class="folder">documentation/</span>
+                <span class="tree">├──</span> <span class="file-html">01-framework-overview-and-folder-structure.html</span>
+                <span class="tree">├──</span> <span class="file-html">02-routing-system.html</span>
+                <span class="tree">├──</span> <span class="file-html">03-writing-controllers.html</span>
+                <span class="tree">├──</span> <span class="file-html">04-writing-services.html</span>
+                <span class="tree">├──</span> <span class="file-html">05-writing-repositories.html</span>
+                <span class="tree">├──</span> <span class="file-html">06-database-and-query-handling.html</span>
+                <span class="tree">├──</span> <span class="file-html">07-writing-migrations.html</span>
+                <span class="tree">├──</span> <span class="file-html">08-middleware.html</span>
+                <span class="tree">├──</span> <span class="file-html">09-error-handling-and-api-responses.html</span>
+                <span class="tree">└──</span> <span class="file-html">10-full-ecommerce-walkthrough.html</span>
+</div>
 
-        <div class="architecture-flow">
-            <div class="flow-step">Client Request</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">index.php (Entry Point)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Router (routes.php)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Middleware (before)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Controller</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Service (Business Logic)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Repository (Data Access)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Database</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Response (JSON)</div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-step">Middleware (after)</div>
-        </div>
+    <h2>File Naming Conventions</h2>
+    <p>The framework enforces strict naming conventions to maintain consistency and enable auto-discovery features.</p>
+    <table>
+        <thead><tr><th>Component</th><th>Naming Pattern</th><th>Location</th><th>Example</th></tr></thead>
+        <tbody>
+            <tr><td>Controllers</td>  <td><code>*Controller.php</code></td>  <td><code>src/api/controllers/</code></td>     <td><code>ProductController.php</code></td></tr>
+            <tr><td>Services</td>     <td><code>*Service.php</code></td>     <td><code>src/api/services/</code></td>        <td><code>ProductService.php</code></td></tr>
+            <tr><td>Repositories</td> <td><code>*Repository.php</code></td>  <td><code>src/api/repositories/</code></td>    <td><code>ProductRepository.php</code></td></tr>
+            <tr><td>Migrations</td>   <td><code>*.sql</code></td>            <td><code>src/api/databases/</code></td>       <td><code>001_schema.sql</code></td></tr>
+            <tr><td>Middleware</td>   <td><code>*Middleware.php</code></td>  <td><code>src/api/core/Middlewares/</code></td><td><code>AuthMiddleware.php</code></td></tr>
+            <tr><td>Exceptions</td>   <td><code>*Exception.php</code></td>  <td><code>src/api/core/Exceptions/</code></td> <td><code>ValidationException.php</code></td></tr>
+        </tbody>
+    </table>
 
-        <h2>Complete Folder Structure</h2>
-        <p>The framework follows a clear directory structure where each folder has a specific purpose.</p>
+    <h2>System Routes vs Application Routes</h2>
+    <p>The framework maintains a clear distinction between framework tools (system routes) and your business logic (application routes).</p>
 
-        <div class="folder-tree">
-<span class="folder">framework/</span>
-│
-├── <span class="file">.env</span>                           <span class="comment">// Environment configuration</span>
-├── <span class="file">composer.json</span>                  <span class="comment">// PHP dependencies</span>
-├── <span class="file">docker-compose.yml</span>             <span class="comment">// Docker setup</span>
-├── <span class="file">Dockerfile</span>                     <span class="comment">// Docker image configuration</span>
-│
-└── <span class="folder">src/</span>                           <span class="comment">// Source code root</span>
-    ├── <span class="file">index.php</span>                  <span class="comment">// Public entry point</span>
-    ├── <span class="file">curl_runner2.html</span>          <span class="comment">// Curl testing GUI tool</span>
-    │
-    └── <span class="folder">api/</span>                       <span class="comment">// API application root</span>
-        ├── <span class="file">index.php</span>              <span class="comment">// API entry point (routing starts here)</span>
-        ├── <span class="file">routes.php</span>             <span class="comment">// YOUR application routes</span>
-        │
-        ├── <span class="folder">controllers/</span>           <span class="comment">// Request handlers</span>
-        │   ├── <span class="file">DocsController.php</span>            <span class="comment">// [SYSTEM] API documentation</span>
-        │   ├── <span class="file">InitController.php</span>            <span class="comment">// [SYSTEM] Database migrations</span>
-        │   ├── <span class="file">MonitoringController.php</span>      <span class="comment">// [SYSTEM] Performance monitoring</span>
-        │   ├── <span class="file">ServiceTesterController.php</span>   <span class="comment">// [SYSTEM] Service testing tool</span>
-        │   ├── <span class="file">RepositoryTesterController.php</span><span class="comment">// [SYSTEM] Repository testing tool</span>
-        │   ├── <span class="file">OrderController.php</span>           <span class="comment">// [APP] Your order management</span>
-        │   └── <span class="file">ProductController.php</span>         <span class="comment">// [APP] Your product management</span>
-        │
-        ├── <span class="folder">services/</span>              <span class="comment">// Business logic layer</span>
-        │   ├── <span class="file">OrderService.php</span>              <span class="comment">// Order business logic</span>
-        │   ├── <span class="file">ProductService.php</span>            <span class="comment">// Product business logic</span>
-        │   ├── <span class="file">AdminAuthService.php</span>          <span class="comment">// Authentication logic</span>
-        │   └── <span class="file">MetricsLogger.php</span>             <span class="comment">// [SYSTEM] Monitoring logger</span>
-        │
-        ├── <span class="folder">repositories/</span>          <span class="comment">// Data access layer</span>
-        │   ├── <span class="file">OrderRepository.php</span>           <span class="comment">// Order database queries</span>
-        │   └── <span class="file">ProductRepository.php</span>         <span class="comment">// Product database queries</span>
-        │
-        ├── <span class="folder">databases/</span>             <span class="comment">// SQL migration files</span>
-        │   └── <span class="file">orders_system_migration.sql</span>   <span class="comment">// Database schema</span>
-        │
-        ├── <span class="folder">helpers/</span>               <span class="comment">// Global utility functions</span>
-        │   ├── <span class="file">globalHelpers.php</span>             <span class="comment">// Custom helper functions</span>
-        │   └── <span class="file">_autoload_helpers.php</span>         <span class="comment">// Auto-loader for helpers</span>
-        │
-        └── <span class="folder">core/</span>                   <span class="comment">// Framework core (DO NOT MODIFY)</span>
-            ├── <span class="file">Router.php</span>                    <span class="comment">// Route matching &amp; dispatching</span>
-            ├── <span class="file">BaseController.php</span>            <span class="comment">// Parent class for all controllers</span>
-            ├── <span class="file">Database.php</span>                  <span class="comment">// Database abstraction layer</span>
-            ├── <span class="file">ExceptionHandler.php</span>          <span class="comment">// Global exception handler</span>
-            ├── <span class="file">Security.php</span>                  <span class="comment">// Security utilities</span>
-            ├── <span class="file">SystemRoutes.php</span>              <span class="comment">// Framework tool routes</span>
-            │
-            ├── <span class="folder">Config/</span>
-            │   └── <span class="file">DatabaseConnection.php</span>    <span class="comment">// DB connection singleton</span>
-            │
-            ├── <span class="folder">Exceptions/</span>
-            │   ├── <span class="file">BaseException.php</span>         <span class="comment">// Base exception class</span>
-            │   ├── <span class="file">DatabaseException.php</span>     <span class="comment">// Database error handling</span>
-            │   ├── <span class="file">NotFoundException.php</span>     <span class="comment">// 404 errors</span>
-            │   └── <span class="file">ValidationException.php</span>   <span class="comment">// Validation errors (422)</span>
-            │
-            ├── <span class="folder">Middlewares/</span>
-            │   ├── <span class="file">MiddlewareInterface.php</span>   <span class="comment">// Middleware contract</span>
-            │   ├── <span class="file">BaseMiddleware.php</span>        <span class="comment">// Abstract middleware class</span>
-            │   ├── <span class="file">AuthMiddleware.php</span>        <span class="comment">// Authentication middleware</span>
-            │   ├── <span class="file">AdminMiddleware.php</span>       <span class="comment">// Admin authorization</span>
-            │   ├── <span class="file">LogMiddleware.php</span>         <span class="comment">// Request logging</span>
-            │   └── <span class="file">MonitoringMiddleware.php</span>  <span class="comment">// Performance tracking</span>
-            │
-            └── <span class="folder">utilities/</span>
-                ├── <span class="file">SecurityUtility.php</span>       <span class="comment">// Security helpers</span>
-                └── <span class="file">ValidationUtility.php</span>     <span class="comment">// Validation helpers</span>
-        </div>
+    <h3>System Routes <span class="badge badge-system">Framework Tools</span></h3>
+    <p>These are <strong>built-in development and monitoring tools</strong> defined in <code>src/api/core/SystemRoutes.php</code> and automatically loaded before your application routes.</p>
+    <div class="highlight-box warning">
+        <strong>Important:</strong> System routes are for development/monitoring purposes. In production, restrict access using middleware or environment-based controls.
+    </div>
+    <table>
+        <thead><tr><th>Route</th><th>Purpose</th><th>When to Use</th></tr></thead>
+        <tbody>
+            <tr><td><code>/api/docs</code></td>            <td>Interactive API documentation</td>   <td>Exploring and testing your API endpoints</td></tr>
+            <tr><td><code>/api/service-test</code></td>    <td>Service layer testing tool</td>      <td>Testing business logic methods directly</td></tr>
+            <tr><td><code>/api/repository-test</code></td> <td>Repository layer testing tool</td>   <td>Testing database queries in isolation</td></tr>
+            <tr><td><code>/api/monitoring</code></td>      <td>Real-time performance dashboard</td> <td>Analyzing performance and bottlenecks</td></tr>
+            <tr><td><code>/api/runmigration</code></td>    <td>Database migration runner</td>       <td>Applying SQL migrations to database</td></tr>
+            <tr><td><code>/curl_runner2.html</code></td>   <td>Visual HTTP request tool</td>        <td>Testing APIs without command line</td></tr>
+        </tbody>
+    </table>
 
-        <h2>File Naming Conventions</h2>
-        <p>The framework enforces strict naming conventions to maintain consistency and enable auto-discovery features.</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Component</th>
-                    <th>Naming Pattern</th>
-                    <th>Location</th>
-                    <th>Example</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Controllers</td>
-                    <td><code>*Controller.php</code></td>
-                    <td><code>src/api/controllers/</code></td>
-                    <td><code>ProductController.php</code></td>
-                </tr>
-                <tr>
-                    <td>Services</td>
-                    <td><code>*Service.php</code></td>
-                    <td><code>src/api/services/</code></td>
-                    <td><code>ProductService.php</code></td>
-                </tr>
-                <tr>
-                    <td>Repositories</td>
-                    <td><code>*Repository.php</code></td>
-                    <td><code>src/api/repositories/</code></td>
-                    <td><code>ProductRepository.php</code></td>
-                </tr>
-                <tr>
-                    <td>Migrations</td>
-                    <td><code>*.sql</code></td>
-                    <td><code>src/api/databases/</code></td>
-                    <td><code>orders_system_migration.sql</code></td>
-                </tr>
-                <tr>
-                    <td>Middleware</td>
-                    <td><code>*Middleware.php</code></td>
-                    <td><code>src/api/core/Middlewares/</code></td>
-                    <td><code>AuthMiddleware.php</code></td>
-                </tr>
-                <tr>
-                    <td>Exceptions</td>
-                    <td><code>*Exception.php</code></td>
-                    <td><code>src/api/core/Exceptions/</code></td>
-                    <td><code>ValidationException.php</code></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h2>System Routes vs Application Routes</h2>
-        <p>The framework maintains a clear distinction between framework tools (system routes) and your business logic (application routes).</p>
-
-        <h3>System Routes <span class="badge badge-system">Framework Tools</span></h3>
-        <p>These are <strong>built-in development and monitoring tools</strong> provided by the framework. They are defined in <code>src/api/core/SystemRoutes.php</code> and are automatically loaded before your application routes.</p>
-
-        <div class="highlight-box warning">
-            <strong>Important:</strong> System routes are for development/monitoring purposes. In production, you may want to restrict access to these routes using middleware or environment-based controls.
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Route</th>
-                    <th>Purpose</th>
-                    <th>When to Use</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>/api/docs</code></td>
-                    <td>Interactive API documentation</td>
-                    <td>Exploring and testing your API endpoints</td>
-                </tr>
-                <tr>
-                    <td><code>/api/service-test</code></td>
-                    <td>Service layer testing tool</td>
-                    <td>Testing business logic methods directly</td>
-                </tr>
-                <tr>
-                    <td><code>/api/repository-test</code></td>
-                    <td>Repository layer testing tool</td>
-                    <td>Testing database queries in isolation</td>
-                </tr>
-                <tr>
-                    <td><code>/api/monitoring</code></td>
-                    <td>Real-time performance dashboard</td>
-                    <td>Analyzing performance and bottlenecks</td>
-                </tr>
-                <tr>
-                    <td><code>/api/runmigration</code></td>
-                    <td>Database migration runner</td>
-                    <td>Applying SQL migrations to database</td>
-                </tr>
-                <tr>
-                    <td><code>/curl_runner2.html</code></td>
-                    <td>Visual HTTP request tool</td>
-                    <td>Testing APIs without command line</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>Application Routes <span class="badge badge-app">Your Business Logic</span></h3>
-        <p>These are <strong>your custom routes</strong> that handle your application's business requirements. They are defined in <code>src/api/routes.php</code> and represent your actual API endpoints.</p>
-
-        <pre><code>// Example from routes.php
-router->add([
-    'method' => 'POST',
-    'url' => '/orders/create',
+    <h3>Application Routes <span class="badge badge-app">Your Business Logic</span></h3>
+    <p>These are <strong>your custom routes</strong> defined in <code>src/api/routes.php</code> that represent your actual API endpoints.</p>
+    <pre><code>// Example from routes.php
+$router->add([
+    'method'     => 'POST',
+    'url'        => '/orders/create',
     'controller' => 'OrderController@create',
-    'desc' => 'Create a new order with items',
-    'visible' => true,
-    'group' => 'Orders'
+    'desc'       => 'Create a new order with items',
+    'visible'    => true,
+    'group'      => 'Orders'
 ]);
 
-router->add([
-    'method' => 'GET',
-    'url' => '/products/list',
+$router->add([
+    'method'     => 'GET',
+    'url'        => '/products/list',
     'controller' => 'ProductController@list',
-    'desc' => 'Get list of products',
-    'visible' => true,
-    'group' => 'Products'
+    'desc'       => 'Get list of products',
+    'visible'    => true,
+    'group'      => 'Products'
 ]);</code></pre>
 
-        <h2>Built-in Development Tools</h2>
-        <p>The framework comes with powerful development tools that accelerate your workflow and make debugging easier.</p>
+    <h2>Built-in Development Tools</h2>
+    <p>The framework comes with powerful development tools that accelerate your workflow and make debugging easier.</p>
 
-        <div class="tool-card">
-            <h4>📚 API Documentation Viewer</h4>
-            <div class="route">/api/docs</div>
-            <span class="badge badge-dev">Development Tool</span>
-            
-            <p><strong>Purpose:</strong> Interactive, auto-generated API documentation with live testing capabilities.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li>Automatically scans <code>routes.php</code> and displays all registered routes</li>
-                <li>Grouped by categories (Orders, Products, etc.)</li>
-                <li>Live API testing directly from the browser</li>
-                <li>Auto-fill feature generates dummy data for testing</li>
-                <li>Dark mode support with theme persistence</li>
-                <li>Search functionality across all endpoints</li>
-                <li>Environment variable management (CRUD operations)</li>
-                <li>Syntax highlighting for JSON responses</li>
-            </ul>
-
-            <p><strong>When to Use:</strong></p>
-            <ul>
-                <li>Exploring available API endpoints</li>
-                <li>Testing endpoints without Postman</li>
-                <li>Sharing API documentation with frontend developers</li>
-                <li>Quick environment variable changes during development</li>
-            </ul>
-
-            <div class="highlight-box success">
-                <strong>Pro Tip:</strong> The docs controller automatically reads parameter definitions from your routes, so always document your route parameters for better API documentation.
-            </div>
+    <div class="tool-card">
+        <h4>📚 API Documentation Viewer</h4>
+        <div class="route">/api/docs</div>
+        <span class="badge badge-dev">Development Tool</span>
+        <p><strong>Purpose:</strong> Interactive, auto-generated API documentation with live testing capabilities.</p>
+        <p><strong>Key Features:</strong></p>
+        <ul class="feature-list">
+            <li>Automatically scans <code>routes.php</code> and displays all registered routes</li>
+            <li>Grouped by categories (Orders, Products, etc.)</li>
+            <li>Live API testing directly from the browser</li>
+            <li>Auto-fill feature generates dummy data for testing</li>
+            <li>Dark mode support with theme persistence</li>
+            <li>Search functionality across all endpoints</li>
+            <li>Environment variable management (CRUD operations)</li>
+            <li>Syntax highlighting for JSON responses</li>
+        </ul>
+        <div class="highlight-box success">
+            <strong>Pro Tip:</strong> Always document your route parameters for better auto-generated API docs.
         </div>
+    </div>
 
-        <div class="tool-card">
-            <h4>🔧 Service Tester</h4>
-            <div class="route">/api/service-test</div>
-            <span class="badge badge-dev">Development Tool</span>
-            
-            <p><strong>Purpose:</strong> Test service layer methods independently without going through controllers or HTTP requests.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li>Uses PHP Reflection to discover all service classes in <code>src/api/services/</code></li>
-                <li>Lists all public methods with parameter information</li>
-                <li>JSON-based argument input for method testing</li>
-                <li>Real-time execution with error handling</li>
-                <li>Debug output shows return values and exceptions</li>
-                <li>Dark-themed professional UI</li>
-            </ul>
-
-            <p><strong>When to Use:</strong></p>
-            <ul>
-                <li>Testing business logic in isolation</li>
-                <li>Debugging service methods without HTTP overhead</li>
-                <li>Verifying complex business rules</li>
-                <li>Testing transaction handling</li>
-            </ul>
-
-            <div class="highlight-box info">
-                <strong>Example Use Case:</strong> Test your <code>OrderService::createOrder()</code> method with different data combinations to verify validation logic before writing controller code.
-            </div>
+    <div class="tool-card">
+        <h4>🔧 Service Tester</h4>
+        <div class="route">/api/service-test</div>
+        <span class="badge badge-dev">Development Tool</span>
+        <p><strong>Purpose:</strong> Test service layer methods independently without going through controllers or HTTP requests.</p>
+        <ul class="feature-list">
+            <li>Uses PHP Reflection to discover all service classes in <code>src/api/services/</code></li>
+            <li>Lists all public methods with parameter information</li>
+            <li>JSON-based argument input for method testing</li>
+            <li>Real-time execution with error handling</li>
+            <li>Debug output shows return values and exceptions</li>
+        </ul>
+        <div class="highlight-box info">
+            <strong>Example:</strong> Test <code>OrderService::createOrder()</code> with different data to verify validation before writing controller code.
         </div>
+    </div>
 
-        <div class="tool-card">
-            <h4>💾 Repository Tester</h4>
-            <div class="route">/api/repository-test</div>
-            <span class="badge badge-dev">Development Tool</span>
-            
-            <p><strong>Purpose:</strong> Test repository layer methods and database queries directly without services or controllers.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li>Auto-discovers all repository classes in <code>src/api/repositories/</code></li>
-                <li>Reflects all public methods with their signatures</li>
-                <li>Auto-argument generation for quick testing</li>
-                <li>JSON argument support for complex parameters</li>
-                <li>Real-time query execution and result display</li>
-                <li>Exception handling with detailed error messages</li>
-            </ul>
+    <div class="tool-card">
+        <h4>💾 Repository Tester</h4>
+        <div class="route">/api/repository-test</div>
+        <span class="badge badge-dev">Development Tool</span>
+        <p><strong>Purpose:</strong> Test repository methods and database queries directly without services or controllers.</p>
+        <ul class="feature-list">
+            <li>Auto-discovers all repository classes in <code>src/api/repositories/</code></li>
+            <li>Reflects all public methods with their signatures</li>
+            <li>Auto-argument generation for quick testing</li>
+            <li>Real-time query execution and result display</li>
+            <li>Exception handling with detailed error messages</li>
+        </ul>
+    </div>
 
-            <p><strong>When to Use:</strong></p>
-            <ul>
-                <li>Testing database queries in isolation</li>
-                <li>Verifying SQL logic without service layer</li>
-                <li>Debugging data retrieval issues</li>
-                <li>Testing repository methods with edge cases</li>
-            </ul>
+    <div class="tool-card">
+        <h4>🌐 Curl Runner (GUI)</h4>
+        <div class="route">/curl_runner2.html</div>
+        <span class="badge badge-dev">Development Tool</span>
+        <p><strong>Purpose:</strong> Visual HTTP request tool for testing APIs without command-line curl or Postman.</p>
+        <ul class="feature-list">
+            <li>GUI-based HTTP request builder</li>
+            <li>Support for GET, POST, PUT, DELETE methods</li>
+            <li>Custom headers and request body</li>
+            <li>Formatted response display</li>
+            <li>No installation required</li>
+        </ul>
+    </div>
 
-            <div class="highlight-box info">
-                <strong>Example Use Case:</strong> Test your <code>ProductRepository::findById()</code> method with various product IDs to ensure it handles missing records correctly.
-            </div>
+    <div class="tool-card">
+        <h4>📊 Monitoring Dashboard</h4>
+        <div class="route">/api/monitoring</div>
+        <span class="badge badge-system">Performance</span>
+        <p><strong>Purpose:</strong> Real-time application performance monitoring with live charts and metrics.</p>
+        <ul class="feature-list">
+            <li><strong>Real-time SSE Streaming:</strong> Live metrics pushed to the dashboard</li>
+            <li><strong>Memory Usage Tracking:</strong> Current, peak, and average memory consumption</li>
+            <li><strong>Response Time Analysis:</strong> P50 and P95 for app and system routes</li>
+            <li><strong>Database Query Metrics:</strong> Query count, execution time, % of response time</li>
+            <li><strong>Top Slowest Endpoints:</strong> Identifies performance bottlenecks</li>
+            <li><strong>Health Checks:</strong> Database, disk usage, PHP version</li>
+            <li><strong>Historical Data:</strong> View metrics by date or date range</li>
+        </ul>
+        <div class="highlight-box warning">
+            <strong>Performance Impact:</strong> Monitoring adds ~2–5ms overhead since logging happens after the response is sent.
         </div>
-
-        <div class="tool-card">
-            <h4>🌐 Curl Runner (GUI)</h4>
-            <div class="route">/curl_runner2.html</div>
-            <span class="badge badge-dev">Development Tool</span>
-            
-            <p><strong>Purpose:</strong> Visual HTTP request tool for testing APIs without command-line curl or Postman.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li>GUI-based HTTP request builder</li>
-                <li>Support for GET, POST, PUT, DELETE methods</li>
-                <li>Custom headers and request body</li>
-                <li>Formatted response display</li>
-                <li>No installation required</li>
-            </ul>
-
-            <p><strong>When to Use:</strong></p>
+        <div class="highlight-box success">
+            <strong>Color Coding:</strong>
             <ul>
-                <li>Quick API endpoint testing</li>
-                <li>Testing external APIs</li>
-                <li>When you don't want to use command-line tools</li>
+                <li><strong style="color:#3fb950">Green:</strong> Memory &lt;50MB, Response &lt;200ms, DB Queries &lt;10</li>
+                <li><strong style="color:#fbbf24">Yellow:</strong> Memory 50–100MB, Response 200–500ms, DB Queries 10–50</li>
+                <li><strong style="color:#f85149">Red:</strong> Memory &gt;100MB, Response &gt;500ms, DB Queries &gt;50</li>
             </ul>
         </div>
+    </div>
 
-        <div class="tool-card">
-            <h4>📊 Monitoring Dashboard</h4>
-            <div class="route">/api/monitoring</div>
-            <span class="badge badge-system">Performance</span>
-            
-            <p><strong>Purpose:</strong> Real-time application performance monitoring with live charts and metrics.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li><strong>Real-time SSE Streaming:</strong> Server-Sent Events push live metrics to the dashboard</li>
-                <li><strong>Memory Usage Tracking:</strong> Current, peak, and system route average memory consumption</li>
-                <li><strong>Response Time Analysis:</strong> P50 (median) and P95 (95th percentile) metrics for app and system routes</li>
-                <li><strong>Requests Per Second (RPS):</strong> Live request rate tracking</li>
-                <li><strong>Database Query Metrics:</strong> Query count, execution time, and percentage of total response time</li>
-                <li><strong>Active Requests Counter:</strong> Shows concurrent request handling</li>
-                <li><strong>Top Slowest Endpoints:</strong> Identifies performance bottlenecks</li>
-                <li><strong>Health Checks:</strong> Database connectivity, disk usage, PHP version</li>
-                <li><strong>Historical Data:</strong> View metrics by date or date range</li>
-                <li><strong>System vs App Separation:</strong> Tracks framework tools separately from your business logic</li>
-                <li><strong>Color-coded Indicators:</strong> Green (good), yellow (warning), red (critical)</li>
-            </ul>
-
-            <p><strong>Technical Implementation:</strong></p>
-            <ul>
-                <li>Uses <code>MonitoringMiddleware</code> to capture metrics on every request</li>
-                <li>Logs stored in <code>src/api/logs/monitoring/</code> directory (JSON format)</li>
-                <li>Non-blocking logging (happens after response is sent)</li>
-                <li>Chart.js for live data visualization</li>
-                <li>Supports multiple concurrent viewers (configurable limit)</li>
-            </ul>
-
-            <p><strong>Metrics Captured Per Request:</strong></p>
-            <ul class="feature-list">
-                <li>Response time (total request duration)</li>
-                <li>CPU time (actual processing time)</li>
-                <li>Memory used (RAM consumed)</li>
-                <li>Peak memory (highest memory point)</li>
-                <li>Database queries count</li>
-                <li>Database total execution time</li>
-                <li>Database time as percentage of response time</li>
-                <li>HTTP status code</li>
-                <li>Request method and endpoint</li>
-                <li>Client IP and User-Agent</li>
-                <li>Timestamp</li>
-            </ul>
-
-            <p><strong>When to Use:</strong></p>
-            <ul>
-                <li>Identifying slow endpoints</li>
-                <li>Detecting memory leaks</li>
-                <li>Finding N+1 query problems (high query count)</li>
-                <li>Analyzing database bottlenecks</li>
-                <li>Monitoring production performance</li>
-                <li>Load testing analysis</li>
-            </ul>
-
-            <div class="highlight-box warning">
-                <strong>Performance Impact:</strong> Monitoring middleware adds minimal overhead (~2-5ms) since logging happens after the response is sent. In production, consider enabling only when needed or restricting access.
-            </div>
-
-            <div class="highlight-box success">
-                <strong>Color Coding Guide:</strong>
-                <ul>
-                    <li><strong style="color: #3fb950;">Green (Efficient):</strong> Memory &lt;50MB, Response &lt;200ms, DB Queries &lt;10</li>
-                    <li><strong style="color: #fbbf24;">Yellow (Warning):</strong> Memory 50-100MB, Response 200-500ms, DB Queries 10-50</li>
-                    <li><strong style="color: #f85149;">Red (Critical):</strong> Memory &gt;100MB, Response &gt;500ms, DB Queries &gt;50</li>
-                </ul>
-            </div>
+    <div class="tool-card">
+        <h4>🗄️ Migration Runner</h4>
+        <div class="route">POST /api/runmigration</div>
+        <span class="badge badge-system">Database</span>
+        <p><strong>Purpose:</strong> Execute SQL migration files to set up or update your database schema.</p>
+        <ul class="feature-list">
+            <li>Automatically scans <code>src/api/databases/*.sql</code> files</li>
+            <li>Executes in natural order (001_, 002_, etc.)</li>
+            <li>Handles foreign key constraints automatically</li>
+            <li>Idempotent — safe to run multiple times</li>
+            <li>Detailed execution report with statement counts</li>
+        </ul>
+        <div class="highlight-box success">
+            <strong>Pro Tip:</strong> Name migration files with numeric prefixes (001_, 002_) to control execution order.
         </div>
+    </div>
 
-        <div class="tool-card">
-            <h4>🗄️ Migration Runner</h4>
-            <div class="route">POST /api/runmigration</div>
-            <span class="badge badge-system">Database</span>
-            
-            <p><strong>Purpose:</strong> Execute SQL migration files to set up or update your database schema.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul class="feature-list">
-                <li>Automatically scans <code>src/api/databases/*.sql</code> files</li>
-                <li>Executes migrations in natural order (001_init.sql, 002_orders.sql, etc.)</li>
-                <li>Handles foreign key constraints (disables/re-enables automatically)</li>
-                <li>Idempotent execution (safe to run multiple times)</li>
-                <li>Detailed execution report with statement counts</li>
-                <li>Error handling per statement</li>
-            </ul>
+    <h2>Layer Responsibilities</h2>
+    <p>The framework enforces strict separation of concerns across three primary layers:</p>
 
-            <p><strong>When to Use:</strong></p>
-            <ul>
-                <li>Initial database setup</li>
-                <li>Applying schema changes</li>
-                <li>Resetting development database</li>
-            </ul>
+    <h3>Controllers (Request Layer)</h3>
+    <p><strong>Responsibility:</strong> Handle HTTP requests, validate input, call services, return responses.</p>
+    <p><strong>SHOULD do:</strong></p>
+    <ul>
+        <li>Receive and parse HTTP requests</li>
+        <li>Validate request data using <code>validateRequest()</code></li>
+        <li>Call appropriate service methods</li>
+        <li>Format and return JSON responses</li>
+        <li>Handle exceptions and return appropriate HTTP status codes</li>
+    </ul>
+    <p><strong>SHOULD NOT do:</strong></p>
+    <ul>
+        <li>❌ Contain business logic</li>
+        <li>❌ Directly query the database</li>
+        <li>❌ Process data transformations</li>
+    </ul>
 
-            <div class="highlight-box success">
-                <strong>Pro Tip:</strong> Name your migration files with numeric prefixes (001_, 002_) to control execution order.
-            </div>
-        </div>
+    <h3>Services (Business Logic Layer)</h3>
+    <p><strong>Responsibility:</strong> Implement business rules, orchestrate data operations, handle transactions.</p>
+    <p><strong>SHOULD do:</strong></p>
+    <ul>
+        <li>Implement business rules and validation</li>
+        <li>Orchestrate multiple repository calls</li>
+        <li>Handle database transactions</li>
+        <li>Transform and process data</li>
+    </ul>
+    <p><strong>SHOULD NOT do:</strong></p>
+    <ul>
+        <li>❌ Parse HTTP requests</li>
+        <li>❌ Format HTTP responses</li>
+        <li>❌ Write SQL queries directly</li>
+    </ul>
 
-        <h2>Layer Responsibilities</h2>
-        <p>The framework enforces strict separation of concerns across three primary layers:</p>
+    <h3>Repositories (Data Access Layer)</h3>
+    <p><strong>Responsibility:</strong> Execute database queries, map data to objects.</p>
+    <p><strong>SHOULD do:</strong></p>
+    <ul>
+        <li>Perform database CRUD operations</li>
+        <li>Write optimized SQL queries</li>
+        <li>Map database results to arrays</li>
+    </ul>
+    <p><strong>SHOULD NOT do:</strong></p>
+    <ul>
+        <li>❌ Implement business logic</li>
+        <li>❌ Handle transactions (leave to services)</li>
+        <li>❌ Format HTTP responses</li>
+    </ul>
 
-        <h3>Controllers (Request Layer)</h3>
-        <p><strong>Responsibility:</strong> Handle HTTP requests, validate input, call services, return responses.</p>
-        <p><strong>What Controllers SHOULD do:</strong></p>
-        <ul>
-            <li>Receive and parse HTTP requests</li>
-            <li>Validate request data (using <code>validateRequest()</code>)</li>
-            <li>Call appropriate service methods</li>
-            <li>Format and return JSON responses</li>
-            <li>Handle exceptions and return appropriate HTTP status codes</li>
-        </ul>
-        <p><strong>What Controllers SHOULD NOT do:</strong></p>
-        <ul>
-            <li>❌ Contain business logic</li>
-            <li>❌ Directly query the database</li>
-            <li>❌ Process data transformations</li>
-        </ul>
-
-        <h3>Services (Business Logic Layer)</h3>
-        <p><strong>Responsibility:</strong> Implement business rules, orchestrate data operations, handle transactions.</p>
-        <p><strong>What Services SHOULD do:</strong></p>
-        <ul>
-            <li>Implement business rules and validation</li>
-            <li>Orchestrate multiple repository calls</li>
-            <li>Handle database transactions</li>
-            <li>Transform and process data</li>
-            <li>Throw business logic exceptions</li>
-        </ul>
-        <p><strong>What Services SHOULD NOT do:</strong></p>
-        <ul>
-            <li>❌ Parse HTTP requests</li>
-            <li>❌ Format HTTP responses</li>
-            <li>❌ Write SQL queries directly</li>
-        </ul>
-
-        <h3>Repositories (Data Access Layer)</h3>
-        <p><strong>Responsibility:</strong> Execute database queries, map data to objects.</p>
-        <p><strong>What Repositories SHOULD do:</strong></p>
-        <ul>
-            <li>Perform database CRUD operations</li>
-            <li>Write optimized SQL queries</li>
-            <li>Map database results to arrays</li>
-            <li>Handle database-specific exceptions</li>
-        </ul>
-        <p><strong>What Repositories SHOULD NOT do:</strong></p>
-        <ul>
-            <li>❌ Implement business logic</li>
-            <li>❌ Handle transactions (leave to services)</li>
-            <li>❌ Format HTTP responses</li>
-        </ul>
-
-        <h2>Environment Configuration</h2>
-        <p>The framework uses a <code>.env</code> file for environment-specific configuration.</p>
-
-        <pre><code># Database Configuration
+    <h2>Environment Configuration</h2>
+    <p>The framework uses a <code>.env</code> file for environment-specific configuration.</p>
+    <pre><code># Database Configuration
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=framework_db
@@ -867,44 +488,39 @@ MAX_MONITORING_VIEWERS=2
 # Security
 RATE_LIMIT_REQUESTS=100
 RATE_LIMIT_WINDOW=3600</code></pre>
-
-        <div class="highlight-box warning">
-            <strong>Security Note:</strong> Never commit your <code>.env</code> file to version control. Use <code>.env.example</code> as a template.
-        </div>
-
-        <h2>Getting Started</h2>
-        <p>Now that you understand the framework's structure and tools, here's how to start building your application:</p>
-
-        <ol>
-            <li><strong>Visit the Documentation:</strong> Open <code>/api/docs</code> to see all available routes</li>
-            <li><strong>Run Migrations:</strong> POST to <code>/api/runmigration</code> to set up your database</li>
-            <li><strong>Create Your First Route:</strong> Add routes in <code>src/api/routes.php</code></li>
-            <li><strong>Build Your Controller:</strong> Create a controller in <code>src/api/controllers/</code></li>
-            <li><strong>Implement Business Logic:</strong> Create a service in <code>src/api/services/</code></li>
-            <li><strong>Add Data Access:</strong> Create a repository in <code>src/api/repositories/</code></li>
-            <li><strong>Test Your API:</strong> Use <code>/api/docs</code> to test your endpoints</li>
-            <li><strong>Monitor Performance:</strong> Check <code>/api/monitoring</code> for performance metrics</li>
-        </ol>
-
-        <h2>Next Steps</h2>
-        <p>Continue learning about specific framework components:</p>
-
-        <ul>
-            <li><strong>Routing System:</strong> Learn how to define routes with parameters, middleware, and groups</li>
-            <li><strong>Controllers:</strong> Understand BaseController methods and response helpers</li>
-            <li><strong>Services:</strong> Learn business logic patterns and transaction handling</li>
-            <li><strong>Repositories:</strong> Master database queries using the Database class</li>
-            <li><strong>Middleware:</strong> Create custom before/after request filters</li>
-            <li><strong>Database Migrations:</strong> Learn migration file structure and best practices</li>
-            <li><strong>E-commerce Walkthrough:</strong> Build a complete e-commerce system step-by-step</li>
-        </ul>
-
-        <div class="highlight-box success">
-            <h4>You're Ready to Build! 🚀</h4>
-            <p>You now understand the framework's architecture, folder structure, and development tools. The next documentation sections will dive deeper into each component with practical examples.</p>
-        </div>
+    <div class="highlight-box warning">
+        <strong>Security Note:</strong> Never commit your <code>.env</code> file to version control. Use <code>.env.example</code> as a template.
     </div>
 
-    <a href="#" class="back-to-top">↑ Back to Top</a>
+    <h2>Getting Started</h2>
+    <p>Now that you understand the framework's structure and tools, here's how to start building:</p>
+    <ol>
+        <li><strong>Visit the Documentation:</strong> Open <code>/api/docs</code> to see all available routes</li>
+        <li><strong>Run Migrations:</strong> POST to <code>/api/runmigration</code> to set up your database</li>
+        <li><strong>Create Your First Route:</strong> Add routes in <code>src/api/routes.php</code></li>
+        <li><strong>Build Your Controller:</strong> Create a controller in <code>src/api/controllers/</code></li>
+        <li><strong>Implement Business Logic:</strong> Create a service in <code>src/api/services/</code></li>
+        <li><strong>Add Data Access:</strong> Create a repository in <code>src/api/repositories/</code></li>
+        <li><strong>Test Your API:</strong> Use <code>/api/docs</code> to test your endpoints</li>
+        <li><strong>Monitor Performance:</strong> Check <code>/api/monitoring</code> for performance metrics</li>
+    </ol>
+
+    <h2>Next Steps</h2>
+    <ul>
+        <li><strong>Routing System:</strong> Learn how to define routes with parameters, middleware, and groups</li>
+        <li><strong>Controllers:</strong> Understand BaseController methods and response helpers</li>
+        <li><strong>Services:</strong> Learn business logic patterns and transaction handling</li>
+        <li><strong>Repositories:</strong> Master database queries using the Database class</li>
+        <li><strong>Middleware:</strong> Create custom before/after request filters</li>
+        <li><strong>Database Migrations:</strong> Learn migration file structure and best practices</li>
+        <li><strong>E-commerce Walkthrough:</strong> Build a complete e-commerce system step-by-step</li>
+    </ul>
+    <div class="highlight-box success">
+        <h4>You're Ready to Build! 🚀</h4>
+        <p>You now understand the framework's architecture, folder structure, and development tools. The next documentation sections dive deeper into each component with practical examples.</p>
+    </div>
+
+</div>
+<a href="#" class="back-to-top">↑ Back to Top</a>
 </body>
 </html>

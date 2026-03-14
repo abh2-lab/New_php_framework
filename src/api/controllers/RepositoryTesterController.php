@@ -8,12 +8,13 @@ use App\Core\Database;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
-
+use App\Core\Config\DatabaseConnection;
 class RepositoryTesterController extends BaseController
 {
     public function __construct()
     {
         parent::__construct();
+        $this->db = new Database(DatabaseConnection::pdo());
     }
 
     // UI entry (HTML)
@@ -39,7 +40,7 @@ class RepositoryTesterController extends BaseController
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Repository Tester</title>
+            <title>🗄️ Repository Tester</title>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <style>
                 :root {

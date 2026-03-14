@@ -180,6 +180,7 @@ class Router
         $getParams = $params['get'] ?? [];
         $formParams = $params['form'] ?? $params['post'] ?? [];
         $jsonParams = $params['json'] ?? $params['body'] ?? [];
+        $headerParams = $params['headers'] ?? $params['header'] ?? []; // NEW
 
         $route = [
             'method' => $method,
@@ -193,7 +194,8 @@ class Router
                 'url' => $urlParams,
                 'get' => $getParams,
                 'form' => $formParams,
-                'json' => $jsonParams
+                'json' => $jsonParams,
+                'headers' => $headerParams // NEW
             ],
             'regex' => $this->patternToRegex($pattern),
             'specificity' => $this->calculateSpecificity($pattern),

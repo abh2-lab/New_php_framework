@@ -59,7 +59,7 @@ class MetricsLogger
     /**
      * Get metrics from a specific date
      */
-    public function getMetrics(string $date = null): array
+    public function getMetrics(?string $date = null): array
     {
         $filename = $date ? "metrics-{$date}.json" : $this->getLogFilename();
         $filepath = $this->logDirectory . $filename;

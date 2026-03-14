@@ -3,7 +3,8 @@
 namespace App\Controllers;
 
 use App\Core\BaseController;
-
+use App\Core\Database;
+use App\Core\Config\DatabaseConnection;
 use Dotenv\Dotenv;
 
 class DocsController extends BaseController
@@ -14,9 +15,7 @@ class DocsController extends BaseController
     public function __construct()
     {
         parent::__construct();
-
         $this->dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
-
         $this->dotenv->safeLoad();
     }
 
@@ -39,7 +38,37 @@ class DocsController extends BaseController
         $this->renderEnhancedApiDocs($groupedRoutes, $totalRoutes, $basePath);
     }
 
-    // Environment variable management methods
+    public function getRandomDbValue()
+    {
+        $table = $_GET['table'] ?? '';
+        $column = $_GET['column'] ?? '';
+
+        if (!$table || !$column) {
+            return $this->sendError('Table and column required', 400);
+        }
+
+        // Security: sanitize table and column names to prevent basic SQL injection
+        $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+        $column = preg_replace('/[^a-zA-Z0-9_]/', '', $column);
+
+        try {
+            // Instantiate the Database class wrapper
+            $db = new Database(DatabaseConnection::pdo());
+
+            // Fetch a random single value from the requested table
+            $sql = "SELECT $column FROM $table ORDER BY RAND() LIMIT 1";
+            $result = $db->first($sql);
+
+            if ($result && isset($result[$column])) {
+                return $this->sendSuccess('Value fetched', ['value' => $result[$column]]);
+            }
+
+            return $this->sendError('No data found in table', 404);
+        } catch (\Exception $e) {
+            return $this->sendError('Database error: ' . $e->getMessage(), 500);
+        }
+    }
+
     private function getAllowedEnvironmentVariables()
     {
         return [
@@ -174,7 +203,7 @@ class DocsController extends BaseController
         $envFilePath = __DIR__ . '/../../.env';
 
         if (!file_exists($envFilePath)) {
-            file_put_contents($envFilePath, "$key=$value\n");
+            file_put_contents($envFilePath, "$key=\"$value\"\n");
             return;
         }
 
@@ -198,7 +227,7 @@ class DocsController extends BaseController
             $currentKey = trim($currentKey);
 
             if ($currentKey === $key) {
-                $newLines[] = "$key=$value";
+                $newLines[] = "$key=\"$value\"";
                 $updated = true;
             } else {
                 $newLines[] = $line;
@@ -206,7 +235,7 @@ class DocsController extends BaseController
         }
 
         if (!$updated) {
-            $newLines[] = "$key=$value";
+            $newLines[] = "$key=\"$value\"";
         }
 
         file_put_contents($envFilePath, implode("\n", $newLines) . "\n");
@@ -220,14 +249,13 @@ class DocsController extends BaseController
                     error_reporting(E_ALL);
                     ini_set('display_errors', 1);
                     ini_set('display_startup_errors', 1);
-                    ini_set('log_errors', '1');
+                    ini_set('log_errors', 1);
                 } else {
                     error_reporting(0);
                     ini_set('display_errors', 0);
                     ini_set('display_startup_errors', 0);
                 }
                 break;
-
             case 'TIMEZONE':
                 if (!empty($value)) {
                     date_default_timezone_set($value);
@@ -236,7 +264,26 @@ class DocsController extends BaseController
         }
     }
 
-    private function renderEnhancedApiDocs($groupedRoutes, $totalRoutes, $basePath = '')
+    private function slugify($text)
+    {
+        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $text), '-'));
+    }
+
+    private function getGroupIcon($groupName)
+    {
+        $icons = [
+            'Authentication' => '🔐',
+            'Users' => '👥',
+            'Testing' => '🧪',
+            'Documentation' => '📚',
+            'Environment' => '⚙️',
+            'System' => '🖥️',
+        ];
+
+        return $icons[$groupName] ?? '📌';
+    }
+
+    private function renderEnhancedApiDocs($groupedRoutes, $totalRoutes, $basePath)
     {
         header('Content-Type: text/html');
         $allowedEnvVars = $this->getAllowedEnvironmentVariables();
@@ -245,7 +292,7 @@ class DocsController extends BaseController
         <html>
 
         <head>
-            <title>🚀 Enhanced API Documentation</title>
+            <title>Enhanced API Documentation</title>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -286,7 +333,7 @@ class DocsController extends BaseController
                 }
 
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     margin: 0;
                     padding: 20px;
                     background: var(--bg-primary);
@@ -296,6 +343,7 @@ class DocsController extends BaseController
                 }
 
                 .container {
+                    /* max-width: 1200px; */
                     margin: 0 auto;
                 }
 
@@ -304,6 +352,7 @@ class DocsController extends BaseController
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: 30px;
+                    padding: 15px;
                     padding: 0 12px;
                     background: var(--bg-secondary);
                     border-radius: 12px;
@@ -341,6 +390,7 @@ class DocsController extends BaseController
                     cursor: pointer;
                     transition: all 0.3s ease;
                     font-size: 14px;
+                    /* font-weight: 600; */
                 }
 
                 .theme-toggle:hover,
@@ -596,7 +646,7 @@ class DocsController extends BaseController
                 }
 
                 .api-url {
-                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-family: Monaco, Menlo, monospace;
                     font-size: 16px;
                     font-weight: 600;
                     color: var(--text-primary);
@@ -683,7 +733,7 @@ class DocsController extends BaseController
                 .param-item textarea {
                     resize: vertical;
                     min-height: 80px;
-                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-family: Monaco, Menlo, monospace;
                 }
 
                 .param-desc {
@@ -774,7 +824,7 @@ class DocsController extends BaseController
                 }
 
                 .response-content {
-                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-family: Monaco, Menlo, monospace;
                     font-size: 14px;
                     line-height: 1.5;
                     color: #f8f8f2;
@@ -812,7 +862,6 @@ class DocsController extends BaseController
                     display: none !important;
                 }
 
-                /* Exclude controls */
                 .param-top {
                     display: flex;
                     align-items: center;
@@ -856,15 +905,15 @@ class DocsController extends BaseController
                         <h1><span>🚀</span> Enhanced API Documentation</h1>
                         <p>Total APIs: <strong><?= $totalRoutes ?></strong> | Groups:
                             <strong><?= count($groupedRoutes) ?></strong> | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/api/docs">Api Tester</a> | <a target="_blank"
                                 href="<?= $_ENV['APP_URL'] ?>/api/service-test">Service Tester</a> | <a target="_blank"
-                                href="<?= $_ENV['APP_URL'] ?>/curl_runner2.html">Curl Runner</a>
-                                | <a target="_blank"
+                                href="<?= $_ENV['APP_URL'] ?>/curl_runner2.html">Curl Runner</a> | <a target="_blank"
                                 href="<?= $_ENV['APP_URL'] ?>/api/repository-test">Repository Tester</a> | <a target="_blank"
                                 href="<?= $_ENV['APP_URL'] ?>/api/monitoring">Monitoring </a>
                         </p>
                     </div>
                     <div class="header-controls">
-                        <button class="btn btn-secondary" onclick="toggleAllGroups()" id="collapseAllBtn">📁 Collapse
+                        <button class="btn btn-secondary" onclick="toggleAllGroups()" id="collapseAllBtn">▼ Collapse
                             All</button>
                         <button class="env-toggle" onclick="toggleEnvSection()">⚙️ Environment</button>
                         <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
@@ -877,7 +926,7 @@ class DocsController extends BaseController
                 </div>
 
                 <div class="group-nav-section">
-                    <h4>📑 Quick Navigation</h4>
+                    <h4>📍 Quick Navigation</h4>
                     <?php foreach ($groupedRoutes as $groupName => $routes): ?>
                         <button class="group-nav-btn" onclick="scrollToGroup('<?= $this->slugify($groupName) ?>')">
                             <?= $this->getGroupIcon($groupName) ?>             <?= htmlspecialchars($groupName) ?>
@@ -900,27 +949,29 @@ class DocsController extends BaseController
                         <div class="group-header" onclick="toggleGroup('<?= $this->slugify($groupName) ?>')">
                             <div>
                                 <span><?= $this->getGroupIcon($groupName) ?>             <?= htmlspecialchars($groupName) ?></span>
-                                <small style="opacity: 0.8; margin-left: 10px;">(<?= count($routes) ?> endpoints)</small>
+                                <small style="opacity: 0.8; margin-left: 10px;"><?= count($routes) ?> endpoints</small>
                             </div>
-                            <span class="group-toggle">▲</span>
+                            <span class="group-toggle">▼</span>
                         </div>
                         <div class="group-content">
                             <?php foreach ($routes as $index => $route):
-                                $globalIndex = $this->slugify($groupName) . '_' . $index;
+                                $globalIndex = $this->slugify($groupName) . '-' . $index;
                                 $hasUrlParams = !empty($route['params']['url']);
                                 $hasGetParams = !empty($route['params']['get']);
                                 $hasFormParams = !empty($route['params']['form']);
                                 $hasJsonParams = !empty($route['params']['json']);
+                                $hasHeaderParams = !empty($route['params']['headers']); // NEW
                                 ?>
                                 <div class="api-item" data-method="<?= $route['method'] ?>" data-url="<?= $route['pattern'] ?>"
                                     data-description="<?= htmlspecialchars($route['description']) ?>">
+
                                     <div class="api-header">
                                         <div class="api-info">
                                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                                 <span
                                                     class="api-method method-<?= strtolower($route['method']) ?>"><?= $route['method'] ?></span>
                                                 <span class="api-url"><?= htmlspecialchars($basePath . $route['pattern']) ?></span>
-                                                <button class="test-btn-small" onclick="toggleTest('<?= $globalIndex ?>')">🧪
+                                                <button class="test-btn-small" onclick="toggleTest('<?= $globalIndex ?>')">▶
                                                     Test</button>
                                             </div>
                                             <div class="api-description"><?= htmlspecialchars($route['description']) ?></div>
@@ -930,7 +981,29 @@ class DocsController extends BaseController
                                     <div id="test-<?= $globalIndex ?>" class="test-section">
                                         <form class="api-test-form" data-method="<?= $route['method'] ?>"
                                             data-url="<?= $route['pattern'] ?>" data-index="<?= $globalIndex ?>"
-                                            data-json-schema='<?= htmlspecialchars(json_encode($route["params"]["json"] ?? []), ENT_QUOTES, "UTF-8") ?>'>
+                                            data-json-schema="<?= htmlspecialchars(json_encode($route['params']['json'] ?? []), ENT_QUOTES, 'UTF-8') ?>">
+
+                                            <?php if ($hasHeaderParams): ?>
+                                                <div class="param-section">
+                                                    <h4>🔧 Headers</h4>
+                                                    <div class="param-grid">
+                                                        <?php foreach ($route['params']['headers'] as $header => $desc): ?>
+                                                            <div class="param-item" data-scope="header"
+                                                                data-param="<?= htmlspecialchars($header) ?>">
+                                                                <div class="param-top">
+                                                                    <label><?= htmlspecialchars($header) ?></label>
+                                                                    <button type="button" class="exclude-btn" title="Exclude header"
+                                                                        onclick="toggleExclude(this)">❌</button>
+                                                                </div>
+                                                                <input type="text" name="header_<?= htmlspecialchars($header) ?>"
+                                                                    placeholder="Enter <?= htmlspecialchars($header) ?>"
+                                                                    data-desc="<?= htmlspecialchars($desc) ?>">
+                                                                <div class="param-desc"><?= htmlspecialchars($desc) ?></div>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
 
                                             <?php if ($hasUrlParams): ?>
                                                 <div class="param-section">
@@ -942,7 +1015,7 @@ class DocsController extends BaseController
                                                                 <div class="param-top">
                                                                     <label><?= htmlspecialchars($param) ?></label>
                                                                     <button type="button" class="exclude-btn" title="Exclude parameter"
-                                                                        onclick="toggleExclude(this)">✖</button>
+                                                                        onclick="toggleExclude(this)">❌</button>
                                                                 </div>
                                                                 <input type="text" name="url_<?= htmlspecialchars($param) ?>"
                                                                     placeholder="Enter <?= htmlspecialchars($param) ?>"
@@ -956,7 +1029,7 @@ class DocsController extends BaseController
 
                                             <?php if ($hasGetParams): ?>
                                                 <div class="param-section">
-                                                    <h4>❓ GET Parameters (Query String)</h4>
+                                                    <h4>🔍 GET Parameters (Query String)</h4>
                                                     <div class="param-grid">
                                                         <?php foreach ($route['params']['get'] as $param => $desc): ?>
                                                             <div class="param-item" data-scope="get"
@@ -964,7 +1037,7 @@ class DocsController extends BaseController
                                                                 <div class="param-top">
                                                                     <label><?= htmlspecialchars($param) ?></label>
                                                                     <button type="button" class="exclude-btn" title="Exclude parameter"
-                                                                        onclick="toggleExclude(this)">✖</button>
+                                                                        onclick="toggleExclude(this)">❌</button>
                                                                 </div>
                                                                 <input type="text" name="get_<?= htmlspecialchars($param) ?>"
                                                                     placeholder="Enter <?= htmlspecialchars($param) ?>"
@@ -986,7 +1059,7 @@ class DocsController extends BaseController
                                                                 <div class="param-top">
                                                                     <label><?= htmlspecialchars($param) ?></label>
                                                                     <button type="button" class="exclude-btn" title="Exclude parameter"
-                                                                        onclick="toggleExclude(this)">✖</button>
+                                                                        onclick="toggleExclude(this)">❌</button>
                                                                 </div>
                                                                 <input type="text" name="form_<?= htmlspecialchars($param) ?>"
                                                                     placeholder="Enter <?= htmlspecialchars($param) ?>"
@@ -1000,18 +1073,19 @@ class DocsController extends BaseController
 
                                             <?php if ($hasJsonParams): ?>
                                                 <div class="param-section">
-                                                    <h4>🔧 JSON Body</h4>
+                                                    <h4>📦 JSON Body</h4>
                                                     <div class="param-item" data-scope="json" data-param="json_body">
                                                         <div class="param-top">
                                                             <label>JSON Payload</label>
                                                             <button type="button" class="exclude-btn" title="Exclude JSON body"
-                                                                onclick="toggleExclude(this)">✖</button>
+                                                                onclick="toggleExclude(this)">❌</button>
                                                         </div>
                                                         <textarea name="json_body" placeholder='{"key": "value"}' rows="6"></textarea>
                                                         <div class="param-desc">
                                                             <strong>Expected fields:</strong><br>
                                                             <?php foreach ($route['params']['json'] as $param => $desc): ?>
-                                                                • <?= htmlspecialchars($param) ?>: <?= htmlspecialchars($desc) ?><br>
+                                                                • <code><?= htmlspecialchars($param) ?></code>:
+                                                                <?= htmlspecialchars($desc) ?><br>
                                                             <?php endforeach; ?>
                                                         </div>
                                                     </div>
@@ -1021,9 +1095,9 @@ class DocsController extends BaseController
                                             <div class="btn-group">
                                                 <button type="submit" class="btn btn-primary">🚀 Send Request</button>
                                                 <button type="button" class="btn btn-secondary"
-                                                    onclick="autoFillForm('<?= $globalIndex ?>')">✨ Auto‑Fill</button>
+                                                    onclick="autoFillForm('<?= $globalIndex ?>')">🪄 AutoFill</button>
                                                 <button type="button" class="btn btn-secondary"
-                                                    onclick="clearResponse('<?= $globalIndex ?>')">🗑️ Clear</button>
+                                                    onclick="clearResponse('<?= $globalIndex ?>')">🧹 Clear</button>
                                             </div>
                                         </form>
 
@@ -1044,20 +1118,22 @@ class DocsController extends BaseController
                 <?php endforeach; ?>
 
                 <div id="toast" class="toast"></div>
+
             </div>
 
             <script>
                 function showToast(message, type = 'success') {
                     const toast = document.getElementById('toast');
-                    toast.className = 'toast ' + type + ' show';
+                    toast.className = `toast ${type} show`;
                     toast.textContent = message;
-                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                    setTimeout(() => toast.classList.remove('show'), 3000);
                 }
 
                 function toggleTheme() {
                     const body = document.body;
                     const toggleBtn = document.querySelector('.theme-toggle');
                     const currentTheme = body.getAttribute('data-theme');
+
                     if (currentTheme === 'light') {
                         body.setAttribute('data-theme', 'dark');
                         toggleBtn.textContent = '☀️ Light Mode';
@@ -1074,7 +1150,7 @@ class DocsController extends BaseController
                     if (groupSection) {
                         groupSection.classList.toggle('collapsed');
                         const collapsed = groupSection.classList.contains('collapsed');
-                        localStorage.setItem('group-' + groupId + '-collapsed', collapsed);
+                        localStorage.setItem(`group-${groupId}-collapsed`, collapsed);
                     }
                 }
 
@@ -1082,25 +1158,35 @@ class DocsController extends BaseController
                     const groupSections = document.querySelectorAll('.group-section');
                     const btn = document.getElementById('collapseAllBtn');
                     const allCollapsed = Array.from(groupSections).every(g => g.classList.contains('collapsed'));
+
                     groupSections.forEach(group => {
-                        if (allCollapsed) group.classList.remove('collapsed'); else group.classList.add('collapsed');
+                        if (allCollapsed) {
+                            group.classList.remove('collapsed');
+                        } else {
+                            group.classList.add('collapsed');
+                        }
                     });
-                    btn.textContent = allCollapsed ? '📁 Collapse All' : '📂 Expand All';
+
+                    btn.textContent = allCollapsed ? '▼ Collapse All' : '▶ Expand All';
                 }
 
                 function scrollToGroup(groupId) {
                     const groupSection = document.querySelector(`[data-group="${groupId}"]`);
                     if (groupSection) {
                         groupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        if (groupSection.classList.contains('collapsed')) groupSection.classList.remove('collapsed');
+                        if (groupSection.classList.contains('collapsed')) {
+                            groupSection.classList.remove('collapsed');
+                        }
                         groupSection.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
-                        setTimeout(() => { groupSection.style.boxShadow = ''; }, 2000);
+                        setTimeout(() => {
+                            groupSection.style.boxShadow = '';
+                        }, 2000);
                     }
                 }
 
                 function toggleTest(index) {
-                    const testSection = document.getElementById('test-' + index);
-                    if (testSection.style.display === 'none' || testSection.style.display === '') {
+                    const testSection = document.getElementById(`test-${index}`);
+                    if (testSection.style.display === 'none' || !testSection.style.display) {
                         testSection.style.display = 'block';
                         testSection.classList.add('fade-in');
                     } else {
@@ -1109,25 +1195,28 @@ class DocsController extends BaseController
                 }
 
                 function clearResponse(index) {
-                    const responseSection = document.getElementById('response-' + index);
-                    const statusEl = document.getElementById('status-' + index);
-                    const contentEl = document.getElementById('content-' + index);
+                    const responseSection = document.getElementById(`response-${index}`);
+                    const statusEl = document.getElementById(`status-${index}`);
+                    const contentEl = document.getElementById(`content-${index}`);
+
                     responseSection.style.display = 'none';
                     statusEl.textContent = '';
                     contentEl.innerHTML = '';
                 }
 
                 function copyResponse(index) {
-                    const contentEl = document.getElementById('content-' + index);
+                    const contentEl = document.getElementById(`content-${index}`);
                     const text = contentEl.textContent;
+
                     navigator.clipboard.writeText(text).then(() => {
                         const copyBtn = event.target;
                         const originalText = copyBtn.textContent;
-                        copyBtn.textContent = '✅ Copied!';
+                        copyBtn.textContent = '✓ Copied!';
                         copyBtn.style.background = '#28a745';
+
                         setTimeout(() => {
                             copyBtn.textContent = originalText;
-                            copyBtn.style.background = '#ffc107';
+                            copyBtn.style.background = 'var(--btn-warning)';
                         }, 2000);
                     });
                 }
@@ -1148,12 +1237,15 @@ class DocsController extends BaseController
                                 renderEnvironmentVariables(data.data.environment);
                             }
                         })
-                        .catch(error => console.error('Error loading environment variables:', error));
+                        .catch(error => {
+                            console.error('Error loading environment variables:', error);
+                        });
                 }
 
                 function renderEnvironmentVariables(envVars) {
                     const envGrid = document.getElementById('envGrid');
                     envGrid.innerHTML = '';
+
                     Object.entries(envVars).forEach(([key, value]) => {
                         const envItem = document.createElement('div');
                         envItem.className = 'env-item';
@@ -1168,33 +1260,48 @@ class DocsController extends BaseController
                 function updateEnvironmentVariable(key, value) {
                     fetch('<?= $basePath ?>/env/update', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
                         body: `key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}`
                     })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.status === 'success') showToast(`✓ ${key} updated successfully`, 'success');
-                            else showToast(`✗ Failed to update ${key}`, 'error');
+                            if (data.status === 'success') {
+                                showToast(`${key} updated successfully`, 'success');
+                            } else {
+                                showToast(`Failed to update ${key}`, 'error');
+                            }
                         })
-                        .catch(() => { showToast('✗ Network error occurred', 'error'); });
+                        .catch(() => {
+                            showToast('Network error occurred', 'error');
+                        });
                 }
 
                 function saveAllEnvironmentChanges() {
                     const inputs = document.querySelectorAll('.env-item input[data-key]');
                     let successCount = 0;
                     let totalCount = inputs.length;
+
                     inputs.forEach(input => {
                         const key = input.dataset.key;
                         const value = input.value;
+
                         fetch('<?= $basePath ?>/env/update', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
                             body: `key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}`
                         })
                             .then(response => response.json())
                             .then(data => {
-                                if (data.status === 'success') successCount++;
-                                if (successCount === totalCount) showToast('✓ All environment variables saved successfully', 'success');
+                                if (data.status === 'success') {
+                                    successCount++;
+                                    if (successCount === totalCount) {
+                                        showToast('All environment variables saved successfully', 'success');
+                                    }
+                                }
                             });
                     });
                 }
@@ -1230,50 +1337,47 @@ class DocsController extends BaseController
                             }
                         });
 
-                        if (hasVisibleItems) group.classList.remove('hidden'); else group.classList.add('hidden');
+                        if (hasVisibleItems) {
+                            group.classList.remove('hidden');
+                        } else {
+                            group.classList.add('hidden');
+                        }
                     });
                 }
 
-                // Exclude toggle
                 function toggleExclude(btn) {
                     const item = btn.closest('.param-item');
                     if (!item) return;
+
                     item.classList.toggle('excluded');
                     const input = item.querySelector('input, textarea');
-                    if (input) input.dataset.excluded = item.classList.contains('excluded') ? 'true' : 'false';
+                    if (input) {
+                        input.dataset.excluded = item.classList.contains('excluded') ? 'true' : 'false';
+                    }
                 }
 
-                // Auto-Fill utilities + enum support
                 function firstWord(desc) {
                     if (!desc) return '';
                     const m = String(desc).trim().match(/^[A-Za-z]+/);
                     return m ? m[0].toLowerCase() : '';
                 }
+
                 function normalizeType(token) {
                     switch (token) {
-                        case 'int':
-                        case 'integer':
-                        case 'number':
-                        case 'numeric': return 'int';
-                        case 'float':
-                        case 'double':
-                        case 'decimal': return 'float';
-                        case 'bool':
-                        case 'boolean': return 'bool';
-                        case 'date':
-                        case 'datetime':
-                        case 'timestamp': return 'date';
+                        case 'int': case 'integer': case 'number': case 'numeric': return 'int';
+                        case 'float': case 'double': case 'decimal': return 'float';
+                        case 'bool': case 'boolean': return 'bool';
+                        case 'date': case 'datetime': case 'timestamp': return 'date';
                         case 'email': return 'email';
                         case 'uuid': return 'uuid';
-                        case 'string':
-                        case 'text':
-                        case 'str':
-                        default: return 'string';
+                        case 'string': case 'text': case 'str': default: return 'string';
                     }
                 }
+
                 function randInt(min = 1, max = 9999) { return Math.floor(Math.random() * (max - min + 1)) + min; }
                 function randFloat(min = 1, max = 9999, digits = 2) {
-                    const n = Math.random() * (max - min) + min; return Number(n.toFixed(digits));
+                    const n = Math.random() * (max - min) + min;
+                    return Number(n.toFixed(digits));
                 }
                 function randString(len = 12) {
                     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1285,38 +1389,43 @@ class DocsController extends BaseController
                     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
                 }
                 function randDate() {
-                    const now = new Date(); const shift = randInt(-90, 90); now.setDate(now.getDate() + shift);
+                    const now = new Date();
+                    const shift = randInt(-90, 90);
+                    now.setDate(now.getDate() + shift);
                     return now.toISOString().split('T')[0];
                 }
-                function dummyFor(type, name = '') {
+
+                function dummyFor(type, name) {
                     const n = (name || '').toLowerCase();
                     if (type === 'string') {
                         if (n.includes('email')) return randEmail();
                         if (n.includes('uuid') || n.endsWith('id')) return randUUID();
-                        if (n.includes('name')) return `John ${randString(5)}`;
+                        if (n.includes('name')) return 'John ' + randString(5);
                         return randString();
                     }
                     if (type === 'int') return randInt();
                     if (type === 'float') return randFloat();
-                    if (type === 'bool') return Math.random() < 0.5;
+                    if (type === 'bool') return Math.random() > 0.5;
                     if (type === 'date') return randDate();
                     if (type === 'email') return randEmail();
                     if (type === 'uuid') return randUUID();
                     return randString();
                 }
-                // enum helpers
-                // Extract enum values from description: enum(v1|v2|v3)
+
                 function parseEnumValues(desc) {
-                    if (!desc) return [];
-                    const m = String(desc).match(/enum\s*\(([^)]+)\)/i); // ← single backslashes
-                    if (!m) return [];
-                    return m[1]
-                        .split('|')
-                        .map(s => s.trim().replace(/^["']|["']$/g, ''))
-                        .filter(Boolean);
+                    if (!desc) return null;
+                    const m = String(desc).match(/enum\((.*?)\)/i);
+                    if (!m) return null;
+                    return m[1].split('|').map(s => s.trim().replace(/['"]/g, '')).filter(Boolean);
                 }
 
-                // Coerce the chosen enum to the normalized type
+                function parseDefaultValue(desc) {
+                    if (!desc) return null;
+                    const m = String(desc).match(/default\((.*?)\)/i);
+                    if (!m) return null;
+                    return m[1].trim().replace(/['"]/g, '');
+                }
+
                 function coerceEnumValue(val, type) {
                     if (type === 'int') return Number.parseInt(val, 10);
                     if (type === 'float') return Number.parseFloat(val);
@@ -1324,27 +1433,47 @@ class DocsController extends BaseController
                     return String(val);
                 }
 
-
-                function autoFillForm(index) {
+                async function autoFillForm(index) {
                     const form = document.querySelector(`form.api-test-form[data-index="${index}"]`);
                     if (!form) return;
 
-                    // URL, GET, FORM inputs
-                    form.querySelectorAll('.param-item input').forEach(input => {
-                        if (input.dataset.excluded === 'true') return;
+                    // URL, GET, FORM, HEADER inputs
+                    const inputs = form.querySelectorAll('.param-item input');
+                    for (const input of inputs) {
+                        if (input.dataset.excluded === 'true') continue;
+
                         const item = input.closest('.param-item');
                         const paramName = item?.dataset.param || '';
-                        // For each input
                         const desc = input.getAttribute('data-desc') || item?.querySelector('.param-desc')?.textContent || '';
+
+                        // DB Fetch Logic
+                        const dbMatch = String(desc).match(/db\(([^.]+)\.([^)]+)\)/i);
+                        if (dbMatch) {
+                            input.value = "Fetching from DB...";
+                            try {
+                                const res = await fetch(`<?= $basePath ?>/docs/random-db-value?table=${dbMatch[1]}&column=${dbMatch[2]}`);
+                                const json = await res.json();
+                                input.value = json.status === 'success' ? json.data.value : "";
+                            } catch (e) {
+                                input.value = "";
+                            }
+                            continue;
+                        }
+
                         const token = firstWord(desc);
                         const type = normalizeType(token);
                         const enums = parseEnumValues(desc);
-                        const val = enums.length
-                            ? coerceEnumValue(enums[Math.floor(Math.random() * enums.length)], type)
-                            : dummyFor(type, paramName);
-                        input.value = String(val);
+                        const defaultVal = parseDefaultValue(desc);
 
-                    });
+                        if (defaultVal !== null) {
+                            input.value = String(coerceEnumValue(defaultVal, type));
+                        } else if (enums && enums.length) {
+                            const val = coerceEnumValue(enums[Math.floor(Math.random() * enums.length)], type);
+                            input.value = String(val);
+                        } else {
+                            input.value = String(dummyFor(type, paramName));
+                        }
+                    }
 
                     // JSON body
                     const jsonItem = form.querySelector('.param-item[data-scope="json"]');
@@ -1352,14 +1481,35 @@ class DocsController extends BaseController
                     if (jsonItem && jsonTextarea && jsonTextarea.dataset.excluded !== 'true') {
                         let schema = {};
                         try { schema = JSON.parse(form.dataset.jsonSchema || '{}'); } catch (e) { schema = {}; }
+
                         const obj = {};
-                        Object.entries(schema).forEach(([key, d]) => {
+
+                        for (const [key, d] of Object.entries(schema)) {
+                            // DB Fetch Logic for JSON keys
+                            const dbMatch = String(d).match(/db\(([^.]+)\.([^)]+)\)/i);
+                            if (dbMatch) {
+                                try {
+                                    const res = await fetch(`<?= $basePath ?>/docs/random-db-value?table=${dbMatch[1]}&column=${dbMatch[2]}`);
+                                    const json = await res.json();
+                                    obj[key] = json.status === 'success' ? json.data.value : "";
+                                } catch (e) {
+                                    obj[key] = "";
+                                }
+                                continue;
+                            }
+
                             const t = normalizeType(firstWord(d));
                             const ev = parseEnumValues(d);
-                            obj[key] = ev.length
-                                ? coerceEnumValue(ev[Math.floor(Math.random() * ev.length)], t)
-                                : dummyFor(t, key);
-                        });
+                            const defVal = parseDefaultValue(d);
+
+                            if (defVal !== null) {
+                                obj[key] = coerceEnumValue(defVal, t);
+                            } else if (ev && ev.length) {
+                                obj[key] = coerceEnumValue(ev[Math.floor(Math.random() * ev.length)], t);
+                            } else {
+                                obj[key] = dummyFor(t, key);
+                            }
+                        }
 
                         if (Object.keys(obj).length === 0) obj.sample = randString();
                         jsonTextarea.value = JSON.stringify(obj, null, 2);
@@ -1367,6 +1517,7 @@ class DocsController extends BaseController
 
                     showToast('✓ Auto‑filled dummy values', 'success');
                 }
+
 
                 function initializeApiTesting() {
                     document.querySelectorAll('.api-test-form').forEach(form => {
@@ -1386,7 +1537,15 @@ class DocsController extends BaseController
                     let formData = {};
                     let jsonData = null;
 
-                    // URL params
+                    let headerData = {};
+                    form.querySelectorAll('input[name^="header_"]').forEach(input => {
+                        if (input.dataset.excluded === 'true') return;
+                        if (input.value) {
+                            const headerName = input.name.replace('header_', '');
+                            headerData[headerName] = input.value;
+                        }
+                    });
+
                     form.querySelectorAll('input[name^="url_"]').forEach(input => {
                         if (input.dataset.excluded === 'true') return;
                         if (input.value) {
@@ -1395,7 +1554,6 @@ class DocsController extends BaseController
                         }
                     });
 
-                    // GET params
                     form.querySelectorAll('input[name^="get_"]').forEach(input => {
                         if (input.dataset.excluded === 'true') return;
                         if (input.value) {
@@ -1404,7 +1562,6 @@ class DocsController extends BaseController
                         }
                     });
 
-                    // FORM params
                     form.querySelectorAll('input[name^="form_"]').forEach(input => {
                         if (input.dataset.excluded === 'true') return;
                         if (input.value) {
@@ -1413,7 +1570,6 @@ class DocsController extends BaseController
                         }
                     });
 
-                    // JSON body (optional/skippable)
                     const jsonTextarea = form.querySelector('textarea[name="json_body"]');
                     if (jsonTextarea && jsonTextarea.dataset.excluded !== 'true' && jsonTextarea.value.trim()) {
                         try {
@@ -1424,7 +1580,6 @@ class DocsController extends BaseController
                         }
                     }
 
-                    // Add query params
                     if (Object.keys(queryParams).length > 0) {
                         const urlObj = new URL(url, window.location.origin);
                         Object.entries(queryParams).forEach(([key, value]) => { urlObj.searchParams.append(key, value); });
@@ -1433,47 +1588,61 @@ class DocsController extends BaseController
 
                     showResponse(index, 'loading', 'Sending request...', null);
 
-                    const requestOptions = { method: method, headers: {} };
+                    const requestOptions = { method: method, headers: { ...headerData } };
+
                     if (jsonData) {
-                        requestOptions.headers['Content-Type'] = 'application/json';
+                        if (!requestOptions.headers['Content-Type']) {
+                            requestOptions.headers['Content-Type'] = 'application/json';
+                        }
                         requestOptions.body = JSON.stringify(jsonData);
                     } else if (Object.keys(formData).length > 0 && method !== 'GET') {
-                        requestOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                        if (!requestOptions.headers['Content-Type']) {
+                            requestOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                        }
                         requestOptions.body = new URLSearchParams(formData).toString();
                     }
 
                     fetch(url, requestOptions)
                         .then(async response => {
-                            const contentType = response.headers.get('content-type');
+                            const contentType = response.headers.get("content-type");
                             let data;
                             try {
                                 const responseText = await response.text();
-                                if (contentType && contentType.includes('application/json')) {
-                                    try { data = JSON.parse(responseText); } catch { data = responseText; }
+                                if (contentType && contentType.includes("application/json")) {
+                                    try {
+                                        data = JSON.parse(responseText);
+                                    } catch (e) {
+                                        data = responseText;
+                                    }
                                 } else {
                                     data = responseText;
                                 }
-                                showResponse(index, response.ok ? 'success' : 'error', data, response.status);
-                            } catch (fetchError) {
-                                showResponse(index, 'error', `Network Error: ${fetchError.message}`, null);
+                            } catch (e) {
+                                data = "Failed to parse response body";
                             }
+
+                            showResponse(index, response.ok ? 'success' : 'error', data, response.status);
                         })
                         .catch(error => {
-                            showResponse(index, 'error', `Connection Error: ${error.message}`, null);
+                            showResponse(index, 'error', 'Connection Error: ' + error.message, null);
                         });
                 }
 
                 function showResponse(index, type, data, status) {
-                    const responseSection = document.getElementById('response-' + index);
-                    const statusEl = document.getElementById('status-' + index);
-                    const contentEl = document.getElementById('content-' + index);
+                    const responseSection = document.getElementById(`response-${index}`);
+                    const statusEl = document.getElementById(`status-${index}`);
+                    const contentEl = document.getElementById(`content-${index}`);
 
                     responseSection.style.display = 'block';
                     responseSection.classList.add('fade-in');
 
                     statusEl.className = `response-status status-${type}`;
-                    if (type === 'loading') statusEl.textContent = 'Loading...';
-                    else statusEl.textContent = status ? `${type.toUpperCase()} ${status}` : type.toUpperCase();
+
+                    if (type === 'loading') {
+                        statusEl.textContent = 'Loading...';
+                    } else {
+                        statusEl.textContent = status ? `${type.toUpperCase()} (${status})` : type.toUpperCase();
+                    }
 
                     if (typeof data === 'object') {
                         const jsonString = JSON.stringify(data, null, 2);
@@ -1482,7 +1651,7 @@ class DocsController extends BaseController
                         contentEl.innerHTML = `<pre><code>${escapeHtml(data)}</code></pre>`;
                     }
 
-                    if (window.hljs) { hljs.highlightAll(); }
+                    if (window.hljs) hljs.highlightAll();
                 }
 
                 function escapeHtml(text) {
@@ -1494,46 +1663,29 @@ class DocsController extends BaseController
                 document.addEventListener('DOMContentLoaded', function () {
                     const savedTheme = localStorage.getItem('theme') || 'light';
                     const toggleBtn = document.querySelector('.theme-toggle');
+
                     if (savedTheme === 'dark') {
                         document.body.setAttribute('data-theme', 'dark');
                         toggleBtn.textContent = '☀️ Light Mode';
                     }
 
-                    document.querySelectorAll('.group-section').forEach((group) => {
+                    document.querySelectorAll('.group-section').forEach(group => {
                         const groupId = group.dataset.group;
-                        const isCollapsed = localStorage.getItem('group-' + groupId + '-collapsed') === 'true';
-                        if (isCollapsed) { group.classList.add('collapsed'); }
+                        const isCollapsed = localStorage.getItem(`group-${groupId}-collapsed`) === 'true';
+                        if (isCollapsed) {
+                            group.classList.add('collapsed');
+                        }
                     });
 
                     initializeSearch();
                     initializeApiTesting();
-                    if (window.hljs) { hljs.highlightAll(); }
+
+                    if (window.hljs) hljs.highlightAll();
                 });
             </script>
-
         </body>
 
         </html>
-
         <?php
-    }
-
-    private function slugify($text)
-    {
-        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $text), '-'));
-    }
-
-    private function getGroupIcon($groupName)
-    {
-        $icons = [
-            'Authentication' => '🔐',
-            'Users' => '👥',
-            'Testing' => '🧪',
-            'Documentation' => '📚',
-            'Environment' => '⚙️',
-            'System' => '🔧',
-        ];
-
-        return $icons[$groupName] ?? '📁';
     }
 }

@@ -1,0 +1,4 @@
+vendor
+src/api/logs/error.log
+src/api/php-error.log
+# .env

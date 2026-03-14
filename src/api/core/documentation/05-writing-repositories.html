@@ -4,1322 +4,1259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Writing Repositories - Framework Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            line-height: 1.7;
-            padding: 20px;
+            background: #0d1117; color: #c9d1d9; line-height: 1.7; padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #161b22;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            max-width: 1200px; margin: 0 auto; background: #161b22;
+            border-radius: 12px; padding: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
-
-        h1 {
-            font-size: 42px;
-            color: #58a6ff;
-            margin-bottom: 10px;
-            font-weight: 700;
-            border-bottom: 3px solid #21262d;
-            padding-bottom: 15px;
-        }
-
-        h2 {
-            font-size: 32px;
-            color: #58a6ff;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            border-left: 4px solid #58a6ff;
-            padding-left: 15px;
-        }
-
-        h3 {
-            font-size: 24px;
-            color: #79c0ff;
-            margin-top: 35px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        h4 {
-            font-size: 20px;
-            color: #a371f7;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        p {
-            margin-bottom: 16px;
-            color: #c9d1d9;
-            font-size: 16px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #8b949e;
-            margin-bottom: 30px;
-        }
-
-        ul, ol {
-            margin: 15px 0 15px 30px;
-        }
-
-        li {
-            margin-bottom: 10px;
-            color: #c9d1d9;
-        }
-
+        h1 { font-size: 42px; color: #58a6ff; margin-bottom: 10px; font-weight: 700; border-bottom: 3px solid #21262d; padding-bottom: 15px; }
+        h2 { font-size: 32px; color: #58a6ff; margin-top: 50px; margin-bottom: 20px; font-weight: 600; border-left: 4px solid #58a6ff; padding-left: 15px; }
+        h3 { font-size: 24px; color: #79c0ff; margin-top: 35px; margin-bottom: 15px; font-weight: 600; }
+        h4 { font-size: 20px; color: #a371f7; margin-top: 25px; margin-bottom: 12px; font-weight: 600; }
+        p { margin-bottom: 16px; color: #c9d1d9; font-size: 16px; }
+        .subtitle { font-size: 18px; color: #8b949e; margin-bottom: 30px; }
+        ul, ol { margin: 15px 0 15px 30px; }
+        li { margin-bottom: 10px; color: #c9d1d9; }
         code {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            color: #79c0ff;
+            background: #0d1117; border: 1px solid #30363d; padding: 3px 8px; border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; color: #79c0ff;
         }
-
         pre {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 20px;
-            overflow-x: auto;
-            margin: 20px 0;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
+            background: #0d1117 !important; border: 1px solid #30363d; border-radius: 8px;
+            padding: 0 !important; overflow-x: auto; margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; line-height: 1.6;
         }
-
-        pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            color: #c9d1d9;
+        pre code.hljs {
+            background: #0d1117 !important; border: none; padding: 20px !important;
+            border-radius: 8px; font-size: 14px; line-height: 1.6;
         }
-
-        .highlight-box {
-            background: #1c2128;
-            border-left: 4px solid #58a6ff;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-
-        .highlight-box.success {
-            border-left-color: #3fb950;
-        }
-
-        .highlight-box.warning {
-            border-left-color: #fbbf24;
-        }
-
-        .highlight-box.error {
-            border-left-color: #f85149;
-        }
-
-        .highlight-box.info {
-            border-left-color: #a371f7;
-        }
-
-        .architecture-box {
-            background: #0d1117;
-            border: 2px solid #30363d;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .layer {
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: 2px solid;
-        }
-
-        .layer-controller {
-            border-color: #58a6ff;
-            background: rgba(88, 166, 255, 0.1);
-        }
-
-        .layer-service {
-            border-color: #3fb950;
-            background: rgba(63, 185, 80, 0.1);
-        }
-
-        .layer-repository {
-            border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.1);
-        }
-
-        .do-dont {
-            margin: 20px 0;
-        }
-
-        .do-item {
-            padding: 12px;
-            margin: 10px 0;
-            border-left: 4px solid #3fb950;
-            background: rgba(63, 185, 80, 0.1);
-            border-radius: 4px;
-        }
-
-        .dont-item {
-            padding: 12px;
-            margin: 10px 0;
-            border-left: 4px solid #f85149;
-            background: rgba(248, 81, 73, 0.1);
-            border-radius: 4px;
-        }
-
-        .do-item:before {
-            content: "✓ ";
-            color: #3fb950;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .dont-item:before {
-            content: "✗ ";
-            color: #f85149;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .method-card {
-            background: #1c2128;
-            border: 2px solid #30363d;
-            border-radius: 10px;
-            padding: 25px;
-            margin: 25px 0;
-        }
-
-        .method-card h4 {
-            margin-top: 0;
-            color: #58a6ff;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
+        .highlight-box { background: #1c2128; border-left: 4px solid #58a6ff; padding: 20px; margin: 20px 0; border-radius: 6px; }
+        .highlight-box.success { border-left-color: #3fb950; }
+        .highlight-box.warning { border-left-color: #fbbf24; }
+        .highlight-box.error { border-left-color: #f85149; }
+        .highlight-box.info { border-left-color: #a371f7; }
+        .architecture-box { background: #0d1117; border: 2px solid #30363d; padding: 25px; border-radius: 8px; margin: 20px 0; }
+        .layer { padding: 15px; margin: 10px 0; border-radius: 6px; border: 2px solid; }
+        .layer-controller { border-color: #58a6ff; background: rgba(88,166,255,0.1); }
+        .layer-service { border-color: #3fb950; background: rgba(63,185,80,0.1); }
+        .layer-repository { border-color: #fbbf24; background: rgba(251,191,36,0.1); }
+        .do-dont { margin: 20px 0; }
+        .do-item { padding: 12px; margin: 10px 0; border-left: 4px solid #3fb950; background: rgba(63,185,80,0.1); border-radius: 4px; }
+        .dont-item { padding: 12px; margin: 10px 0; border-left: 4px solid #f85149; background: rgba(248,81,73,0.1); border-radius: 4px; }
+        .do-item:before { content: "✓ "; color: #3fb950; font-weight: bold; margin-right: 8px; }
+        .dont-item:before { content: "✗ "; color: #f85149; font-weight: bold; margin-right: 8px; }
+        .method-card { background: #1c2128; border: 2px solid #30363d; border-radius: 10px; padding: 25px; margin: 25px 0; }
+        .method-card h4 { margin-top: 0; color: #58a6ff; font-size: 20px; margin-bottom: 10px; }
         .method-signature {
-            background: #0d1117;
-            padding: 12px 16px;
-            border-radius: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
-            color: #79c0ff;
-            margin: 10px 0;
-            border: 1px solid #30363d;
+            background: #0d1117; padding: 12px 16px; border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; color: #79c0ff;
+            margin: 10px 0; border: 1px solid #30363d;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: #0d1117;
-            border-radius: 8px;
-            overflow: hidden;
+        .return-badge {
+            display: inline-block; background: #1f3a5f; border: 1px solid #388bfd;
+            color: #79c0ff; padding: 3px 10px; border-radius: 12px; font-size: 13px;
+            font-family: monospace; margin: 6px 4px 6px 0;
         }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #30363d;
-        }
-
-        th {
-            background: #1c2128;
-            color: #58a6ff;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        td {
-            color: #c9d1d9;
-        }
-
-        .security-box {
-            background: #1c2128;
-            border: 2px solid #f85149;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .security-box h4 {
-            color: #f85149;
-            margin-top: 0;
-        }
-
+        .return-badge.green { background: #1a3a1a; border-color: #3fb950; color: #3fb950; }
+        .return-badge.yellow { background: #3a2e00; border-color: #fbbf24; color: #fbbf24; }
+        .return-badge.red { background: #3a0a0a; border-color: #f85149; color: #f85149; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #0d1117; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #30363d; }
+        th { background: #1c2128; color: #58a6ff; font-weight: 600; font-size: 16px; }
+        td { color: #c9d1d9; }
+        .security-box { background: #1c2128; border: 2px solid #f85149; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .security-box h4 { color: #f85149; margin-top: 0; }
         .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #58a6ff;
-            color: #0d1117;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
-            transition: all 0.3s ease;
+            position: fixed; bottom: 30px; right: 30px; background: #58a6ff; color: #0d1117;
+            padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(88,166,255,0.3); transition: all 0.3s ease;
         }
-
-        .back-to-top:hover {
-            background: #79c0ff;
-            transform: translateY(-3px);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 32px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-        }
+        .back-to-top:hover { background: #79c0ff; transform: translateY(-3px); }
+        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 32px; } h2 { font-size: 26px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Writing Repositories</h1>
-        <p class="subtitle">Learn how to implement the data access layer with repositories</p>
+<div class="container">
 
-        <h2>What is a Repository?</h2>
-        <p>A <strong>Repository</strong> is a class that handles all database operations for a specific entity or domain. Repositories are the <strong>only place in your application where SQL queries should be written</strong>.</p>
+    <h1>Writing Repositories</h1>
+    <p class="subtitle">Learn how to implement the data access layer with repositories</p>
 
-        <div class="architecture-box">
-            <h4>Three-Layer Architecture</h4>
-            
-            <div class="layer layer-controller">
-                <strong>Controller Layer</strong>
-                <ul style="margin-top: 10px;">
-                    <li>Handles HTTP requests</li>
-                    <li>Calls Service methods</li>
-                    <li>Returns formatted responses</li>
-                </ul>
-            </div>
-            
-            <div class="layer layer-service">
-                <strong>Service Layer</strong>
-                <ul style="margin-top: 10px;">
-                    <li>Contains business logic</li>
-                    <li>Orchestrates repositories</li>
-                    <li>Manages transactions</li>
-                </ul>
-            </div>
-            
-            <div class="layer layer-repository">
-                <strong>Repository Layer (YOU ARE HERE)</strong>
-                <ul style="margin-top: 10px;">
-                    <li>Executes SQL queries</li>
-                    <li>Maps database results to arrays</li>
-                    <li>Provides data access methods</li>
-                    <li>No business logic</li>
-                </ul>
-            </div>
-        </div>
+    <!-- ============================================================ -->
+    <h2>What is a Repository?</h2>
+    <p>A <strong>Repository</strong> is a class that handles all database operations for a specific entity or domain. Repositories are the <strong>only place in your application where SQL queries should be written</strong>.</p>
 
-        <h2>Why Repositories Exist</h2>
-
-        <div class="highlight-box info">
-            <h4>Benefits of Repository Pattern</h4>
-            <ul>
-                <li><strong>Single Source of Truth:</strong> All SQL for an entity is in one place</li>
-                <li><strong>Testability:</strong> Easy to mock repositories in tests</li>
-                <li><strong>Maintainability:</strong> Changing a query affects only one file</li>
-                <li><strong>Security:</strong> Centralized parameter binding prevents SQL injection</li>
-                <li><strong>Reusability:</strong> Same query methods used across services</li>
+    <div class="architecture-box">
+        <h4>Three-Layer Architecture</h4>
+        <div class="layer layer-controller">
+            <strong>🔵 Controller Layer</strong>
+            <ul style="margin-top:10px;">
+                <li>Handles HTTP requests and responses</li>
+                <li>Calls Service methods only</li>
+                <li>Returns formatted JSON responses</li>
             </ul>
         </div>
-
-        <h2>Repository Layer Responsibilities</h2>
-
-        <div class="do-dont">
-            <h3 style="color: #3fb950;">✓ Repositories SHOULD</h3>
-            <div class="do-item">Write SQL queries (SELECT, INSERT, UPDATE, DELETE)</div>
-            <div class="do-item">Use parameter binding for all user input</div>
-            <div class="do-item">Return arrays or null (not PDO objects)</div>
-            <div class="do-item">Provide CRUD methods (Create, Read, Update, Delete)</div>
-            <div class="do-item">Map database results to meaningful structures</div>
-            <div class="do-item">Handle database-specific operations</div>
-            
-            <h3 style="color: #f85149; margin-top: 30px;">✗ Repositories SHOULD NOT</h3>
-            <div class="dont-item">Contain business logic</div>
-            <div class="dont-item">Validate business rules</div>
-            <div class="dont-item">Handle transactions (services do this)</div>
-            <div class="dont-item">Call other repositories</div>
-            <div class="dont-item">Throw ValidationException (only DatabaseException)</div>
-            <div class="dont-item">Calculate derived values (services do this)</div>
+        <div class="layer layer-service">
+            <strong>🟢 Service Layer</strong>
+            <ul style="margin-top:10px;">
+                <li>Contains all business logic</li>
+                <li>Orchestrates repositories</li>
+                <li>Manages transactions</li>
+            </ul>
         </div>
+        <div class="layer layer-repository">
+            <strong>🟡 Repository Layer — YOU ARE HERE</strong>
+            <ul style="margin-top:10px;">
+                <li>Executes SQL queries via the Database class</li>
+                <li>Maps database results to arrays</li>
+                <li>Provides data access methods</li>
+                <li>Absolutely no business logic</li>
+            </ul>
+        </div>
+    </div>
 
-        <h2>Creating Your First Repository</h2>
-
-        <h3>File Location and Naming</h3>
+    <!-- ============================================================ -->
+    <h2>Why Repositories Exist</h2>
+    <div class="highlight-box info">
+        <h4>Benefits of Repository Pattern</h4>
         <ul>
-            <li><strong>Location:</strong> <code>src/api/repositories/</code></li>
-            <li><strong>Naming:</strong> <code>*Repository.php</code> (e.g., <code>ProductRepository.php</code>)</li>
-            <li><strong>Class Name:</strong> Must match filename (e.g., <code>class ProductRepository</code>)</li>
+            <li><strong>Single Source of Truth:</strong> All SQL for an entity lives in one file</li>
+            <li><strong>Testability:</strong> Easy to mock repositories in unit tests</li>
+            <li><strong>Maintainability:</strong> Changing a query only affects one file</li>
+            <li><strong>Security:</strong> Centralized parameter binding prevents SQL injection</li>
+            <li><strong>Reusability:</strong> Same query methods can be reused across multiple services</li>
         </ul>
+    </div>
 
-        <h3>Basic Repository Template</h3>
+    <!-- ============================================================ -->
+    <h2>Repository Layer Responsibilities</h2>
+    <div class="do-dont">
+        <h3 style="color:#3fb950;">✓ Repositories SHOULD</h3>
+        <div class="do-item">Write SQL queries (SELECT, INSERT, UPDATE, DELETE)</div>
+        <div class="do-item">Use parameter binding for ALL user input</div>
+        <div class="do-item">Return arrays or null — never PDO objects</div>
+        <div class="do-item">Provide clean CRUD methods (Create, Read, Update, Delete)</div>
+        <div class="do-item">Map database results to meaningful array structures</div>
+        <div class="do-item">Handle database-specific operations like JOINs and aggregates</div>
 
-        <pre><code>&lt;?php
+        <h3 style="color:#f85149; margin-top:30px;">✗ Repositories SHOULD NOT</h3>
+        <div class="dont-item">Contain any business logic or validation rules</div>
+        <div class="dont-item">Handle transactions (services are responsible for that)</div>
+        <div class="dont-item">Call other repositories directly</div>
+        <div class="dont-item">Throw ValidationException — only DatabaseException if truly needed</div>
+        <div class="dont-item">Calculate derived values (e.g., totals, discounts)</div>
+        <div class="dont-item">Know anything about HTTP requests or responses</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2>Creating Your First Repository</h2>
+
+    <h3>File Location and Naming</h3>
+    <ul>
+        <li><strong>Location:</strong> <code>src/api/repositories/</code></li>
+        <li><strong>Filename:</strong> <code>*Repository.php</code> — e.g., <code>ProductRepository.php</code></li>
+        <li><strong>Class Name:</strong> Must exactly match the filename — e.g., <code>class ProductRepository</code></li>
+        <li><strong>Namespace:</strong> <code>App\Repositories</code></li>
+    </ul>
+
+    <h3>Basic Repository Template</h3>
+    <pre><code class="language-php">&lt;?php
 // src/api/repositories/ProductRepository.php
 
 namespace App\Repositories;
 
 use App\Core\Database;
-use App\Core\Exceptions\DatabaseException;
 
 class ProductRepository
 {
     private Database $db;
-    
+
     /**
-     * Constructor - Accept Database instance
+     * Constructor - Database is injected automatically by the framework
      */
     public function __construct(Database $db)
     {
         $this->db = $db;
     }
-    
+
     /**
      * Find product by ID
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM products WHERE id = :id";
-        $result = $this->db->query($sql, ['id' => $id]);
-        return $result[0] ?? null;
+        return $this->db->first(
+            "SELECT * FROM products WHERE id = :id",
+            ['id' => $id]
+        );
     }
-    
+
     /**
      * Get all products
      */
     public function findAll(): array
     {
-        $sql = "SELECT * FROM products ORDER BY createdat DESC";
-        return $this->db->query($sql);
+        return $this->db->select("SELECT * FROM products ORDER BY createdat DESC");
     }
-    
+
     /**
-     * Create new product
+     * Create new product — returns the new record's ID
      */
     public function create(array $data): int
     {
-        $sql = "INSERT INTO products (name, sku, price, stock, category) 
-                VALUES (:name, :sku, :price, :stock, :category)";
-        
-        return $this->db->insert($sql, [
-            'name' => $data['name'],
-            'sku' => $data['sku'],
-            'price' => $data['price'],
-            'stock' => $data['stock'] ?? 0,
-            'category' => $data['category'] ?? null
-        ]);
+        return $this->db->insert(
+            "INSERT INTO products (name, sku, price, stock, category)
+             VALUES (:name, :sku, :price, :stock, :category)",
+            [
+                'name'     => $data['name'],
+                'sku'      => $data['sku'],
+                'price'    => $data['price'],
+                'stock'    => $data['stock'] ?? 0,
+                'category' => $data['category'] ?? null,
+            ]
+        );
     }
-    
+
     /**
-     * Update product
+     * Update product — returns true if a row was changed
      */
     public function update(int $id, array $data): bool
     {
-        $sql = "UPDATE products 
-                SET name = :name, price = :price, stock = :stock
-                WHERE id = :id";
-        
-        $affected = $this->db->update($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'price' => $data['price'],
-            'stock' => $data['stock']
-        ]);
-        
+        $affected = $this->db->update(
+            "UPDATE products SET name = :name, price = :price, stock = :stock WHERE id = :id",
+            [
+                'id'    => $id,
+                'name'  => $data['name'],
+                'price' => $data['price'],
+                'stock' => $data['stock'],
+            ]
+        );
         return $affected > 0;
     }
-    
+
     /**
-     * Delete product
+     * Delete product — returns true if a row was deleted
      */
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM products WHERE id = :id";
-        $affected = $this->db->delete($sql, ['id' => $id]);
-        return $affected > 0;
+        return $this->db->delete(
+            "DELETE FROM products WHERE id = :id",
+            ['id' => $id]
+        ) > 0;
     }
 }</code></pre>
 
-        <h2>Using the Database Class</h2>
+    <!-- ============================================================ -->
+    <h2>Using the Database Class</h2>
+    <p>The <code>Database</code> class (<code>src/api/core/Database.php</code>) is a PDO wrapper that provides helper methods for all operations. Every repository receives a <code>Database</code> instance via constructor injection. All methods use <strong>exception-based error handling</strong> — if an operation fails it throws a <code>DatabaseException</code>, so you never need to check a <code>'success'</code> flag.</p>
 
-        <p>The framework provides a <code>Database</code> class with methods for all database operations. All repositories receive a <code>Database</code> instance in their constructor.</p>
-
-        <div class="method-card">
-            <h4>query() - Execute SELECT Queries</h4>
-            <div class="method-signature">
-                public function query(string $sql, array $params = []): array
-            </div>
-            
-            <p><strong>Use for:</strong> SELECT queries that return multiple rows</p>
-            <p><strong>Returns:</strong> Array of associative arrays (or empty array)</p>
-            
-            <pre><code>// Get all products
-$sql = "SELECT * FROM products";
-$products = $this->db->query($sql);
+    <!-- select() -->
+    <div class="method-card">
+        <h4>select() — Fetch Multiple Rows</h4>
+        <div class="method-signature">public function select(string $sql, array $params = []): array</div>
+        <span class="return-badge green">Returns: array (rows)</span>
+        <span class="return-badge">Empty [] when nothing found</span>
+        <p><strong>Use for:</strong> SELECT queries that return zero or more rows. Identical to <code>query()</code> — both names work.</p>
+        <pre><code class="language-php">// All products (no params needed)
+$products = $this->db->select("SELECT * FROM products ORDER BY createdat DESC");
 // Returns: [['id' => 1, 'name' => 'Laptop'], ['id' => 2, 'name' => 'Phone']]
 
-// Get products with filter
-$sql = "SELECT * FROM products WHERE category = :category";
-$products = $this->db->query($sql, ['category' => 'Electronics']);
+// Filter by category
+$products = $this->db->select(
+    "SELECT * FROM products WHERE category = :category AND status = 'active'",
+    ['category' => 'Electronics']
+);
 
-// Get single product (returns array with one element)
-$sql = "SELECT * FROM products WHERE id = :id";
-$result = $this->db->query($sql, ['id' => 123]);
-$product = $result[0] ?? null;  // Get first element or null</code></pre>
-        </div>
+// With ordering and limit
+$products = $this->db->select(
+    "SELECT * FROM products ORDER BY price ASC LIMIT :limit",
+    ['limit' => 20]
+);
 
-        <div class="method-card">
-            <h4>insert() - Insert and Return ID</h4>
-            <div class="method-signature">
-                public function insert(string $sql, array $params = []): int
-            </div>
-            
-            <p><strong>Use for:</strong> INSERT queries where you need the new record's ID</p>
-            <p><strong>Returns:</strong> The auto-increment ID of the inserted row</p>
-            
-            <pre><code>$sql = "INSERT INTO products (name, sku, price) 
-        VALUES (:name, :sku, :price)";
+// If nothing found, returns empty array (never null)
+if (empty($products)) {
+    // handle no results
+}</code></pre>
+    </div>
 
-$productId = $this->db->insert($sql, [
-    'name' => 'Laptop',
-    'sku' => 'LAP-001',
-    'price' => 50000
-]);
+    <!-- first() -->
+    <div class="method-card">
+        <h4>first() — Fetch a Single Row</h4>
+        <div class="method-signature">public function first(string $sql, array $params = []): ?array</div>
+        <span class="return-badge green">Returns: array (row found)</span>
+        <span class="return-badge red">Returns: null (not found)</span>
+        <p><strong>Use for:</strong> Looking up a single record by ID or unique key. Automatically appends <code>LIMIT 1</code> if not present, so it's also more efficient than <code>select()</code>.</p>
+        <pre><code class="language-php">// Find product by primary key
+$product = $this->db->first(
+    "SELECT * FROM products WHERE id = :id",
+    ['id' => 42]
+);
 
-// $productId = 123 (the new product's ID)</code></pre>
-        </div>
+if ($product === null) {
+    throw new NotFoundException('Product not found');
+}
 
-        <div class="method-card">
-            <h4>update() - Update Records</h4>
-            <div class="method-signature">
-                public function update(string $sql, array $params = []): int
-            </div>
-            
-            <p><strong>Use for:</strong> UPDATE queries</p>
-            <p><strong>Returns:</strong> Number of affected rows</p>
-            
-            <pre><code>$sql = "UPDATE products SET price = :price WHERE id = :id";
+// Find by unique field (email)
+$user = $this->db->first(
+    "SELECT * FROM users WHERE email = :email",
+    ['email' => $email]
+);
 
-$affected = $this->db->update($sql, [
-    'id' => 123,
-    'price' => 45000
-]);
+// Safe to access directly after null check
+echo $product['name'];
+echo $product['price'];</code></pre>
+    </div>
 
-// $affected = 1 (if product exists and was updated)
-// $affected = 0 (if product doesn't exist or price was already 45000)</code></pre>
-        </div>
+    <!-- insert() -->
+    <div class="method-card">
+        <h4>insert() — Insert a Record</h4>
+        <div class="method-signature">public function insert(string $sql, array $params = []): int</div>
+        <span class="return-badge green">Returns: int (New Auto-Increment ID)</span>
+        <p><strong>Use for:</strong> INSERT queries. Returns the new record's ID directly — no array unpacking needed. If the insert fails, a <code>DatabaseException</code> is thrown automatically.</p>
+        <pre><code class="language-php">// Simple insert — returns the new ID directly
+$productId = $this->db->insert(
+    "INSERT INTO products (name, sku, price, stock)
+     VALUES (:name, :sku, :price, :stock)",
+    [
+        'name'  => 'Wireless Keyboard',
+        'sku'   => 'WK-2024',
+        'price' => 1500,
+        'stock' => 50,
+    ]
+);
+// $productId = 123 (the new row's auto-increment ID)
 
-        <div class="method-card">
-            <h4>delete() - Delete Records</h4>
-            <div class="method-signature">
-                public function delete(string $sql, array $params = []): int
-            </div>
-            
-            <p><strong>Use for:</strong> DELETE queries</p>
-            <p><strong>Returns:</strong> Number of affected rows</p>
-            
-            <pre><code>$sql = "DELETE FROM products WHERE id = :id";
+// Use the returned ID immediately
+$newProduct = $this->db->first(
+    "SELECT * FROM products WHERE id = :id",
+    ['id' => $productId]
+);</code></pre>
+    </div>
 
-$affected = $this->db->delete($sql, ['id' => 123]);
+    <!-- update() -->
+    <div class="method-card">
+        <h4>update() — Update Records</h4>
+        <div class="method-signature">public function update(string $sql, array $params = []): int</div>
+        <span class="return-badge yellow">Returns: int (Number of Affected Rows)</span>
+        <p><strong>Use for:</strong> UPDATE queries. Returns the count of rows actually changed. A result of <code>0</code> means either the record was not found, or the values were already identical to what you tried to set.</p>
+        <pre><code class="language-php">$affected = $this->db->update(
+    "UPDATE products SET price = :price, stock = :stock WHERE id = :id",
+    ['id' => 123, 'price' => 1200, 'stock' => 45]
+);
 
-// $affected = 1 (if product existed and was deleted)
-// $affected = 0 (if product didn't exist)</code></pre>
-        </div>
+// $affected = 1  → row found and updated
+// $affected = 0  → row not found OR values were already the same
 
-        <div class="method-card">
-            <h4>execute() - General Purpose Execution</h4>
-            <div class="method-signature">
-                public function execute(string $sql, array $params = []): bool
-            </div>
-            
-            <p><strong>Use for:</strong> Any query where you just need success/failure (not commonly used)</p>
-            <p><strong>Returns:</strong> Boolean (true on success, false on failure)</p>
-            
-            <pre><code>$sql = "UPDATE products SET stock = stock + :quantity WHERE id = :id";
+// Convert to bool for repository return type
+return $affected > 0;
 
-$success = $this->db->execute($sql, [
-    'id' => 123,
-    'quantity' => 10
-]);
+// Conditional update (only update if stock is enough)
+$sold = $this->db->update(
+    "UPDATE products SET stock = stock - :qty WHERE id = :id AND stock >= :qty",
+    ['id' => $productId, 'qty' => $quantity]
+);
+if ($sold === 0) {
+    throw new \Exception('Insufficient stock');
+}</code></pre>
+    </div>
 
-// $success = true or false</code></pre>
-        </div>
+    <!-- delete() -->
+    <div class="method-card">
+        <h4>delete() — Delete Records</h4>
+        <div class="method-signature">public function delete(string $sql, array $params = []): int</div>
+        <span class="return-badge red">Returns: int (Number of Affected Rows)</span>
+        <p><strong>Use for:</strong> DELETE queries. Returns the count of rows removed. Returns <code>0</code> if the record did not exist.</p>
+        <pre><code class="language-php">$affected = $this->db->delete(
+    "DELETE FROM products WHERE id = :id",
+    ['id' => 123]
+);
 
-        <h2>Parameter Binding (SQL Injection Prevention)</h2>
+// $affected = 1  → product was found and deleted
+// $affected = 0  → product didn't exist
 
-        <div class="security-box">
-            <h4>⚠️ CRITICAL: Always Use Parameter Binding</h4>
-            <p>Parameter binding prevents SQL injection attacks. <strong>Never concatenate user input into SQL strings.</strong></p>
-        </div>
+return $affected > 0; // true/false for the repository caller
 
-        <h3>Named Parameters</h3>
+// Delete with conditions
+$affected = $this->db->delete(
+    "DELETE FROM sessions WHERE userid = :userid AND expiredat &lt; NOW()",
+    ['userid' => $userId]
+);
+// Returns how many expired sessions were removed</code></pre>
+    </div>
 
-        <pre><code>// ✓ GOOD: Using named parameters
+    <!-- ============================================================ -->
+    <h2>Parameter Binding (SQL Injection Prevention)</h2>
+
+    <div class="security-box">
+        <h4>⚠️ CRITICAL: Always Use Parameter Binding</h4>
+        <p>Parameter binding prevents SQL injection attacks. <strong>Never concatenate user input directly into SQL strings.</strong> PDO automatically escapes all bound values.</p>
+    </div>
+
+    <h3>Named Parameters — Correct Way</h3>
+    <pre><code class="language-php">// ✅ GOOD — Named parameters, completely safe
 $sql = "SELECT * FROM products WHERE category = :category AND price > :minPrice";
-$products = $this->db->query($sql, [
-    'category' => $userInput,
-    'minPrice' => 1000
+$products = $this->db->select($sql, [
+    'category' => $userInput,    // Safely escaped by PDO
+    'minPrice' => $minPrice,     // Safely escaped by PDO
 ]);
 
-// ❌ BAD: String concatenation (VULNERABLE TO SQL INJECTION!)
+// ❌ BAD — String concatenation, VULNERABLE TO SQL INJECTION
 $sql = "SELECT * FROM products WHERE category = '$userInput'";
-$products = $this->db->query($sql);  // NEVER DO THIS!</code></pre>
+$products = $this->db->select($sql); // NEVER DO THIS!</code></pre>
 
-        <h3>How Parameter Binding Works</h3>
+    <h3>How Parameter Binding Works</h3>
+    <ol>
+        <li>Write your SQL using <code>:placeholder</code> syntax for every variable value</li>
+        <li>Pass a matching associative array as the second argument</li>
+        <li>PDO prepares the statement, then safely binds and escapes each value</li>
+        <li>SQL injection is structurally impossible — user input can never break the query structure</li>
+    </ol>
 
-        <ol>
-            <li>Write SQL with <code>:placeholder</code> syntax</li>
-            <li>Pass parameters as associative array</li>
-            <li>PDO safely escapes and binds values</li>
-            <li>SQL injection is impossible</li>
-        </ol>
-
-        <pre><code>// Step 1: SQL with placeholders
+    <pre><code class="language-php">// Full example: safe INSERT with user-supplied data
 $sql = "INSERT INTO users (name, email, age) VALUES (:name, :email, :age)";
 
-// Step 2: Parameters array
 $params = [
-    'name' => $userData['name'],      // Automatically escaped
-    'email' => $userData['email'],    // Automatically escaped
-    'age' => $userData['age']         // Automatically escaped
+    'name'  => $userData['name'],    // User input → safely escaped
+    'email' => $userData['email'],   // User input → safely escaped
+    'age'   => $userData['age'],     // User input → safely escaped
 ];
 
-// Step 3: Execute safely
-$userId = $this->db->insert($sql, $params);</code></pre>
+$userId = $this->db->insert($sql, $params);
+// Even if $userData['name'] = "Robert'); DROP TABLE users; --"
+// PDO treats it as a literal string value, not SQL</code></pre>
 
-        <h2>Common Repository Methods</h2>
+    <!-- ============================================================ -->
+    <h2>Common Repository Methods</h2>
 
-        <h3>Standard CRUD Methods</h3>
+    <h3>Standard CRUD Interface</h3>
+    <table>
+        <thead>
+            <tr><th>Method</th><th>Purpose</th><th>DB Method Used</th><th>Returns</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>findById($id)</code></td><td>Get one record by primary key</td><td><code>first()</code></td><td><code>?array</code></td></tr>
+            <tr><td><code>findAll()</code></td><td>Get all records</td><td><code>select()</code></td><td><code>array</code></td></tr>
+            <tr><td><code>create($data)</code></td><td>Insert a new record</td><td><code>insert()</code></td><td><code>int</code> (new ID)</td></tr>
+            <tr><td><code>update($id, $data)</code></td><td>Modify an existing record</td><td><code>update()</code></td><td><code>bool</code></td></tr>
+            <tr><td><code>delete($id)</code></td><td>Remove a record</td><td><code>delete()</code></td><td><code>bool</code></td></tr>
+        </tbody>
+    </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Method</th>
-                    <th>Purpose</th>
-                    <th>Returns</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>findById($id)</code></td>
-                    <td>Get single record by ID</td>
-                    <td>Array or null</td>
-                </tr>
-                <tr>
-                    <td><code>findAll()</code></td>
-                    <td>Get all records</td>
-                    <td>Array of arrays</td>
-                </tr>
-                <tr>
-                    <td><code>create($data)</code></td>
-                    <td>Insert new record</td>
-                    <td>New record ID (int)</td>
-                </tr>
-                <tr>
-                    <td><code>update($id, $data)</code></td>
-                    <td>Update existing record</td>
-                    <td>Boolean (success/failure)</td>
-                </tr>
-                <tr>
-                    <td><code>delete($id)</code></td>
-                    <td>Delete record</td>
-                    <td>Boolean (success/failure)</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- ============================================================ -->
+    <h2>Complete Repository Examples</h2>
 
-        <h2>Complete Repository Examples</h2>
-
-        <h3>ProductRepository - Full Implementation</h3>
-
-        <pre><code>&lt;?php
+    <h3>ProductRepository — Full Implementation</h3>
+    <pre><code class="language-php">&lt;?php
+// src/api/repositories/ProductRepository.php
 
 namespace App\Repositories;
 
 use App\Core\Database;
 
 /**
- * ProductRepository - Data access for products table
+ * ProductRepository
+ * All data access for the `products` table lives here.
  */
 class ProductRepository
 {
     private Database $db;
-    
+
     public function __construct(Database $db)
     {
         $this->db = $db;
     }
-    
+
+    // ----------------------------------------------------------------
+    // READ Methods
+    // ----------------------------------------------------------------
+
     /**
-     * Find product by ID
-     * 
-     * @param int $id Product ID
-     * @return array|null Product data or null
+     * Find a product by its primary key.
+     *
+     * @param int $id
+     * @return array|null  Product row or null if not found
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM products WHERE id = :id";
-        $result = $this->db->query($sql, ['id' => $id]);
-        return $result[0] ?? null;
+        return $this->db->first(
+            "SELECT * FROM products WHERE id = :id",
+            ['id' => $id]
+        );
     }
-    
+
     /**
-     * Get all products with optional filters
-     * 
-     * @param string|null $category Optional category filter
-     * @param int $limit Number of products to return
-     * @return array Products list
+     * Get all products, newest first.
+     *
+     * @param int $limit  Max rows to return (default 50)
+     * @return array
      */
-    public function getAll(?string $category = null, int $limit = 10): array
+    public function findAll(int $limit = 50): array
     {
-        if ($category) {
-            $sql = "SELECT * FROM products 
-                    WHERE category = :category 
-                    ORDER BY createdat DESC 
-                    LIMIT :limit";
-            
-            return $this->db->query($sql, [
-                'category' => $category,
-                'limit' => $limit
-            ]);
-        }
-        
-        $sql = "SELECT * FROM products 
-                ORDER BY createdat DESC 
-                LIMIT :limit";
-        
-        return $this->db->query($sql, ['limit' => $limit]);
+        return $this->db->select(
+            "SELECT * FROM products ORDER BY createdat DESC LIMIT :limit",
+            ['limit' => $limit]
+        );
     }
-    
+
     /**
-     * Create new product
-     * 
-     * @param array $data Product data
-     * @return int New product ID
+     * Get products filtered by category.
+     *
+     * @param string $category
+     * @param int    $limit
+     * @return array
+     */
+    public function findByCategory(string $category, int $limit = 20): array
+    {
+        return $this->db->select(
+            "SELECT * FROM products
+             WHERE category = :category AND status = 'active'
+             ORDER BY createdat DESC
+             LIMIT :limit",
+            ['category' => $category, 'limit' => $limit]
+        );
+    }
+
+    /**
+     * Search products by name or SKU (LIKE search).
+     *
+     * @param string $term  Search keyword
+     * @return array
+     */
+    public function search(string $term): array
+    {
+        return $this->db->select(
+            "SELECT * FROM products
+             WHERE name LIKE :search OR sku LIKE :search
+             ORDER BY name ASC",
+            ['search' => '%' . $term . '%']
+        );
+    }
+
+    /**
+     * Get products with stock at or below a threshold.
+     *
+     * @param int $threshold  Default: 10 units
+     * @return array
+     */
+    public function getLowStock(int $threshold = 10): array
+    {
+        return $this->db->select(
+            "SELECT * FROM products
+             WHERE stock &lt;= :threshold AND status = 'active'
+             ORDER BY stock ASC",
+            ['threshold' => $threshold]
+        );
+    }
+
+    /**
+     * Find a product by its unique SKU.
+     */
+    public function findBySku(string $sku): ?array
+    {
+        return $this->db->first(
+            "SELECT * FROM products WHERE sku = :sku",
+            ['sku' => $sku]
+        );
+    }
+
+    // ----------------------------------------------------------------
+    // WRITE Methods
+    // ----------------------------------------------------------------
+
+    /**
+     * Insert a new product and return its ID.
+     *
+     * @param array $data  Must contain: name, sku, price
+     * @return int         The new product's auto-increment ID
      */
     public function create(array $data): int
     {
-        $sql = "INSERT INTO products (name, sku, price, stock, category, description, status) 
-                VALUES (:name, :sku, :price, :stock, :category, :description, :status)";
-        
-        return $this->db->insert($sql, [
-            'name' => $data['name'],
-            'sku' => $data['sku'],
-            'price' => $data['price'],
-            'stock' => $data['stock'] ?? 0,
-            'category' => $data['category'] ?? null,
-            'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'active'
-        ]);
+        return $this->db->insert(
+            "INSERT INTO products (name, sku, price, stock, category, description, status)
+             VALUES (:name, :sku, :price, :stock, :category, :description, :status)",
+            [
+                'name'        => $data['name'],
+                'sku'         => $data['sku'],
+                'price'       => $data['price'],
+                'stock'       => $data['stock']       ?? 0,
+                'category'    => $data['category']    ?? null,
+                'description' => $data['description'] ?? null,
+                'status'      => $data['status']      ?? 'active',
+            ]
+        );
     }
-    
+
     /**
-     * Update product
-     * 
-     * @param int $id Product ID
-     * @param array $data Data to update
-     * @return bool Success status
+     * Partially update a product. Only the fields present in $data are changed.
+     *
+     * @param int   $id
+     * @param array $data  Key-value pairs of columns to update
+     * @return bool        True if at least one row was changed
      */
     public function update(int $id, array $data): bool
     {
-        // Build dynamic update query based on provided fields
         $fields = [];
         $params = ['id' => $id];
-        
-        if (isset($data['name'])) {
-            $fields[] = "name = :name";
-            $params['name'] = $data['name'];
+
+        $allowed = ['name', 'price', 'stock', 'category', 'description', 'status'];
+
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[]       = "{$field} = :{$field}";
+                $params[$field] = $data[$field];
+            }
         }
-        
-        if (isset($data['price'])) {
-            $fields[] = "price = :price";
-            $params['price'] = $data['price'];
-        }
-        
-        if (isset($data['stock'])) {
-            $fields[] = "stock = :stock";
-            $params['stock'] = $data['stock'];
-        }
-        
-        if (isset($data['category'])) {
-            $fields[] = "category = :category";
-            $params['category'] = $data['category'];
-        }
-        
-        if (isset($data['status'])) {
-            $fields[] = "status = :status";
-            $params['status'] = $data['status'];
-        }
-        
+
         if (empty($fields)) {
-            return false;  // Nothing to update
+            return false; // Nothing to update
         }
-        
-        $sql = "UPDATE products SET " . implode(', ', $fields) . " WHERE id = :id";
-        $affected = $this->db->update($sql, $params);
-        
+
+        $affected = $this->db->update(
+            "UPDATE products SET " . implode(', ', $fields) . " WHERE id = :id",
+            $params
+        );
+
         return $affected > 0;
     }
-    
+
     /**
-     * Delete product
-     * 
-     * @param int $id Product ID
-     * @return bool Success status
+     * Permanently delete a product.
+     *
+     * @param int $id
+     * @return bool  True if the row was found and deleted
      */
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM products WHERE id = :id";
-        $affected = $this->db->delete($sql, ['id' => $id]);
-        return $affected > 0;
+        return $this->db->delete(
+            "DELETE FROM products WHERE id = :id",
+            ['id' => $id]
+        ) > 0;
     }
-    
+
+    // ----------------------------------------------------------------
+    // Stock Management Methods
+    // ----------------------------------------------------------------
+
     /**
-     * Reduce product stock (for orders)
-     * 
-     * @param int $productId Product ID
-     * @param int $quantity Quantity to reduce
-     * @return bool Success status
+     * Atomically reduce stock — only succeeds if enough stock exists.
+     * Returns false (without error) if stock is insufficient.
+     *
+     * @param int $productId
+     * @param int $quantity   Units to deduct
+     * @return bool
      */
     public function reduceStock(int $productId, int $quantity): bool
     {
-        $sql = "UPDATE products 
-                SET stock = stock - :quantity 
-                WHERE id = :id AND stock >= :quantity";
-        
-        $affected = $this->db->update($sql, [
-            'id' => $productId,
-            'quantity' => $quantity
-        ]);
-        
-        return $affected > 0;
+        $affected = $this->db->update(
+            "UPDATE products
+             SET stock = stock - :quantity
+             WHERE id = :id AND stock >= :quantity",
+            ['id' => $productId, 'quantity' => $quantity]
+        );
+        return $affected > 0; // false if insufficient stock
     }
-    
+
     /**
-     * Increase product stock (for cancellations)
-     * 
-     * @param int $productId Product ID
-     * @param int $quantity Quantity to increase
-     * @return bool Success status
+     * Restore stock (e.g., on order cancellation).
+     *
+     * @param int $productId
+     * @param int $quantity
+     * @return bool
      */
     public function increaseStock(int $productId, int $quantity): bool
     {
-        $sql = "UPDATE products 
-                SET stock = stock + :quantity 
-                WHERE id = :id";
-        
-        $affected = $this->db->update($sql, [
-            'id' => $productId,
-            'quantity' => $quantity
-        ]);
-        
-        return $affected > 0;
-    }
-    
-    /**
-     * Search products by name or SKU
-     * 
-     * @param string $searchTerm Search term
-     * @return array Matching products
-     */
-    public function search(string $searchTerm): array
-    {
-        $sql = "SELECT * FROM products 
-                WHERE name LIKE :search OR sku LIKE :search
-                ORDER BY name ASC";
-        
-        return $this->db->query($sql, [
-            'search' => '%' . $searchTerm . '%'
-        ]);
-    }
-    
-    /**
-     * Get products with low stock
-     * 
-     * @param int $threshold Stock threshold
-     * @return array Products with low stock
-     */
-    public function getLowStockProducts(int $threshold = 10): array
-    {
-        $sql = "SELECT * FROM products 
-                WHERE stock <= :threshold AND status = 'active'
-                ORDER BY stock ASC";
-        
-        return $this->db->query($sql, ['threshold' => $threshold]);
+        return $this->db->update(
+            "UPDATE products SET stock = stock + :quantity WHERE id = :id",
+            ['id' => $productId, 'quantity' => $quantity]
+        ) > 0;
     }
 }</code></pre>
 
-        <h3>OrderRepository - Complex Queries with Joins</h3>
-
-        <pre><code>&lt;?php
+    <h3>OrderRepository — Complex Queries with JOINs</h3>
+    <pre><code class="language-php">&lt;?php
+// src/api/repositories/OrderRepository.php
 
 namespace App\Repositories;
 
 use App\Core\Database;
 
 /**
- * OrderRepository - Data access for orders, order_items, and transactions
+ * OrderRepository
+ * Handles data access for orders, order_items, and order_transactions tables.
  */
 class OrderRepository
 {
     private Database $db;
-    
+
     public function __construct(Database $db)
     {
         $this->db = $db;
     }
-    
+
+    // ----------------------------------------------------------------
+    // READ Methods
+    // ----------------------------------------------------------------
+
     /**
-     * Find order by ID
-     * 
-     * @param int $id Order ID
-     * @return array|null Order data or null
+     * Find an order by ID.
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM orders WHERE id = :id";
-        $result = $this->db->query($sql, ['id' => $id]);
-        return $result[0] ?? null;
+        return $this->db->first(
+            "SELECT * FROM orders WHERE id = :id",
+            ['id' => $id]
+        );
     }
-    
+
     /**
-     * Create new order
-     * 
-     * @param array $data Order data
-     * @return int New order ID
+     * Get all orders for a specific user, newest first.
+     *
+     * @param int $userId
+     * @param int $limit
+     * @return array
+     */
+    public function findByUser(int $userId, int $limit = 20): array
+    {
+        return $this->db->select(
+            "SELECT * FROM orders
+             WHERE userid = :userid
+             ORDER BY createdat DESC
+             LIMIT :limit",
+            ['userid' => $userId, 'limit' => $limit]
+        );
+    }
+
+    /**
+     * Get order items joined with product details — a JOIN query.
+     *
+     * @param int $orderId
+     * @return array  Each row has order item fields + product name and SKU
+     */
+    public function getOrderItems(int $orderId): array
+    {
+        return $this->db->select(
+            "SELECT
+                oi.id,
+                oi.orderid,
+                oi.productid,
+                oi.quantity,
+                oi.price,
+                oi.subtotal,
+                p.name  AS productname,
+                p.sku   AS productsku,
+                p.stock AS currentstock
+             FROM order_items oi
+             INNER JOIN products p ON oi.productid = p.id
+             WHERE oi.orderid = :orderid
+             ORDER BY oi.id ASC",
+            ['orderid' => $orderId]
+        );
+    }
+
+    /**
+     * Get a full order with user info (JOIN with users table).
+     */
+    public function findWithUser(int $orderId): ?array
+    {
+        return $this->db->first(
+            "SELECT
+                o.*,
+                u.name  AS username,
+                u.email AS useremail,
+                u.phone AS userphone
+             FROM orders o
+             INNER JOIN users u ON o.userid = u.id
+             WHERE o.id = :id",
+            ['id' => $orderId]
+        );
+    }
+
+    /**
+     * Get orders by status (e.g., all 'pending' orders).
+     */
+    public function findByStatus(string $status): array
+    {
+        return $this->db->select(
+            "SELECT o.*, u.name AS username, u.email AS useremail
+             FROM orders o
+             INNER JOIN users u ON o.userid = u.id
+             WHERE o.status = :status
+             ORDER BY o.createdat ASC",
+            ['status' => $status]
+        );
+    }
+
+    /**
+     * Get transaction log entries for an order.
+     */
+    public function getTransactionLog(int $orderId): array
+    {
+        return $this->db->select(
+            "SELECT * FROM order_transactions
+             WHERE orderid = :orderid
+             ORDER BY createdat DESC",
+            ['orderid' => $orderId]
+        );
+    }
+
+    /**
+     * Get aggregate order statistics — uses COUNT, SUM, AVG, and CASE WHEN.
+     *
+     * @return array  Single row with stats
+     */
+    public function getStatistics(): array
+    {
+        $result = $this->db->first(
+            "SELECT
+                COUNT(*)                                                  AS total_orders,
+                SUM(CASE WHEN status = 'pending'   THEN 1 ELSE 0 END)     AS pending_orders,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END)     AS completed_orders,
+                SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END)     AS cancelled_orders,
+                COALESCE(SUM(totalamount), 0)                             AS total_revenue,
+                COALESCE(AVG(totalamount), 0)                             AS average_order_value
+             FROM orders"
+        );
+        return $result ?? [];
+    }
+
+    // ----------------------------------------------------------------
+    // WRITE Methods
+    // ----------------------------------------------------------------
+
+    /**
+     * Create a new order and return its ID.
+     *
+     * @param array $data
+     * @return int  New order ID
      */
     public function create(array $data): int
     {
-        $sql = "INSERT INTO orders (userid, totalamount, paymentmethod, status, notes) 
-                VALUES (:userid, :totalamount, :paymentmethod, :status, :notes)";
-        
-        return $this->db->insert($sql, [
-            'userid' => $data['userid'],
-            'totalamount' => $data['totalamount'],
-            'paymentmethod' => $data['paymentmethod'],
-            'status' => $data['status'] ?? 'pending',
-            'notes' => $data['notes'] ?? null
-        ]);
+        return $this->db->insert(
+            "INSERT INTO orders (userid, totalamount, paymentmethod, status, notes)
+             VALUES (:userid, :totalamount, :paymentmethod, :status, :notes)",
+            [
+                'userid'        => $data['userid'],
+                'totalamount'   => $data['totalamount'],
+                'paymentmethod' => $data['paymentmethod'],
+                'status'        => $data['status']  ?? 'pending',
+                'notes'         => $data['notes']   ?? null,
+            ]
+        );
     }
-    
+
     /**
-     * Update order
-     * 
-     * @param int $id Order ID
-     * @param array $data Data to update
-     * @return bool Success status
+     * Add a single item line to an order.
+     *
+     * @param array $data  Must contain: orderid, productid, quantity, price, subtotal
+     * @return int  New order_item ID
+     */
+    public function addOrderItem(array $data): int
+    {
+        return $this->db->insert(
+            "INSERT INTO order_items (orderid, productid, quantity, price, subtotal)
+             VALUES (:orderid, :productid, :quantity, :price, :subtotal)",
+            [
+                'orderid'   => $data['orderid'],
+                'productid' => $data['productid'],
+                'quantity'  => $data['quantity'],
+                'price'     => $data['price'],
+                'subtotal'  => $data['subtotal'],
+            ]
+        );
+    }
+
+    /**
+     * Update order fields (partial update pattern).
+     *
+     * @param int   $id
+     * @param array $data
+     * @return bool
      */
     public function update(int $id, array $data): bool
     {
         $fields = [];
         $params = ['id' => $id];
-        
-        if (isset($data['status'])) {
-            $fields[] = "status = :status";
-            $params['status'] = $data['status'];
+
+        $allowed = ['status', 'cancellationreason', 'cancelledat', 'notes'];
+
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[]       = "{$field} = :{$field}";
+                $params[$field] = $data[$field];
+            }
         }
-        
-        if (isset($data['cancellationreason'])) {
-            $fields[] = "cancellationreason = :cancellationreason";
-            $params['cancellationreason'] = $data['cancellationreason'];
-        }
-        
-        if (isset($data['cancelledat'])) {
-            $fields[] = "cancelledat = :cancelledat";
-            $params['cancelledat'] = $data['cancelledat'];
-        }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $sql = "UPDATE orders SET " . implode(', ', $fields) . " WHERE id = :id";
-        $affected = $this->db->update($sql, $params);
-        
-        return $affected > 0;
+
+        if (empty($fields)) return false;
+
+        return $this->db->update(
+            "UPDATE orders SET " . implode(', ', $fields) . " WHERE id = :id",
+            $params
+        ) > 0;
     }
-    
+
     /**
-     * Add item to order
-     * 
-     * @param array $data Order item data
-     * @return int New item ID
-     */
-    public function addOrderItem(array $data): int
-    {
-        $sql = "INSERT INTO order_items (orderid, productid, quantity, price, subtotal) 
-                VALUES (:orderid, :productid, :quantity, :price, :subtotal)";
-        
-        return $this->db->insert($sql, [
-            'orderid' => $data['orderid'],
-            'productid' => $data['productid'],
-            'quantity' => $data['quantity'],
-            'price' => $data['price'],
-            'subtotal' => $data['subtotal']
-        ]);
-    }
-    
-    /**
-     * Get order items with product details (JOIN query)
-     * 
-     * @param int $orderId Order ID
-     * @return array Order items with product info
-     */
-    public function getOrderItems(int $orderId): array
-    {
-        $sql = "SELECT 
-                    oi.id,
-                    oi.orderid,
-                    oi.productid,
-                    oi.quantity,
-                    oi.price,
-                    oi.subtotal,
-                    p.name AS productname,
-                    p.sku AS productsku
-                FROM order_items oi
-                INNER JOIN products p ON oi.productid = p.id
-                WHERE oi.orderid = :orderid
-                ORDER BY oi.id ASC";
-        
-        return $this->db->query($sql, ['orderid' => $orderId]);
-    }
-    
-    /**
-     * Get orders by user
-     * 
-     * @param int $userId User ID
-     * @param int $limit Number of orders to return
-     * @return array User's orders
-     */
-    public function getByUser(int $userId, int $limit = 10): array
-    {
-        $sql = "SELECT * FROM orders 
-                WHERE userid = :userid 
-                ORDER BY createdat DESC 
-                LIMIT :limit";
-        
-        return $this->db->query($sql, [
-            'userid' => $userId,
-            'limit' => $limit
-        ]);
-    }
-    
-    /**
-     * Create transaction log entry
-     * 
-     * @param array $data Transaction data
-     * @return int New transaction ID
+     * Append a transaction log entry for an order.
+     *
+     * @param array $data
+     * @return int  New transaction ID
      */
     public function createTransactionLog(array $data): int
     {
-        $sql = "INSERT INTO order_transactions 
-                (orderid, action, amount, paymentmethod, status, notes) 
-                VALUES (:orderid, :action, :amount, :paymentmethod, :status, :notes)";
-        
-        return $this->db->insert($sql, [
-            'orderid' => $data['orderid'],
-            'action' => $data['action'],
-            'amount' => $data['amount'],
-            'paymentmethod' => $data['paymentmethod'],
-            'status' => $data['status'],
-            'notes' => $data['notes'] ?? null
-        ]);
-    }
-    
-    /**
-     * Get transaction log for order
-     * 
-     * @param int $orderId Order ID
-     * @return array Transaction log entries
-     */
-    public function getTransactionLog(int $orderId): array
-    {
-        $sql = "SELECT * FROM order_transactions 
-                WHERE orderid = :orderid 
-                ORDER BY createdat DESC";
-        
-        return $this->db->query($sql, ['orderid' => $orderId]);
-    }
-    
-    /**
-     * Get order statistics (advanced query)
-     * 
-     * @return array Order statistics
-     */
-    public function getOrderStatistics(): array
-    {
-        $sql = "SELECT 
-                    COUNT(*) AS total_orders,
-                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_orders,
-                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_orders,
-                    SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_orders,
-                    SUM(totalamount) AS total_revenue,
-                    AVG(totalamount) AS average_order_value
-                FROM orders";
-        
-        $result = $this->db->query($sql);
-        return $result[0] ?? [];
+        return $this->db->insert(
+            "INSERT INTO order_transactions
+                (orderid, action, amount, paymentmethod, status, notes)
+             VALUES
+                (:orderid, :action, :amount, :paymentmethod, :status, :notes)",
+            [
+                'orderid'       => $data['orderid'],
+                'action'        => $data['action'],
+                'amount'        => $data['amount'],
+                'paymentmethod' => $data['paymentmethod'],
+                'status'        => $data['status'],
+                'notes'         => $data['notes'] ?? null,
+            ]
+        );
     }
 }</code></pre>
 
-        <h2>Advanced Query Patterns</h2>
+    <!-- ============================================================ -->
+    <h2>Advanced Query Patterns</h2>
 
-        <h3>JOIN Queries</h3>
-
-        <pre><code>// Get orders with user information
+    <h3>JOIN Queries</h3>
+    <pre><code class="language-php">// INNER JOIN — get only rows that match in both tables
 public function getOrdersWithUsers(): array
 {
-    $sql = "SELECT 
-                o.id,
-                o.totalamount,
-                o.status,
-                o.createdat,
-                u.name AS username,
-                u.email AS useremail
-            FROM orders o
-            INNER JOIN users u ON o.userid = u.id
-            ORDER BY o.createdat DESC";
-    
-    return $this->db->query($sql);
+    return $this->db->select(
+        "SELECT
+            o.id,
+            o.totalamount,
+            o.status,
+            o.createdat,
+            u.name  AS username,
+            u.email AS useremail
+         FROM orders o
+         INNER JOIN users u ON o.userid = u.id
+         ORDER BY o.createdat DESC"
+    );
+}
+
+// LEFT JOIN — include products even if they have no order items
+public function getProductsWithOrderCount(): array
+{
+    return $this->db->select(
+        "SELECT
+            p.id,
+            p.name,
+            p.sku,
+            COUNT(oi.id)      AS times_ordered,
+            COALESCE(SUM(oi.quantity), 0) AS total_units_sold
+         FROM products p
+         LEFT JOIN order_items oi ON p.id = oi.productid
+         GROUP BY p.id, p.name, p.sku
+         ORDER BY total_units_sold DESC"
+    );
 }</code></pre>
 
-        <h3>Aggregate Queries</h3>
-
-        <pre><code>// Get product sales summary
+    <h3>Aggregate Queries</h3>
+    <pre><code class="language-php">// Revenue and sales summary for a single product
 public function getProductSalesSummary(int $productId): ?array
 {
-    $sql = "SELECT 
-                p.id,
-                p.name,
-                COUNT(oi.id) AS times_ordered,
-                SUM(oi.quantity) AS total_quantity_sold,
-                SUM(oi.subtotal) AS total_revenue
-            FROM products p
-            LEFT JOIN order_items oi ON p.id = oi.productid
-            WHERE p.id = :productid
-            GROUP BY p.id";
-    
-    $result = $this->db->query($sql, ['productid' => $productId]);
-    return $result[0] ?? null;
+    return $this->db->first(
+        "SELECT
+            p.id,
+            p.name,
+            p.price                        AS current_price,
+            COUNT(oi.id)                   AS times_ordered,
+            COALESCE(SUM(oi.quantity), 0)  AS total_units_sold,
+            COALESCE(SUM(oi.subtotal), 0)  AS total_revenue
+         FROM products p
+         LEFT JOIN order_items oi ON p.id = oi.productid
+         WHERE p.id = :productid
+         GROUP BY p.id",
+        ['productid' => $productId]
+    );
+}
+
+// Daily revenue for the last 30 days
+public function getDailyRevenue(): array
+{
+    return $this->db->select(
+        "SELECT
+            DATE(createdat)    AS order_date,
+            COUNT(*)           AS order_count,
+            SUM(totalamount)   AS daily_revenue
+         FROM orders
+         WHERE status = 'completed'
+           AND createdat >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+         GROUP BY DATE(createdat)
+         ORDER BY order_date DESC"
+    );
 }</code></pre>
 
-        <h3>Subqueries</h3>
-
-        <pre><code>// Get products never ordered
+    <h3>Subqueries</h3>
+    <pre><code class="language-php">// Get products that have NEVER been ordered
 public function getProductsNeverOrdered(): array
 {
-    $sql = "SELECT * FROM products 
-            WHERE id NOT IN (
-                SELECT DISTINCT productid FROM order_items
-            )
-            ORDER BY name ASC";
-    
-    return $this->db->query($sql);
+    return $this->db->select(
+        "SELECT * FROM products
+         WHERE id NOT IN (
+             SELECT DISTINCT productid FROM order_items
+         )
+         ORDER BY name ASC"
+    );
+}
+
+// Get users who placed more than 5 orders
+public function getFrequentBuyers(int $minOrders = 5): array
+{
+    return $this->db->select(
+        "SELECT u.id, u.name, u.email, COUNT(o.id) AS order_count
+         FROM users u
+         INNER JOIN orders o ON u.id = o.userid
+         GROUP BY u.id, u.name, u.email
+         HAVING order_count >= :min
+         ORDER BY order_count DESC",
+        ['min' => $minOrders]
+    );
 }</code></pre>
 
-        <h3>Conditional Updates</h3>
-
-        <pre><code>// Update stock only if sufficient quantity available
-public function reduceStockIfAvailable(int $productId, int $quantity): bool
+    <h3>Conditional / Atomic Updates</h3>
+    <pre><code class="language-php">// Atomically deduct stock only if enough exists
+// The WHERE clause makes this safe even under concurrent requests
+public function deductStock(int $productId, int $qty): bool
 {
-    $sql = "UPDATE products 
-            SET stock = stock - :quantity 
-            WHERE id = :id 
-            AND stock >= :quantity";  // Condition in WHERE
-    
-    $affected = $this->db->update($sql, [
-        'id' => $productId,
-        'quantity' => $quantity
-    ]);
-    
-    return $affected > 0;  // Returns false if insufficient stock
+    return $this->db->update(
+        "UPDATE products
+         SET stock = stock - :qty
+         WHERE id = :id AND stock >= :qty",
+        ['id' => $productId, 'qty' => $qty]
+    ) > 0;
+    // Returns false if product not found OR stock insufficient
+    // No separate SELECT needed — the condition is in the WHERE clause
+}
+
+// Soft-delete (mark as deleted instead of removing the row)
+public function softDelete(int $id): bool
+{
+    return $this->db->update(
+        "UPDATE products SET status = 'deleted', deletedat = NOW() WHERE id = :id",
+        ['id' => $id]
+    ) > 0;
 }</code></pre>
 
-        <h2>Repository Best Practices</h2>
-
-        <div class="do-dont">
-            <h3 style="color: #3fb950;">✓ DO</h3>
-            <div class="do-item">Always use parameter binding for user input</div>
-            <div class="do-item">Return <code>null</code> for findById when not found</div>
-            <div class="do-item">Return empty arrays <code>[]</code> for list queries with no results</div>
-            <div class="do-item">Use meaningful method names (<code>findById</code>, <code>getAll</code>)</div>
-            <div class="do-item">Document complex queries with comments</div>
-            <div class="do-item">Keep queries focused and simple</div>
-            <div class="do-item">Use <code>SELECT *</code> for simplicity (optimize later if needed)</div>
-            
-            <h3 style="color: #f85149; margin-top: 30px;">✗ DON'T</h3>
-            <div class="dont-item">Concatenate user input into SQL strings</div>
-            <div class="dont-item">Return PDOStatement objects (always return arrays)</div>
-            <div class="dont-item">Perform business logic calculations</div>
-            <div class="dont-item">Call other repositories</div>
-            <div class="dont-item">Handle transactions (services do this)</div>
-            <div class="dont-item">Throw ValidationException (only DatabaseException if needed)</div>
-            <div class="dont-item">Write overly complex queries that should be split</div>
-        </div>
-
-        <h2>Return Value Conventions</h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Method Type</th>
-                    <th>Return Type</th>
-                    <th>When Not Found</th>
-                    <th>Example</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>findById()</td>
-                    <td><code>?array</code></td>
-                    <td><code>null</code></td>
-                    <td><code>['id' => 1, 'name' => 'Laptop']</code></td>
-                </tr>
-                <tr>
-                    <td>findAll() / getAll()</td>
-                    <td><code>array</code></td>
-                    <td><code>[]</code> (empty array)</td>
-                    <td><code>[['id' => 1], ['id' => 2]]</code></td>
-                </tr>
-                <tr>
-                    <td>create()</td>
-                    <td><code>int</code></td>
-                    <td>N/A (throws exception)</td>
-                    <td><code>123</code> (new ID)</td>
-                </tr>
-                <tr>
-                    <td>update()</td>
-                    <td><code>bool</code></td>
-                    <td><code>false</code></td>
-                    <td><code>true</code> or <code>false</code></td>
-                </tr>
-                <tr>
-                    <td>delete()</td>
-                    <td><code>bool</code></td>
-                    <td><code>false</code></td>
-                    <td><code>true</code> or <code>false</code></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h2>Testing Repositories</h2>
-
-        <div class="highlight-box success">
-            <h4>Use the Repository Tester Tool</h4>
-            <p>The framework provides a built-in repository tester at <code>/api/repository-test</code></p>
-            <ul>
-                <li>Test repository methods without services or controllers</li>
-                <li>Pass JSON arguments to methods</li>
-                <li>See query results immediately</li>
-                <li>Debug SQL issues in isolation</li>
-                <li>Verify parameter binding is working</li>
-            </ul>
-        </div>
-
-        <h3>Testing Workflow</h3>
-
-        <ol>
-            <li>Write a repository method</li>
-            <li>Visit <code>/api/repository-test</code></li>
-            <li>Select your repository from the dropdown</li>
-            <li>Select the method to test</li>
-            <li>Provide arguments as JSON</li>
-            <li>Click "Test Method"</li>
-            <li>Review the results</li>
-        </ol>
-
-        <h2>Common Patterns Summary</h2>
-
-        <h3>Find Single Record</h3>
-        <pre><code>public function findById(int $id): ?array
+    <h3>Dynamic WHERE Clause (Partial Update Pattern)</h3>
+    <pre><code class="language-php">// Build an UPDATE statement from only the fields that were provided
+// This avoids overwriting fields the caller didn't intend to change
+public function update(int $id, array $data): bool
 {
-    $sql = "SELECT * FROM table WHERE id = :id";
-    $result = $this->db->query($sql, ['id' => $id]);
-    return $result[0] ?? null;
-}</code></pre>
+    $fields = [];
+    $params = ['id' => $id];
 
-        <h3>Find Multiple Records</h3>
-        <pre><code>public function findAll(): array
-{
-    $sql = "SELECT * FROM table ORDER BY createdat DESC";
-    return $this->db->query($sql);
-}</code></pre>
+    // Whitelist which columns are updatable
+    $allowed = ['name', 'price', 'stock', 'category', 'status', 'description'];
 
-        <h3>Create Record</h3>
-        <pre><code>public function create(array $data): int
-{
-    $sql = "INSERT INTO table (field1, field2) VALUES (:field1, :field2)";
-    return $this->db->insert($sql, [
-        'field1' => $data['field1'],
-        'field2' => $data['field2']
-    ]);
-}</code></pre>
+    foreach ($allowed as $column) {
+        if (array_key_exists($column, $data)) {
+            $fields[]        = "{$column} = :{$column}";
+            $params[$column] = $data[$column];
+        }
+    }
 
-        <h3>Update Record</h3>
-        <pre><code>public function update(int $id, array $data): bool
-{
-    $sql = "UPDATE table SET field1 = :field1 WHERE id = :id";
-    $affected = $this->db->update($sql, [
-        'id' => $id,
-        'field1' => $data['field1']
-    ]);
+    if (empty($fields)) {
+        return false; // No updatable fields were provided
+    }
+
+    // Example output: "UPDATE products SET price = :price, stock = :stock WHERE id = :id"
+    $affected = $this->db->update(
+        "UPDATE products SET " . implode(', ', $fields) . " WHERE id = :id",
+        $params
+    );
+
     return $affected > 0;
 }</code></pre>
 
-        <h3>Delete Record</h3>
-        <pre><code>public function delete(int $id): bool
-{
-    $sql = "DELETE FROM table WHERE id = :id";
-    $affected = $this->db->delete($sql, ['id' => $id]);
-    return $affected > 0;
-}</code></pre>
+    <!-- ============================================================ -->
+    <h2>Repository Best Practices</h2>
 
-        <h2>Next Steps</h2>
-        <p>Now that you understand repositories, continue learning about:</p>
+    <div class="do-dont">
+        <h3 style="color:#3fb950;">✓ DO</h3>
+        <div class="do-item">Always use <code>:named</code> parameter binding — never concatenate user input</div>
+        <div class="do-item">Use <code>first()</code> for single-row lookups — it is more expressive and adds <code>LIMIT 1</code> automatically</div>
+        <div class="do-item">Return <code>null</code> from <code>findById()</code> when nothing is found</div>
+        <div class="do-item">Return <code>[]</code> (empty array) from list methods when no results exist</div>
+        <div class="do-item">Use descriptive method names: <code>findByEmail()</code>, <code>getLowStock()</code>, <code>findByStatus()</code></div>
+        <div class="do-item">Whitelist allowed columns in partial-update methods to prevent mass-assignment</div>
+        <div class="do-item">Use atomic SQL conditions (e.g., <code>WHERE stock >= :qty</code>) for race condition safety</div>
+        <div class="do-item">Add PHPDoc comments on complex queries explaining what data is returned</div>
 
-        <ul>
-            <li><strong>Database Migrations:</strong> Learn how to create database schemas</li>
-            <li><strong>Middleware:</strong> Create custom request filters</li>
-            <li><strong>Exception Handling:</strong> Advanced error handling patterns</li>
-            <li><strong>E-commerce Walkthrough:</strong> Build a complete system step-by-step</li>
-        </ul>
-
-        <div class="highlight-box success">
-            <h4>🎉 You Now Understand Repositories!</h4>
-            <p>You can now create repositories that safely access the database using parameter binding, implement CRUD operations, write complex queries with joins, and follow data access best practices. You have completed the core three-layer architecture (Controllers → Services → Repositories)!</p>
-        </div>
+        <h3 style="color:#f85149; margin-top:30px;">✗ DON'T</h3>
+        <div class="dont-item">Concatenate user input into SQL — <code>"WHERE id = $id"</code> is always wrong</div>
+        <div class="dont-item">Return PDOStatement objects — always return arrays</div>
+        <div class="dont-item">Perform business logic, price calculations, or validation</div>
+        <div class="dont-item">Call other repositories (services orchestrate repositories)</div>
+        <div class="dont-item">Manage transactions — services call <code>beginTransaction()</code>, not repositories</div>
+        <div class="dont-item">Throw <code>ValidationException</code> — repositories only throw <code>DatabaseException</code></div>
+        <div class="dont-item">Write overly complex queries that do the job of two simpler ones</div>
     </div>
 
-    <a href="#" class="back-to-top">↑ Back to Top</a>
+    <!-- ============================================================ -->
+    <h2>Return Value Conventions</h2>
+
+    <table>
+        <thead>
+            <tr><th>Method Type</th><th>DB Method</th><th>Return Type</th><th>When Nothing Found</th><th>Example Value</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>findById()</code></td>
+                <td><code>first()</code></td>
+                <td><code>?array</code></td>
+                <td><code>null</code></td>
+                <td><code>['id' =&gt; 1, 'name' =&gt; 'Laptop']</code></td>
+            </tr>
+            <tr>
+                <td><code>findAll() / getAll()</code></td>
+                <td><code>select()</code></td>
+                <td><code>array</code></td>
+                <td><code>[]</code> (empty array)</td>
+                <td><code>[['id' =&gt; 1], ['id' =&gt; 2]]</code></td>
+            </tr>
+            <tr>
+                <td><code>create()</code></td>
+                <td><code>insert()</code></td>
+                <td><code>int</code></td>
+                <td>N/A (throws exception)</td>
+                <td><code>123</code> (new auto-increment ID)</td>
+            </tr>
+            <tr>
+                <td><code>update()</code></td>
+                <td><code>update()</code></td>
+                <td><code>bool</code></td>
+                <td><code>false</code></td>
+                <td><code>true</code> / <code>false</code></td>
+            </tr>
+            <tr>
+                <td><code>delete()</code></td>
+                <td><code>delete()</code></td>
+                <td><code>bool</code></td>
+                <td><code>false</code></td>
+                <td><code>true</code> / <code>false</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>Testing Repositories</h2>
+
+    <div class="highlight-box success">
+        <h4>✅ Use the Built-in Repository Tester</h4>
+        <p>The framework provides a visual repository tester at <code>/api/repository-test</code>. Test any repository method in isolation, without needing a service or controller.</p>
+        <ul>
+            <li>Select a repository class from the dropdown</li>
+            <li>Select the method to call</li>
+            <li>Enter arguments as JSON (e.g., <code>{"id": 5}</code>)</li>
+            <li>See the raw return value immediately</li>
+            <li>Debug SQL issues without writing curl commands</li>
+        </ul>
+    </div>
+
+    <h3>Testing Workflow</h3>
+    <ol>
+        <li>Write your repository method and save the file</li>
+        <li>Open <code>/api/repository-test</code> in your browser</li>
+        <li>Select your repository from the class dropdown</li>
+        <li>Select the method to test</li>
+        <li>Enter JSON arguments — e.g., <code>{"id": 1}</code> or <code>{"data": {"name": "Test", "sku": "T-01", "price": 100}}</code></li>
+        <li>Click <strong>Run Method</strong> and review the JSON output</li>
+        <li>Fix any issues and repeat — no page reload needed</li>
+    </ol>
+
+    <!-- ============================================================ -->
+    <h2>Common Patterns Summary</h2>
+
+    <h3>Find Single Record</h3>
+    <pre><code class="language-php">public function findById(int $id): ?array
+{
+    return $this->db->first(
+        "SELECT * FROM table_name WHERE id = :id",
+        ['id' => $id]
+    );
+    // Returns the row array, or null if not found
+}</code></pre>
+
+    <h3>Find Multiple Records</h3>
+    <pre><code class="language-php">public function findAll(): array
+{
+    return $this->db->select(
+        "SELECT * FROM table_name ORDER BY createdat DESC"
+    );
+    // Returns array of rows; [] if table is empty
+}</code></pre>
+
+    <h3>Create a Record</h3>
+    <pre><code class="language-php">public function create(array $data): int
+{
+    return $this->db->insert(
+        "INSERT INTO table_name (field1, field2) VALUES (:field1, :field2)",
+        [
+            'field1' => $data['field1'],
+            'field2' => $data['field2'],
+        ]
+    );
+    // Returns the new row's auto-increment ID
+}</code></pre>
+
+    <h3>Update a Record</h3>
+    <pre><code class="language-php">public function update(int $id, array $data): bool
+{
+    $affected = $this->db->update(
+        "UPDATE table_name SET field1 = :field1, field2 = :field2 WHERE id = :id",
+        ['id' => $id, 'field1' => $data['field1'], 'field2' => $data['field2']]
+    );
+    return $affected > 0;
+    // true if updated, false if not found or values unchanged
+}</code></pre>
+
+    <h3>Delete a Record</h3>
+    <pre><code class="language-php">public function delete(int $id): bool
+{
+    return $this->db->delete(
+        "DELETE FROM table_name WHERE id = :id",
+        ['id' => $id]
+    ) > 0;
+    // true if deleted, false if not found
+}</code></pre>
+
+    <!-- ============================================================ -->
+    <h2>Next Steps</h2>
+    <p>Now that you understand repositories, continue learning about:</p>
+    <ul>
+        <li><strong>Database &amp; Query Handling:</strong> Deep dive into all Database class features, transactions and performance tracking</li>
+        <li><strong>Writing Migrations:</strong> Create and manage database schemas with SQL migration files</li>
+        <li><strong>Writing Services:</strong> Learn how services orchestrate repositories and manage transactions</li>
+        <li><strong>Middleware:</strong> Create custom request filters and authentication guards</li>
+        <li><strong>Full E-Commerce Walkthrough:</strong> Build a complete system using repositories, services, and controllers end-to-end</li>
+    </ul>
+
+    <div class="highlight-box success">
+        <h4>🎉 You Now Understand Repositories!</h4>
+        <p>You can create repositories that safely access the database using parameter binding, implement clean CRUD operations, write complex queries with JOINs and aggregates, and follow professional data-access best practices. You have mastered the foundation of the three-layer architecture: <strong>Controllers → Services → Repositories</strong>.</p>
+    </div>
+
+</div>
+<a href="#" class="back-to-top">↑ Top</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
+    });
+</script>
 </body>
 </html>

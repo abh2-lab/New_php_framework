@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Routing System - Framework Documentation</title>
+    
     <!-- GitHub Dark Syntax Highlighter -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -19,6 +19,7 @@
             });
         });
     </script>
+
     <style>
         * {
             margin: 0;
@@ -27,7 +28,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: #0d1117;
             color: #c9d1d9;
             line-height: 1.7;
@@ -90,8 +91,7 @@
             margin-bottom: 30px;
         }
 
-        ul,
-        ol {
+        ul, ol {
             margin: 15px 0 15px 30px;
         }
 
@@ -105,7 +105,7 @@
             border: 1px solid #30363d;
             padding: 3px 8px;
             border-radius: 4px;
-            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
             color: #79c0ff;
         }
@@ -117,7 +117,7 @@
             padding: 20px;
             overflow-x: auto;
             margin: 20px 0;
-            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.6;
         }
@@ -224,8 +224,7 @@
             overflow: hidden;
         }
 
-        th,
-        td {
+        th, td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #30363d;
@@ -248,7 +247,7 @@
             border-radius: 4px;
             font-weight: 700;
             font-size: 12px;
-            font-family: Consolas, Monaco, monospace;
+            font-family: 'Consolas', 'Monaco', monospace;
         }
 
         .method-get {
@@ -329,15 +328,15 @@
             border-radius: 4px;
         }
 
-        .do-item::before {
-            content: "✓";
+        .do-item:before {
+            content: "✓ ";
             color: #3fb950;
             font-weight: bold;
             margin-right: 8px;
         }
-
-        .dont-item::before {
-            content: "✗";
+        
+        .dont-item:before {
+            content: "✗ ";
             color: #f85149;
             font-weight: bold;
             margin-right: 8px;
@@ -362,7 +361,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>Routing System</h1>
@@ -380,17 +378,19 @@
         </div>
 
         <h2>Basic Route Definition</h2>
-        <p>Routes are defined using the <code>$router->add()</code> method with an array of parameters.</p>
+        <p>Routes are defined using the <code>router->add()</code> method with an array of parameters.</p>
 
         <h3>Minimum Required Parameters</h3>
+
         <pre><code>// Simple GET route
-$router->add([
-    'method' => 'GET',                    // HTTP method
-    'url' => 'products/list',             // URL pattern
-    'controller' => 'ProductController@list' // Controller@method
+router->add([
+    'method' => 'GET',              // HTTP method
+    'url' => '/products/list',       // URL pattern
+    'controller' => 'ProductController@list'  // Controller@method
 ]);</code></pre>
 
         <h3>All Available Parameters</h3>
+
         <table>
             <thead>
                 <tr>
@@ -405,19 +405,19 @@ $router->add([
                     <td><code>method</code></td>
                     <td>string</td>
                     <td><span class="badge badge-required">Required</span></td>
-                    <td>HTTP method (GET, POST, PUT, DELETE)</td>
+                    <td>HTTP method: GET, POST, PUT, DELETE</td>
                 </tr>
                 <tr>
                     <td><code>url</code></td>
                     <td>string</td>
                     <td><span class="badge badge-required">Required</span></td>
-                    <td>URL pattern (e.g., <code>products/{id}</code>)</td>
+                    <td>URL pattern (e.g., <code>/products/{id}</code>)</td>
                 </tr>
                 <tr>
                     <td><code>controller</code></td>
                     <td>string</td>
                     <td><span class="badge badge-required">Required</span></td>
-                    <td>Controller and method (<code>ControllerName@methodName</code>)</td>
+                    <td>Controller and method: <code>ControllerName@methodName</code></td>
                 </tr>
                 <tr>
                     <td><code>desc</code></td>
@@ -441,7 +441,7 @@ $router->add([
                     <td><code>middleware</code></td>
                     <td>string|array</td>
                     <td><span class="badge badge-optional">Optional</span></td>
-                    <td>Middleware aliases to apply</td>
+                    <td>Middleware name(s) to apply</td>
                 </tr>
                 <tr>
                     <td><code>params</code></td>
@@ -465,20 +465,21 @@ $router->add([
         </table>
 
         <h3>Complete Route Example</h3>
-        <pre><code>$router->add([
+
+        <pre><code>router->add([
     'method' => 'POST',
-    'url' => 'orders/create',
+    'url' => '/orders/create',
     'controller' => 'OrderController@create',
     'desc' => 'Create a new order with items',
     'visible' => true,
     'group' => 'Orders',
-    'middleware' => ['auth'], // Require authentication
+    'middleware' => 'auth',  // Require authentication
     'params' => [
         'json' => [
-            'user_id' => 'int The ID of the user db(users.id)',
-            'payment_method' => 'string Payment method enum(card|cash|upi)',
-            'items' => 'array Array of items with product_id and quantity',
-            'notes' => 'string Optional order notes'
+            'userid' => 'User ID (integer)',
+            'paymentmethod' => 'Payment method: card/cash/upi',
+            'items' => 'Array of items with productid and quantity',
+            'notes' => 'Optional order notes'
         ]
     ]
 ]);</code></pre>
@@ -490,24 +491,24 @@ $router->add([
             <h4><span class="badge badge-get">GET</span> Retrieving Data</h4>
             <p><strong>Use for:</strong> Fetching data without modifying anything</p>
             <pre><code>// Get product list
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/list',
+    'url' => '/products/list',
     'controller' => 'ProductController@list',
     'desc' => 'Get list of products with filters',
     'group' => 'Products',
     'params' => [
         'get' => [
-            'category' => 'string Optional Filter by category',
-            'limit' => 'int Optional Number of products default(10)'
+            'category' => 'Optional: Filter by category',
+            'limit' => 'Optional: Number of products (default: 10)'
         ]
     ]
 ]);
 
 // Get single product
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/{id}',
+    'url' => '/products/{id}',
     'controller' => 'ProductController@details',
     'desc' => 'Get product details by ID',
     'group' => 'Products'
@@ -517,19 +518,19 @@ $router->add([
         <div class="example-card">
             <h4><span class="badge badge-post">POST</span> Creating Data</h4>
             <p><strong>Use for:</strong> Creating new resources or submitting data</p>
-            <pre><code>$router->add([
+            <pre><code>router->add([
     'method' => 'POST',
-    'url' => 'products/create',
+    'url' => '/products/create',
     'controller' => 'ProductController@create',
     'desc' => 'Create a new product',
     'group' => 'Products',
     'params' => [
         'json' => [
-            'name' => 'string Product name',
-            'sku' => 'string Product SKU (unique)',
-            'price' => 'float Product price',
-            'stock' => 'int Stock quantity',
-            'category' => 'string Product category enum(Electronics|Books|Clothing)'
+            'name' => 'Product name',
+            'sku' => 'Product SKU (unique)',
+            'price' => 'Product price',
+            'stock' => 'Stock quantity',
+            'category' => 'Product category'
         ]
     ]
 ]);</code></pre>
@@ -538,18 +539,18 @@ $router->add([
         <div class="example-card">
             <h4><span class="badge badge-put">PUT</span> Updating Data</h4>
             <p><strong>Use for:</strong> Updating existing resources</p>
-            <pre><code>$router->add([
-    'method' => 'POST', // Using POST for simplicity (PUT requires different handling)
-    'url' => 'products/update',
+            <pre><code>router->add([
+    'method' => 'POST',  // Using POST for simplicity (PUT requires different handling)
+    'url' => '/products/update',
     'controller' => 'ProductController@update',
     'desc' => 'Update product details',
     'group' => 'Products',
     'params' => [
         'json' => [
-            'product_id' => 'int Product ID to update db(products.id)',
-            'name' => 'string Optional New product name',
-            'price' => 'float Optional New price',
-            'stock' => 'int Optional New stock quantity'
+            'productid' => 'Product ID to update',
+            'name' => 'Optional: New product name',
+            'price' => 'Optional: New price',
+            'stock' => 'Optional: New stock quantity'
         ]
     ]
 ]);</code></pre>
@@ -558,16 +559,16 @@ $router->add([
         <div class="example-card">
             <h4><span class="badge badge-delete">DELETE</span> Deleting Data</h4>
             <p><strong>Use for:</strong> Removing resources</p>
-            <pre><code>$router->add([
-    'method' => 'POST', // Using POST for simplicity
-    'url' => 'orders/cancel',
+            <pre><code>router->add([
+    'method' => 'POST',  // Using POST for simplicity
+    'url' => '/orders/cancel',
     'controller' => 'OrderController@cancel',
     'desc' => 'Cancel an order and restore stock',
     'group' => 'Orders',
     'params' => [
         'json' => [
-            'order_id' => 'int Order ID to cancel db(orders.id)',
-            'reason' => 'string Cancellation reason'
+            'orderid' => 'Order ID to cancel',
+            'reason' => 'Cancellation reason'
         ]
     ]
 ]);</code></pre>
@@ -578,31 +579,33 @@ $router->add([
 
         <h3>1. URL Parameters</h3>
         <p>Define dynamic segments in the URL using <code>{parameterName}</code> syntax.</p>
+
         <pre><code>// Single URL parameter
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/{id}',
+    'url' => '/products/{id}',
     'controller' => 'ProductController@details',
     'desc' => 'Get product by ID',
     'params' => [
         'url' => [
-            'id' => 'int Product ID'
+            'id' => 'Product ID (integer)'
         ]
     ]
 ]);
 
 // Multiple URL parameters
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'categories/{categoryId}/products/{productId}',
+    'url' => '/categories/{categoryId}/products/{productId}',
     'controller' => 'ProductController@getByCategory',
     'params' => [
         'url' => [
-            'categoryId' => 'int Category ID',
-            'productId' => 'int Product ID'
+            'categoryId' => 'Category ID',
+            'productId' => 'Product ID'
         ]
     ]
 ]);</code></pre>
+
         <p><strong>Accessing in Controller:</strong></p>
         <pre><code>public function details($id) {
     // $id is automatically passed as method parameter
@@ -611,22 +614,24 @@ $router->add([
 }</code></pre>
 
         <h3>2. Query String Parameters</h3>
-        <p>Parameters passed after <code>?</code> in the URL (<code>/products/list?category=electronics&limit=20</code>)</p>
-        <pre><code>$router->add([
+        <p>Parameters passed after <code>?</code> in the URL: <code>/products/list?category=electronics&limit=20</code></p>
+
+        <pre><code>router->add([
     'method' => 'GET',
-    'url' => 'products/list',
+    'url' => '/products/list',
     'controller' => 'ProductController@list',
     'params' => [
         'get' => [
-            'category' => 'string Optional Filter by category',
-            'limit' => 'int Optional Number of results default(10)',
-            'sort' => 'string Optional Sort order enum(asc|desc)'
+            'category' => 'Optional: Filter by category',
+            'limit' => 'Optional: Number of results (default: 10)',
+            'sort' => 'Optional: Sort order (asc/desc)'
         ]
     ]
 ]);</code></pre>
+
         <p><strong>Accessing in Controller:</strong></p>
         <pre><code>public function list() {
-    $filters = $this->getQueryParams(); // From BaseController
+    $filters = $this->getQueryParams();  // From BaseController
     // $filters = ['category' => 'electronics', 'limit' => '20']
     
     $products = $this->productService->getProducts($filters);
@@ -635,144 +640,123 @@ $router->add([
 
         <h3>3. Request Body Parameters</h3>
         <p>For POST requests, data is sent in the request body (form data or JSON).</p>
-        <pre><code>$router->add([
+
+        <pre><code>router->add([
     'method' => 'POST',
-    'url' => 'orders/create',
+    'url' => '/orders/create',
     'controller' => 'OrderController@create',
     'params' => [
-        'json' => [ // JSON body
-            'user_id' => 'int User ID db(users.id)',
-            'payment_method' => 'string Payment method enum(card|cash|upi)',
-            'items' => 'array Array of items (product_id, quantity)',
-            'notes' => 'string Optional order notes'
+        'json' => [  // JSON body
+            'userid' => 'User ID (integer)',
+            'paymentmethod' => 'Payment method: card/cash/upi',
+            'items' => 'Array of items [{productid, quantity}]',
+            'notes' => 'Optional order notes'
         ]
     ]
 ]);</code></pre>
+
         <p><strong>Accessing in Controller:</strong></p>
         <pre><code>public function create() {
-    $data = $this->getRequestData(); // From BaseController
-    // $data = ['user_id' => 123, 'payment_method' => 'card', 'items' => [...]]
+    $data = $this->getRequestData();  // From BaseController
+    // $data = ['userid' => 123, 'paymentmethod' => 'card', 'items' => [...]]
     
     $order = $this->orderService->createOrder($data, $data['items']);
     $this->sendSuccess('Order created', $order);
 }</code></pre>
 
-
-        <h2>Auto-Fill & Dummy Data Formatting</h2>
-        <p>The framework includes an interactive API Tester in the documentation interface. To make the <strong>AutoFill</strong> feature generate realistic data, you can format your <code>params</code> descriptions using specific tags.</p>
-
-        <div class="highlight-box success">
-            <h4>Supported Auto-Fill Tags (In Order of Priority)</h4>
-            
-            <ol>
-                <li><strong>Database Lookups (Highest Priority):</strong> 
-                    Use <code>db(tableName.columnName)</code> to fetch a real, valid random value directly from your database.
-                    <br><code>'user_id' => 'int The ID of the buyer db(users.id)'</code>
-                </li>
-
-                <li><strong>Strict Defaults:</strong> 
-                    Use <code>default(value)</code> to bypass random generation and force an exact value.
-                    <br><code>'limit' => 'int Number of results default(20)'</code>
-                    <br><code>'status' => 'string Current status default(active)'</code>
-                </li>
-
-                <li><strong>Enum Arrays:</strong> 
-                    Use <code>enum(value1|value2|value3)</code> to make the auto-filler randomly pick from a predefined list.
-                    <br><code>'payment_method' => 'string How they paid enum(card|cash|upi)'</code>
-                </li>
-
-                <li><strong>Smart Name Detection:</strong> 
-                    If no tag is provided, the auto-filler reads the parameter name. If the parameter is named <code>email</code>, <code>uuid</code>, or contains <code>name</code>, it generates appropriate localized string values (e.g. <code>user123@example.com</code>).
-                </li>
-
-                <li><strong>Standard Type Fallbacks:</strong> 
-                    Start the description with the data type (<code>int</code>, <code>float</code>, <code>bool</code>, <code>date</code>) to generate generic random formats (e.g. random numbers or dates).
-                </li>
-            </ol>
-        </div>
-
-
         <h2>Route Grouping</h2>
         <p>Group related routes together to share common attributes (prefix, middleware, filters).</p>
 
         <h3>Basic Group with Prefix</h3>
+
         <pre><code>// Group all admin routes with /admin prefix
-$router->group(['prefix' => 'admin'], function($router) {
+router->group(['prefix' => '/admin'], function($router) {
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'users', // Becomes /admin/users
+        'url' => '/users',  // Becomes: /admin/users
         'controller' => 'AdminController@listUsers'
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'users/create', // Becomes /admin/users/create
+        'url' => '/users/create',  // Becomes: /admin/users/create
         'controller' => 'AdminController@createUser'
     ]);
+    
 });</code></pre>
 
         <h3>Group with Shared Middleware</h3>
+
         <pre><code>// All routes in this group require authentication
-$router->group(['prefix' => 'orders', 'middleware' => ['auth']], function($router) {
+router->group(['prefix' => '/orders', 'middleware' => 'auth'], function($router) {
     
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'create', // Becomes /orders/create
+        'url' => '/create',  // Becomes: /orders/create
         'controller' => 'OrderController@create',
         'group' => 'Orders'
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'details', // Becomes /orders/details
+        'url' => '/details',  // Becomes: /orders/details
         'controller' => 'OrderController@details',
         'group' => 'Orders'
     ]);
+    
 });</code></pre>
 
         <h3>Group with Before/After Filters</h3>
-        <pre><code>$router->group([
-    'prefix' => 'api/v2',
-    'before' => function() { error_log("API v2 request started"); },
-    'after' => function($response) { 
-        error_log("API v2 request completed"); 
-        return $response; 
+
+        <pre><code>router->group([
+    'prefix' => '/api/v2',
+    'before' => function() {
+        error_log('API v2 request started');
+    },
+    'after' => function($response) {
+        error_log('API v2 request completed');
+        return $response;
     }
 ], function($router) {
-    $router->add([
+    
+    router->add([
         'method' => 'GET',
-        'url' => 'products',
+        'url' => '/products',
         'controller' => 'ProductController@list'
     ]);
+    
 });</code></pre>
 
         <h3>Nested Groups</h3>
-        <pre><code>// Outer group (admin prefix)
-$router->group(['prefix' => 'admin', 'middleware' => ['auth']], function($router) {
+
+        <pre><code>// Outer group: /admin prefix
+router->group(['prefix' => '/admin', 'middleware' => 'auth'], function($router) {
     
-    // Inner group (admin/products prefix)
-    $router->group(['prefix' => 'products'], function($router) {
+    // Inner group: /admin/products prefix
+    router->group(['prefix' => '/products'], function($router) {
         
-        $router->add([
+        router->add([
             'method' => 'GET',
-            'url' => 'list', // Becomes /admin/products/list
+            'url' => '/list',  // Becomes: /admin/products/list
             'controller' => 'AdminProductController@list'
         ]);
         
-        $router->add([
+        router->add([
             'method' => 'POST',
-            'url' => 'create', // Becomes /admin/products/create
+            'url' => '/create',  // Becomes: /admin/products/create
             'controller' => 'AdminProductController@create'
         ]);
+        
     });
+    
 });</code></pre>
 
         <h2>Middleware Integration</h2>
         <p>Middleware allows you to filter HTTP requests before they reach your controllers or after they leave.</p>
 
         <div class="highlight-box warning">
-            <h4>Important Middleware Types in This Framework</h4>
+            <h4>Important: Middleware Types in This Framework</h4>
             <ul>
                 <li><strong>Framework-Provided:</strong> <code>BaseMiddleware</code>, <code>LogMiddleware</code>, <code>MonitoringMiddleware</code></li>
                 <li><strong>Example Middleware:</strong> <code>TestMiddleware</code>, <code>BlockingMiddleware</code>, <code>AuthMiddleware</code>, <code>AdminMiddleware</code></li>
@@ -782,55 +766,58 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth']], function($router
 
         <h3>Step 1: Register Middleware</h3>
         <p>Before using middleware in routes, register it with a name.</p>
+
         <pre><code>// In routes.php (at the top)
 
 // Register your custom middleware
-$router->registerMiddleware('auth', AuthMiddleware::class);
-$router->registerMiddleware('admin', AdminMiddleware::class);
-$router->registerMiddleware('log', LogMiddleware::class);
+router->registerMiddleware('auth', AuthMiddleware::class);
+router->registerMiddleware('admin', AdminMiddleware::class);
+router->registerMiddleware('log', LogMiddleware::class);
 
 // Register example/test middleware
-$router->registerMiddleware('test', TestMiddleware::class);
-$router->registerMiddleware('blocking', BlockingMiddleware::class);</code></pre>
+router->registerMiddleware('test', TestMiddleware::class);
+router->registerMiddleware('blocking', BlockingMiddleware::class);</code></pre>
 
         <h3>Step 2: Apply Middleware to Routes</h3>
-        
+
         <h4>Single Middleware</h4>
-        <pre><code>$router->add([
+        <pre><code>router->add([
     'method' => 'POST',
-    'url' => 'orders/create',
+    'url' => '/orders/create',
     'controller' => 'OrderController@create',
-    'middleware' => 'auth' // Single middleware
+    'middleware' => 'auth'  // Single middleware
 ]);</code></pre>
 
         <h4>Multiple Middleware</h4>
-        <pre><code>$router->add([
+        <pre><code>router->add([
     'method' => 'POST',
-    'url' => 'admin/users/delete',
+    'url' => '/admin/users/delete',
     'controller' => 'AdminController@deleteUser',
-    'middleware' => ['auth', 'admin'] // Array of middleware
+    'middleware' => ['auth', 'admin']  // Array of middleware
 ]);</code></pre>
 
         <h4>Middleware in Groups</h4>
         <pre><code>// All routes in this group have 'auth' middleware
-$router->group(['prefix' => 'dashboard', 'middleware' => ['auth']], function($router) {
+router->group(['prefix' => '/dashboard', 'middleware' => 'auth'], function($router) {
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'profile',
+        'url' => '/profile',
         'controller' => 'DashboardController@profile'
         // Automatically has 'auth' middleware
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'orders',
+        'url' => '/orders',
         'controller' => 'DashboardController@orders',
-        'middleware' => ['log'] // This route has BOTH 'auth' (from group) AND 'log'
+        'middleware' => 'log'  // This route has BOTH 'auth' (from group) AND 'log'
     ]);
+    
 });</code></pre>
 
         <h3>Middleware Execution Order</h3>
+
         <div class="highlight-box info">
             <h4>Before Request (before controller)</h4>
             <ol>
@@ -848,24 +835,29 @@ $router->group(['prefix' => 'dashboard', 'middleware' => ['auth']], function($ro
         </div>
 
         <h3>Creating Custom Middleware</h3>
-        <pre><code>// src/api/core/Middlewares/AuthMiddleware.php
-namespace App;
 
-class AuthMiddleware extends BaseMiddleware {
-    public function before(): mixed {
+        <pre><code>// src/api/core/Middlewares/AuthMiddleware.php
+
+namespace App\Core\Middlewares;
+
+class AuthMiddleware extends BaseMiddleware
+{
+    public function before(): mixed
+    {
         // Check if user is authenticated
         $token = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
         
         if (empty($token)) {
-            $this->halt(401, 'Unauthorized', ['Token required']);
+            $this->halt(401, 'Unauthorized: Token required');
         }
         
         // Validate token logic here...
         
-        return null; // Continue to controller
+        return null;  // Continue to controller
     }
     
-    public function after(mixed $response): mixed {
+    public function after(mixed $response): mixed
+    {
         // Optionally modify response after controller
         return $response;
     }
@@ -874,61 +866,71 @@ class AuthMiddleware extends BaseMiddleware {
         <h2>Route Organization Best Practices</h2>
 
         <h3>Group by Feature/Resource</h3>
-        <pre><code>// === PRODUCT ROUTES ===
-$router->group(['prefix' => 'products', 'group' => 'Products'], function($router) {
+
+        <pre><code>// ============================================
+// PRODUCT ROUTES
+// ============================================
+
+router->group(['prefix' => '/products', 'group' => 'Products'], function($router) {
     
     // List products
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'list',
+        'url' => '/list',
         'controller' => 'ProductController@list',
         'desc' => 'Get list of products with filters'
     ]);
     
     // Product details
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => '{id}',
+        'url' => '/{id}',
         'controller' => 'ProductController@details',
         'desc' => 'Get product details by ID'
     ]);
     
     // Create product
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'create',
+        'url' => '/create',
         'controller' => 'ProductController@create',
         'desc' => 'Create a new product',
-        'middleware' => ['admin']
+        'middleware' => 'admin'
     ]);
+    
 });
 
-// === ORDER ROUTES ===
-$router->group(['prefix' => 'orders', 'group' => 'Orders', 'middleware' => ['auth']], function($router) {
+// ============================================
+// ORDER ROUTES
+// ============================================
+
+router->group(['prefix' => '/orders', 'group' => 'Orders', 'middleware' => 'auth'], function($router) {
     
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'create',
+        'url' => '/create',
         'controller' => 'OrderController@create',
         'desc' => 'Create a new order'
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => '{id}',
+        'url' => '/{id}',
         'controller' => 'OrderController@details',
         'desc' => 'Get order details'
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'cancel',
+        'url' => '/cancel',
         'controller' => 'OrderController@cancel',
         'desc' => 'Cancel an order'
     ]);
+    
 });</code></pre>
 
         <h3>RESTful Route Naming Conventions</h3>
+
         <table>
             <thead>
                 <tr>
@@ -943,63 +945,65 @@ $router->group(['prefix' => 'orders', 'group' => 'Orders', 'middleware' => ['aut
                     <td>List all</td>
                     <td><span class="method-label method-get">GET</span></td>
                     <td><code>/products/list</code></td>
-                    <td><code>list</code> or <code>index</code></td>
+                    <td><code>list()</code> or <code>index()</code></td>
                 </tr>
                 <tr>
                     <td>Get one</td>
                     <td><span class="method-label method-get">GET</span></td>
                     <td><code>/products/{id}</code></td>
-                    <td><code>details</code> or <code>show</code></td>
+                    <td><code>details()</code> or <code>show()</code></td>
                 </tr>
                 <tr>
                     <td>Create</td>
                     <td><span class="method-label method-post">POST</span></td>
                     <td><code>/products/create</code></td>
-                    <td><code>create</code> or <code>store</code></td>
+                    <td><code>create()</code> or <code>store()</code></td>
                 </tr>
                 <tr>
                     <td>Update</td>
                     <td><span class="method-label method-post">POST</span></td>
                     <td><code>/products/update</code></td>
-                    <td><code>update</code></td>
+                    <td><code>update()</code></td>
                 </tr>
                 <tr>
                     <td>Delete</td>
                     <td><span class="method-label method-post">POST</span></td>
                     <td><code>/products/delete</code></td>
-                    <td><code>delete</code> or <code>destroy</code></td>
+                    <td><code>delete()</code> or <code>destroy()</code></td>
                 </tr>
             </tbody>
         </table>
 
         <h3>Route Visibility in Documentation</h3>
+
         <pre><code>// Visible in API docs (default)
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/list',
+    'url' => '/products/list',
     'controller' => 'ProductController@list',
-    'visible' => true // Will appear in /api/docs
+    'visible' => true  // Will appear in /api/docs
 ]);
 
 // Hidden from API docs (internal routes)
-$router->add([
+router->add([
     'method' => 'POST',
-    'url' => 'internal/cleanup',
+    'url' => '/internal/cleanup',
     'controller' => 'InternalController@cleanup',
-    'visible' => false // Won't appear in /api/docs
+    'visible' => false  // Won't appear in /api/docs
 ]);</code></pre>
 
         <h2>System Routes vs Application Routes</h2>
 
         <h3>How Routes are Loaded</h3>
+
         <pre><code>// In src/api/index.php
 
 // 1. System routes loaded first (framework tools)
-$router->setRouteType('system');
+router->setRouteType('system');
 require_once __DIR__ . '/core/SystemRoutes.php';
 
 // 2. Application routes loaded second (your business logic)
-$router->setRouteType('app');
+router->setRouteType('app');
 require_once __DIR__ . '/routes.php';</code></pre>
 
         <div class="comparison-table">
@@ -1013,8 +1017,9 @@ require_once __DIR__ . '/routes.php';</code></pre>
                     <li><code>/api/service-test</code> - Service tester</li>
                     <li><code>/api/monitoring</code> - Performance monitoring</li>
                 </ul>
-                <p><strong>Flag:</strong> <code>is_system_route = true</code></p>
+                <p><strong>Flag:</strong> <code>issystemroute = true</code></p>
             </div>
+
             <div class="comparison-card">
                 <h4>Application Routes</h4>
                 <p><strong>File:</strong> <code>src/api/routes.php</code></p>
@@ -1025,7 +1030,7 @@ require_once __DIR__ . '/routes.php';</code></pre>
                     <li><code>/api/products/list</code> - List products</li>
                     <li><code>/api/users/profile</code> - User profile</li>
                 </ul>
-                <p><strong>Flag:</strong> <code>is_system_route = false</code></p>
+                <p><strong>Flag:</strong> <code>issystemroute = false</code></p>
             </div>
         </div>
 
@@ -1033,9 +1038,10 @@ require_once __DIR__ . '/routes.php';</code></pre>
             <strong>Why This Matters:</strong> The monitoring dashboard separates system route performance from application route performance, giving you accurate insights into your actual business logic performance.
         </div>
 
-        <h2>Route Matching Priority</h2>
+        <h2>Route Matching & Priority</h2>
 
         <h3>How the Router Matches Requests</h3>
+
         <ol>
             <li><strong>Method Match:</strong> HTTP method must match exactly (GET, POST, etc.)</li>
             <li><strong>Pattern Match:</strong> URL must match the route pattern (including parameters)</li>
@@ -1043,47 +1049,49 @@ require_once __DIR__ . '/routes.php';</code></pre>
         </ol>
 
         <h3>Route Specificity Calculation</h3>
+
         <pre><code>// Route specificity (higher = more specific)
-// Score 20: two exact segments
-/products/list 
 
-// Score 15: one exact, one parameter
-/products/{id} 
+// Score: 20 (two exact segments)
+'/products/list'  
 
-// Score 10: one exact segment
-/products 
+// Score: 15 (one exact + one parameter)
+'/products/{id}'  
 
-// Score 5: one parameter
-/{id} 
+// Score: 10 (one exact segment)
+'/products'  
 
-// Score 0: wildcard
-/* </code></pre>
+// Score: 5 (one parameter)
+'/{id}'  
+
+// Score: 0 (wildcard)
+'/*'  </code></pre>
 
         <div class="highlight-box error">
             <h4>Avoid Route Conflicts</h4>
-            <pre><code>// BAD: These routes conflict!
-$router->add([
+            <pre><code>// ❌ BAD: These routes conflict!
+router->add([
     'method' => 'GET',
-    'url' => 'products/{id}', // Matches /products/123
+    'url' => '/products/{id}',  // Matches: /products/123
     'controller' => 'ProductController@details'
 ]);
 
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/featured', // Also matches /products/123!
+    'url' => '/products/featured',  // Also matches: /products/123
     'controller' => 'ProductController@featured'
 ]);
 
-// GOOD: Make specific routes more specific
-$router->add([
+// ✓ GOOD: Make specific routes more specific
+router->add([
     'method' => 'GET',
-    'url' => 'products/featured', // Register this FIRST (higher specificity)
+    'url' => '/products/featured',  // Register this FIRST (higher specificity)
     'controller' => 'ProductController@featured'
 ]);
 
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/{id}', // Register this SECOND
+    'url' => '/products/{id}',  // Register this SECOND
     'controller' => 'ProductController@details'
 ]);</code></pre>
         </div>
@@ -1091,218 +1099,253 @@ $router->add([
         <h2>Router Advanced Features</h2>
 
         <h3>Wildcard Routes</h3>
+
         <pre><code>// Trailing wildcard - matches /files/docs/guide.pdf, /files/images/logo.png, etc.
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'files/*',
+    'url' => '/files/*',
     'controller' => 'FileController@serve'
 ]);
 
 // Access matched wildcard in controller
 public function serve($path) {
-    // $path = 'docs/guide.pdf' or 'images/logo.png'
+    // $path = "docs/guide.pdf" or "images/logo.png"
 }</code></pre>
 
         <h3>Base Path Handling</h3>
-        <pre><code>// Framework automatically handles base path (/api/)
-// You define routes without /api/ prefix
+
+        <pre><code>// Framework automatically handles base path /api
+// You define routes without /api prefix
+
 // Define as:
-$router->add([
+router->add([
     'method' => 'GET',
-    'url' => 'products/list',
+    'url' => '/products/list',
     'controller' => 'ProductController@list'
 ]);
+
 // Accessed at: http://yourdomain.com/api/products/list</code></pre>
 
         <h3>Route Normalization</h3>
+
         <p>The framework automatically normalizes routes:</p>
+
         <div class="do-dont">
-            <div class="do-item"><code>/products/list/</code> → <code>products/list</code></div>
-            <div class="do-item"><code>products//list</code> → <code>products/list</code></div>
-            <div class="do-item"><code>/products/list</code> → <code>products/list</code></div>
-            <div class="do-item"><code>products/list</code> → <code>products/list</code></div>
+            <div class="do-item">
+                <code>'/products/list'</code> → <code>'/products/list'</code> ✓
+            </div>
+            <div class="do-item">
+                <code>'products/list'</code> → <code>'/products/list'</code> ✓
+            </div>
+            <div class="do-item">
+                <code>'/products/list/'</code> → <code>'/products/list'</code> ✓
+            </div>
+            <div class="do-item">
+                <code>'//products///list//'</code> → <code>'/products/list'</code> ✓
+            </div>
         </div>
 
         <h2>Complete E-commerce Route Example</h2>
+
         <pre><code>// src/api/routes.php
 
 // Register middleware
-$router->registerMiddleware('auth', AuthMiddleware::class);
-$router->registerMiddleware('admin', AdminMiddleware::class);
-$router->registerMiddleware('log', LogMiddleware::class);
+router->registerMiddleware('auth', AuthMiddleware::class);
+router->registerMiddleware('admin', AdminMiddleware::class);
+router->registerMiddleware('log', LogMiddleware::class);
 
-// === PRODUCTS - Public Access ===
-$router->group(['prefix' => 'products', 'group' => 'Products'], function($router) {
+// ============================================
+// PRODUCTS - Public Access
+// ============================================
+
+router->group(['prefix' => '/products', 'group' => 'Products'], function($router) {
     
-    // List products with filters
-    $router->add([
+    // List products (with filters)
+    router->add([
         'method' => 'GET',
-        'url' => 'list',
+        'url' => '/list',
         'controller' => 'ProductController@list',
         'desc' => 'Get list of products with optional filters',
         'params' => [
             'get' => [
-                'category' => 'string Optional Filter by category',
-                'limit' => 'int Optional Number of products default(10)',
-                'sort' => 'string Optional Sort by price/name enum(asc|desc)'
+                'category' => 'Optional: Filter by category',
+                'limit' => 'Optional: Number of products (default: 10)',
+                'sort' => 'Optional: Sort by price/name (asc/desc)'
             ]
         ]
     ]);
     
     // Product details
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => '{id}',
+        'url' => '/{id}',
         'controller' => 'ProductController@details',
         'desc' => 'Get product details by ID',
         'params' => [
-            'url' => ['id' => 'int Product ID']
+            'url' => [
+                'id' => 'Product ID (integer)'
+            ]
         ]
     ]);
     
     // Create product (admin only)
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'create',
+        'url' => '/create',
         'controller' => 'ProductController@create',
         'desc' => 'Create a new product (Admin only)',
         'middleware' => ['auth', 'admin'],
         'params' => [
             'json' => [
-                'name' => 'string Product name',
-                'sku' => 'string Product SKU (unique)',
-                'price' => 'float Product price',
-                'stock' => 'int Stock quantity',
-                'category' => 'string Product category enum(Electronics|Books)'
+                'name' => 'Product name',
+                'sku' => 'Product SKU (unique)',
+                'price' => 'Product price',
+                'stock' => 'Stock quantity',
+                'category' => 'Product category'
             ]
         ]
     ]);
     
     // Update product (admin only)
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'update',
+        'url' => '/update',
         'controller' => 'ProductController@update',
         'desc' => 'Update product details (Admin only)',
         'middleware' => ['auth', 'admin'],
         'params' => [
             'json' => [
-                'product_id' => 'int Product ID to update db(products.id)',
-                'name' => 'string Optional New name',
-                'price' => 'float Optional New price',
-                'stock' => 'int Optional New stock'
+                'productid' => 'Product ID to update',
+                'name' => 'Optional: New name',
+                'price' => 'Optional: New price',
+                'stock' => 'Optional: New stock'
             ]
         ]
     ]);
+    
 });
 
-// === ORDERS - Authenticated Users Only ===
-$router->group(['prefix' => 'orders', 'group' => 'Orders', 'middleware' => ['auth']], function($router) {
+// ============================================
+// ORDERS - Authenticated Users Only
+// ============================================
+
+router->group(['prefix' => '/orders', 'group' => 'Orders', 'middleware' => 'auth'], function($router) {
     
     // Create order
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'create',
+        'url' => '/create',
         'controller' => 'OrderController@create',
         'desc' => 'Create a new order with items',
         'params' => [
             'json' => [
-                'user_id' => 'int User ID db(users.id)',
-                'payment_method' => 'string Payment method enum(card|cash|upi)',
-                'items' => 'array Array: [{"product_id": 1, "quantity": 2}]',
-                'notes' => 'string Optional Order notes'
+                'userid' => 'User ID (integer)',
+                'paymentmethod' => 'Payment method: card/cash/upi',
+                'items' => 'Array: [{productid: 1, quantity: 2}, ...]',
+                'notes' => 'Optional: Order notes'
             ]
         ]
     ]);
     
     // Order details
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'details',
+        'url' => '/details',
         'controller' => 'OrderController@details',
         'desc' => 'Get order details by ID',
         'params' => [
-            'get' => ['order_id' => 'int Order ID to retrieve']
+            'get' => [
+                'orderid' => 'Order ID to retrieve'
+            ]
         ]
     ]);
     
     // Cancel order
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'cancel',
+        'url' => '/cancel',
         'controller' => 'OrderController@cancel',
         'desc' => 'Cancel an order and restore stock',
         'params' => [
             'json' => [
-                'order_id' => 'int Order ID to cancel db(orders.id)',
-                'reason' => 'string Cancellation reason'
+                'orderid' => 'Order ID to cancel',
+                'reason' => 'Cancellation reason'
             ]
         ]
     ]);
     
     // User's orders
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'my-orders',
+        'url' => '/my-orders',
         'controller' => 'OrderController@myOrders',
         'desc' => 'Get current user\'s orders',
         'params' => [
             'get' => [
-                'limit' => 'int Optional Number of orders default(10)',
-                'status' => 'string Optional Filter by status enum(pending|shipped)'
+                'limit' => 'Optional: Number of orders (default: 10)',
+                'status' => 'Optional: Filter by status'
             ]
         ]
     ]);
+    
 });
 
-// === CATEGORIES ===
-$router->add([
+// ============================================
+// CATEGORIES
+// ============================================
+
+router->add([
     'method' => 'GET',
-    'url' => 'categories/list',
+    'url' => '/categories/list',
     'controller' => 'CategoryController@list',
     'desc' => 'Get all product categories',
     'group' => 'Categories'
 ]);
 
-// === USER PROFILE ===
-$router->group(['prefix' => 'user', 'group' => 'User', 'middleware' => ['auth']], function($router) {
+// ============================================
+// USER PROFILE
+// ============================================
+
+router->group(['prefix' => '/user', 'group' => 'User', 'middleware' => 'auth'], function($router) {
     
-    $router->add([
+    router->add([
         'method' => 'GET',
-        'url' => 'profile',
+        'url' => '/profile',
         'controller' => 'UserController@profile',
         'desc' => 'Get current user profile'
     ]);
     
-    $router->add([
+    router->add([
         'method' => 'POST',
-        'url' => 'profile/update',
+        'url' => '/profile/update',
         'controller' => 'UserController@updateProfile',
         'desc' => 'Update user profile',
         'params' => [
             'json' => [
-                'name' => 'string Optional User name',
-                'email' => 'string Optional Email address',
-                'phone' => 'string Optional Phone number'
+                'name' => 'Optional: User name',
+                'email' => 'Optional: Email address',
+                'phone' => 'Optional: Phone number'
             ]
         ]
     ]);
+    
 });</code></pre>
 
         <h2>Best Practices Summary</h2>
+
         <div class="do-dont">
-            <h3 style="color: #3fb950;">DO</h3>
+            <h3 style="color: #3fb950;">✓ DO</h3>
             <div class="do-item">Use route groups to organize related routes</div>
-            <div class="do-item">Document parameters in the <code>params</code> array with proper <code>db()</code>, <code>enum()</code>, and <code>default()</code> tags</div>
+            <div class="do-item">Document parameters in the <code>params</code> array for API docs</div>
             <div class="do-item">Apply middleware at the group level when possible</div>
-            <div class="do-item">Use descriptive route names (<code>/products/list</code> not <code>/prod/l</code>)</div>
-            <div class="do-item">Follow RESTful conventions (GET for read, POST for write)</div>
+            <div class="do-item">Use descriptive route names: <code>/products/list</code> not <code>/prod/l</code></div>
+            <div class="do-item">Follow RESTful conventions: GET for read, POST for write</div>
             <div class="do-item">Register more specific routes before generic ones</div>
             <div class="do-item">Use the <code>group</code> parameter to organize docs by feature</div>
-
-            <h3 style="color: #f85149; margin-top: 30px;">DON'T</h3>
+            
+            <h3 style="color: #f85149; margin-top: 30px;">✗ DON'T</h3>
             <div class="dont-item">Define conflicting route patterns</div>
-            <div class="dont-item">Hardcode the <code>/api/</code> prefix in route URLs</div>
+            <div class="dont-item">Hardcode the <code>/api</code> prefix in route URLs</div>
             <div class="dont-item">Mix authentication logic into route definitions (use middleware)</div>
             <div class="dont-item">Create overly complex URL patterns</div>
             <div class="dont-item">Forget to register middleware before using it</div>
@@ -1312,33 +1355,33 @@ $router->group(['prefix' => 'user', 'group' => 'User', 'middleware' => ['auth']]
         <h2>LLM Prompt for Route Generation</h2>
         <p>Copy and paste the text block below into any LLM (like ChatGPT, Claude, or Gemini) along with your desired route requirements. It will output perfectly formatted code for your specific routing system.</p>
 
-        <pre><code class="language-text">You are an expert PHP developer working with a custom framework.
-I need you to generate routing code based on the specific syntax rules of this framework.
+        <pre><code class="language-text">You are an expert PHP developer working with a custom framework. I need you to generate routing code based on the specific syntax rules of this framework.
 
 Here are the rules for defining routes:
-1. Use `$router->add()` and pass an associative array.
+1. Use `$router->add([])` and pass an associative array.
 2. Required keys:
-   - `method`: The HTTP method (GET, POST, PUT, DELETE).
-   - `url`: The endpoint (e.g., 'users/{id}'). URL parameters use curly braces.
-   - `controller`: Formatted as 'ControllerName@methodName'.
+   - 'method': The HTTP method ('GET', 'POST', 'PUT', 'DELETE').
+   - 'url': The endpoint (e.g., '/users/{id}'). URL parameters use curly braces.
+   - 'controller': Formatted as 'ControllerName@methodName'.
 3. Optional keys:
-   - `desc`: A brief string describing the route.
-   - `group`: A string to organize the route in documentation.
-   - `middleware`: A string (e.g., 'auth') or array (e.g., ['auth', 'admin']) of registered middleware aliases.
-   - `params`: An array documenting expected inputs. Keys can be 'url', 'get', or 'json', mapping to an array of field descriptions. Ensure to append `db(table.column)`, `default(val)`, or `enum(a|b)` inside the description string for smart auto-filling.
+   - 'desc': A brief string describing the route.
+   - 'group': A string to organize the route in documentation.
+   - 'middleware': A string (e.g., 'auth') or array (e.g., ['auth', 'admin']) of registered middleware aliases.
+   - 'params': An array documenting expected inputs. Keys can be 'url', 'get', or 'json', mapping to an array of field descriptions.
 
 Here are the rules for grouping routes:
-1. Use `$router->group([], function($router) { ... });`.
-2. The first argument is an array that can contain `prefix`, `middleware`, and `group` keys.
+1. Use `$router->group([], function($router) { ... });`
+2. The first argument is an array that can contain 'prefix', 'middleware', and 'group' keys. 
 3. Nested routes inside the closure do not need to repeat the prefix.
 
-Do not write plain HTML, and only provide the PHP routing code.
+Do not write plain HTML, and only provide the PHP routing code. 
 
 Please generate the routing code for the following requirements:
 [INSERT YOUR ROUTE REQUIREMENTS HERE]</code></pre>
 
         <h2>Next Steps</h2>
         <p>Now that you understand routing, continue learning about:</p>
+
         <ul>
             <li><strong>Controllers:</strong> Learn how to handle requests in controller methods</li>
             <li><strong>Middleware:</strong> Deep dive into creating custom middleware</li>
@@ -1347,13 +1390,11 @@ Please generate the routing code for the following requirements:
         </ul>
 
         <div class="highlight-box success">
-            <h4>✓ You Now Understand Routing!</h4>
+            <h4>🎉 You Now Understand Routing!</h4>
             <p>You can now define routes, organize them with groups, apply middleware, and build RESTful APIs. The next documentation will show you how to handle these requests in controllers.</p>
         </div>
-
     </div>
 
     <a href="#" class="back-to-top">↑ Back to Top</a>
 </body>
-
 </html>
