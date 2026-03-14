@@ -1,26 +1,29 @@
 {
-    "name": "yourname/php-light-framework",
-    "description": "A lightweight PHP API framework",
+    "name": "your-name/modern-php-framework",
+    "description": "A modular, AI-ready PHP framework with built-in developer tools.",
     "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "ext-json": "*"
+    },
     "autoload": {
         "psr-4": {
-            "App\\Controllers\\": "src/api/controllers/",
-            "App\\Core\\Exceptions\\": "src/api/core/exceptions/",
-            "App\\Core\\Utilities\\": "src/api/core/utilities/",
-            "App\\Core\\Middlewares\\": "src/api/core/middlewares/",
-            "App\\Core\\": "src/api/core/",
-            "App\\Services\\": "src/api/services/",
-            "App\\Repositories\\": "src/api/repositories/",
-            "App\\": "src/api/"
+            "App\\": "src/api/",
+            "Framework\\Core\\": "src/api/Core/"
         },
         "files": [
-            "src/api/helpers/_autoload_helpers.php"
+            "src/api/helpers/globalHelpers.php",
+            "src/api/helpers/utilityHelpers.php"
         ]
     },
-    "require": {
-        "php": ">=8.0",
-        "vlucas/phpdotenv": "^5.6",
-        "firebase/php-jwt": "^7.0",
-        "jetbrains/phpstorm-stubs": "^2024.3"
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com"
+        }
+    ],
+    "config": {
+        "optimize-autoloader": true
     }
 }

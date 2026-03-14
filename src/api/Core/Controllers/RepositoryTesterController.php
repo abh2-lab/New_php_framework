@@ -1,7 +1,7 @@
 <?php
 // api/controllers/RepositoryTesterController.php
 
-namespace App\Controllers;
+namespace App\Core\Controllers;
 
 use App\Core\BaseController;
 use App\Core\Database;
